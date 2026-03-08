@@ -1,0 +1,57 @@
+server:
+  port: 8083
+  tomcat:
+    max-http-form-post-data-size: 100MB
+    max-swallow-size: -1 
+    max-part-count: 1000
+    max-http-form-post-size: 20971520  # 20MB
+
+spring:
+  profiles:
+    active: 
+      - "production"
+  web:
+    resources:
+      static-locations: classpath:/static/,classpath:/images/
+  mvc:
+    static-path-pattern: /**
+  servlet:
+    multipart:
+      enabled: true        
+      max-file-size: 20MB   
+      max-request-size: 100MB   
+      file-size-threshold: 2MB    
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate: 
+        dialect: org.hibernate.dialect.MariaDBDialect
+        format_sql: false
+      connection:
+        isolationLevel: 2
+    show-sql: false
+  messages:
+    basename: lang/messages
+    encoding: UTF-8
+    cache-duration: 0
+  lifecycle:
+    timeout-per-shutdown-phase: "20s"
+logging:
+  pattern:
+    console: "%d{HH:mm:ss yyyy-MM-dd} [%thread] %-5level %logger{36} - %msg%n"
+
+api:
+  url: http://localhost:8083
+
+frontend:
+  url: http://localhost:30000
+
+app:
+  cookie:
+    secure: false
+    domain: "" 
+    sameSite: "Lax"
+
+isTest: false

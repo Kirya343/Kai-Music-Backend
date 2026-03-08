@@ -1,0 +1,9 @@
+spring:
+  config:
+    import:
+      - classpath:database.yml
+      - classpath:main.yml
+      - classpath:logging.yml
+      - optional:file:./config/database.yml
+      - optional:file:./config/main.yml
+      - optional:file:./config/logging.yml

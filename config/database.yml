@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    jdbc-url: jdbc:mariadb://localhost:3306/L2G_Center?useSSL=false&serverTimezone=UTC
+    username: rest_api
+    password: PGW325grabyD
+    driver-class-name: org.mariadb.jdbc.Driver
+
+    connection-timeout: 30000
+    minimum-idle: 2
+    maximum-pool-size: 10
+    idle-timeout: 600000
+    max-lifetime: 1800000
+    leak-detection-threshold: 30000
+    validation-timeout: 5000
+    keepalive-time: 300000

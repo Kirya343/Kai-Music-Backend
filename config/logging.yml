@@ -1,0 +1,15 @@
+logging:
+  level:
+    ru.neverboost.config.SecurityConfig: INFO
+    ru.neverboost.config.WebSocketConfig: INFO
+    ru.neverboost.core.security.AuthSuccessService: INFO
+    ru.neverboost.api.controller.AuthController: DEBUG
+    ru.neverboost.api.controller.BoostsController: DEBUG
+    ru.neverboost.core.services.util.AuthService: DEBUG
+
+    org.springframework.web.multipart: INFO
+    org.springframework.web.servlet.resource: INFO
+    org.springframework.security: DEBUG
+
+    com.zaxxer.hikari: INFO
+    org.hibernate.SQL: INFO

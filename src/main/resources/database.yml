@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    jdbc-url: 
+    username: 
+    password: 
+    driver-class-name: org.mariadb.jdbc.Driver
+
+    connection-timeout: 30000
+    minimum-idle: 2
+    maximum-pool-size: 10
+    idle-timeout: 600000
+    max-lifetime: 1800000
+    leak-detection-threshold: 30000
+    validation-timeout: 5000
+    keepalive-time: 300000
