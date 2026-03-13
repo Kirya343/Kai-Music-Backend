@@ -2,6 +2,8 @@ package org.kirya343.core.user.impl;
 
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,7 +36,7 @@ public class UserMappingServiceImpl implements UserMappingService {
             roles,
             user.getEmail(),
             user.getStatus().toString(),
-            user.getCreatedAt()
+            LocalDateTime.ofInstant(user.getCreatedAt(), ZoneId.systemDefault())
         );
         return dto;
     }
@@ -64,7 +66,7 @@ public class UserMappingServiceImpl implements UserMappingService {
             user.getAvatarUrl(),
             user.getStatus(),
             roles,
-            user.getCreatedAt()
+            LocalDateTime.ofInstant(user.getCreatedAt(), ZoneId.systemDefault())
         );
 
         return dto;

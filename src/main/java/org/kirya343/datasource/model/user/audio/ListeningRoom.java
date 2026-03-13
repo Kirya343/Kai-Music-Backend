@@ -1,0 +1,44 @@
+package org.kirya343.datasource.model.user.audio;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.kirya343.datasource.model.user.User;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Getter
+@NoArgsConstructor
+public class ListeningRoom {
+
+    public ListeningRoom(User owner) {
+        this.owner = owner;
+    }
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+ 
+    @ManyToOne
+    private User owner;
+
+    @OneToMany(mappedBy = "listeningRoom")
+    private List<User> members = new ArrayList<>();
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    private List<QueueItem> queue = new ArrayList<>();
+    
+    @CreationTimestamp
+    private Instant createdAt;
+}

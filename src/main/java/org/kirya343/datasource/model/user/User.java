@@ -1,11 +1,12 @@
 package org.kirya343.datasource.model.user;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.kirya343.core.config.Constants;
+import org.kirya343.datasource.model.user.audio.ListeningRoom;
 import org.kirya343.datasource.model.user.permission.Role;
 import org.kirya343.enums.AuthProvider;
 import org.kirya343.enums.UserStatus;
@@ -25,6 +26,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -88,7 +90,7 @@ public class User {
     private UserStatus status = UserStatus.ACTIVE;
 
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -98,6 +100,9 @@ public class User {
     @Column(name = "provider") // имя колонки для enum
     @Enumerated(EnumType.STRING)
     private Set<AuthProvider> providers = new HashSet<>(Set.of(AuthProvider.LOCAL));
+
+    @ManyToOne
+    private ListeningRoom listeningRoom;
 
     @Transient
     @Setter
