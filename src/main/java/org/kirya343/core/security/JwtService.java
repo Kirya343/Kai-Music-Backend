@@ -147,7 +147,6 @@ public class JwtService {
         try {
 
             openId = claims.getStringClaim("openId");
-            System.out.println("openId: " + openId);
 
         } catch(ParseException e) {
             System.out.println(e);

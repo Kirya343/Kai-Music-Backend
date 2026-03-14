@@ -2,7 +2,9 @@ package org.kirya343.datasource.model.user.audio;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.kirya343.datasource.model.user.User;
@@ -34,7 +36,7 @@ public class ListeningRoom {
     private User owner;
 
     @OneToMany(mappedBy = "listeningRoom")
-    private List<User> members = new ArrayList<>();
+    private Set<User> members = new HashSet<>();
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<QueueItem> queue = new ArrayList<>();
