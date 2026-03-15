@@ -7,13 +7,16 @@ import org.kirya343.datasource.model.user.audio.AudioFile;
 import org.kirya343.datasource.model.user.audio.ListeningRoom;
 import org.kirya343.datasource.model.user.audio.QueueItem;
 import org.kirya343.datasource.repository.audio.AudioFileRepository;
+import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
 import org.kirya343.datasource.repository.audio.QueueItemRepository;
 import org.kirya343.dto.audio.AudioDTO;
 import org.kirya343.dto.audio.ListeningRoomDTO;
 import org.kirya343.dto.audio.QueueItemDTO;
 import org.kirya343.dto.auth.UserAuthData;
+import org.kirya343.enums.PlaybackMode;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -22,12 +25,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.kirya343.core.audio.LimitedInputStream;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import java.io.File;
@@ -49,29 +55,67 @@ public class AudioController {
     private final AudioMappingService audioMappingService;
     private final EntityManager entityManager;
     private final QueueItemRepository queueItemRepository;
+    private final ListeningRoomRepository listeningRoomRepository;
 
     @GetMapping("/{audioId}")
     public ResponseEntity<InputStreamResource> getAudio(
-        @AuthenticationPrincipal UserAuthData authData, 
-        @PathVariable Long audioId
+            @AuthenticationPrincipal UserAuthData authData,
+            @PathVariable Long audioId,
+            @RequestHeader(value = "Range", required = false) String rangeHeader
     ) throws IOException {
 
         AudioFile audio = audioFileRepository.findAudioInUserRoom(authData.id(), audioId)
-            .orElseThrow(() -> new AccessDeniedException("Нет доступа к этому треку"));
+                .orElseThrow(() -> new AccessDeniedException("Нет доступа к этому треку"));
 
-        File audioFile = new File(audio.getPath()); // путь к вашему файлу
+        File audioFile = new File(audio.getPath());
+        long fileLength = audioFile.length();
+
+        if (rangeHeader == null) {
+            // Отдаём весь файл целиком
+            FileInputStream fis = new FileInputStream(audioFile);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + audioFile.getName())
+                    .header(HttpHeaders.ACCEPT_RANGES, "bytes")
+                    .contentLength(fileLength)
+                    .contentType(MediaType.parseMediaType("audio/mpeg"))
+                    .body(new InputStreamResource(fis));
+        }
+
+        // Парсим Range: bytes=START-
+        String[] ranges = rangeHeader.replace("bytes=", "").split("-");
+        long start = Long.parseLong(ranges[0]);
+        long end = ranges.length > 1 && !ranges[1].isEmpty() ? Long.parseLong(ranges[1]) : fileLength - 1;
+        long contentLength = end - start + 1;
+
         FileInputStream fis = new FileInputStream(audioFile);
+        fis.skip(start);
+        InputStreamResource resource = new InputStreamResource(new LimitedInputStream(fis, contentLength));
 
-        return ResponseEntity.ok()
+        return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + audioFile.getName())
-                .contentLength(audioFile.length())
-                .contentType(MediaType.parseMediaType("audio/mpeg"))
-                .body(new InputStreamResource(fis));
+                .header(HttpHeaders.CONTENT_TYPE, "audio/mpeg")
+                .header(HttpHeaders.ACCEPT_RANGES, "bytes")
+                .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(contentLength))
+                .header(HttpHeaders.CONTENT_RANGE, "bytes " + start + "-" + end + "/" + fileLength)
+                .body(resource);
+    }
+
+    @GetMapping("/{audioId}/info")
+    public AudioDTO getAudioInfo(@PathVariable Long audioId) {
+        AudioFile audio = audioFileRepository.findById(audioId).orElseThrow(
+            () -> new EntityNotFoundException("Трек не найден"));
+
+        return audioMappingService.toDTO(audio);
     }
 
     @GetMapping("/room")
     public ListeningRoomDTO getCurrentRoom(@AuthenticationPrincipal UserAuthData authData) {
         return audioQueryService.getCurrentRoom(authData);
+    }
+
+    @PatchMapping("/room/{roomId}/mode")
+    public void updatePlaybackMode(@PathVariable Long roomId, @RequestParam PlaybackMode mode) {
+        listeningRoomRepository.updatePlaybackMode(roomId, mode);
     }
 
     @GetMapping("/library")

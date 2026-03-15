@@ -4,6 +4,8 @@ spring:
       - classpath:database.yml
       - classpath:main.yml
       - classpath:logging.yml
+      - classpath:cors.yml
+      - optional:file:./config/cors.yml
       - optional:file:./config/database.yml
       - optional:file:./config/main.yml
       - optional:file:./config/logging.yml

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>ru.neverboost</groupId>
 	<artifactId>api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>api</name>
 	<properties>
 		<java.version>21</java.version>
@@ -115,6 +115,12 @@
 			<groupId>com.bucket4j</groupId>
 			<artifactId>bucket4j-core</artifactId>
 			<version>8.10.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.mpatric</groupId>
+			<artifactId>mp3agic</artifactId>
+			<version>0.9.1</version>
 		</dependency>
 	</dependencies>
 

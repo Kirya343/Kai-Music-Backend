@@ -4,10 +4,10 @@ import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
+import java.util.Arrays;
 
 import org.kirya343.core.security.CookieBearerTokenResolver;
-import org.kirya343.core.security.JwtTokenConverter;
+import org.kirya343.core.security.services.CachedPermissionsJwtTokenConverter;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +28,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
-    
-    private final JwtTokenConverter converter;
+ 
+    private final CorsConfig corsConfig;
+    private final CachedPermissionsJwtTokenConverter jwtTokenConverter;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -50,7 +51,7 @@ public class SecurityConfig {
             )
             .oauth2ResourceServer(oauth2 -> oauth2
                 .bearerTokenResolver(new CookieBearerTokenResolver("accessToken"))
-                .jwt(jwt -> jwt.jwtAuthenticationConverter(converter))
+                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtTokenConverter))
                 .authenticationEntryPoint((request, response, authException) -> {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
                     response.setContentType("application/json");
@@ -66,19 +67,15 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-            "http://localhost:30000",
-            "http://10.165.91.178:30000/",
-            "https://neverboost.com"
-        ));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setExposedHeaders(List.of("Authorization"));
-        configuration.setAllowCredentials(true);
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(corsConfig.getDomains());
+        config.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS","PATCH"));
+        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setExposedHeaders(Arrays.asList("Authorization"));
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 

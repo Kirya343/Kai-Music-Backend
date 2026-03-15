@@ -1,8 +1,11 @@
 package org.kirya343.core.security;
 
 import java.time.Duration;
+import java.util.Objects;
 
+import org.kirya343.core.security.services.UserAuthDataService;
 import org.kirya343.datasource.model.user.User;
+import org.kirya343.dto.auth.UserAuthData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +29,7 @@ public class AuthCookiesService {
     private static final Logger logger = LoggerFactory.getLogger(AuthCookiesService.class);
 
     private final JwtIssuer jwtIssuer;
+    private final UserAuthDataService authDataService;
 
     @Value("${app.cookie.secure}")
     private boolean cookieSecure;
@@ -38,13 +42,17 @@ public class AuthCookiesService {
     
     public void setAuthCookies(HttpServletResponse response, User user) throws ServletException {
 
+        UserAuthData authData = authDataService.load(
+            Objects.requireNonNull(user.getId())
+        );
+
         String accessToken;
         String refreshToken;
 
         try {
             logger.debug("Генерируем токены для: {}", user.getName());
-            accessToken = jwtIssuer.issueAccessToken(user);
-            refreshToken = jwtIssuer.issueRefreshToken(user);
+            accessToken = jwtIssuer.issueAccessToken(authData);
+            refreshToken = jwtIssuer.issueRefreshToken(authData);
         } catch (JOSEException e) {
             throw new ServletException("Ошибка генерации JWT", e);
         }

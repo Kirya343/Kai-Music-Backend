@@ -11,5 +11,8 @@ logging:
     org.springframework.web.servlet.resource: INFO
     org.springframework.security: DEBUG
 
+    org.springframework.web.socket: DEBUG
+    org.springframework.messaging: DEBUG
+
     com.zaxxer.hikari: INFO
     org.hibernate.SQL: INFO

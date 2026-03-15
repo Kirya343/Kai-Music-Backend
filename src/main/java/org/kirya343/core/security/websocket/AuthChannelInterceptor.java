@@ -1,12 +1,15 @@
 package org.kirya343.core.security.websocket;
 
-import java.util.Collection;
+import java.security.Principal;
 import java.util.Map;
 
 import org.kirya343.core.security.JwtService;
+import org.kirya343.core.security.services.CachedPermissionsJwtTokenConverter;
+import org.kirya343.dto.auth.UserAuthData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
@@ -17,12 +20,13 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,10 +39,20 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
     private static final Logger logger = LoggerFactory.getLogger(AuthChannelInterceptor.class);
 
     private final JwtService jwtService;
+    private final CachedPermissionsJwtTokenConverter jwtTokenConverter;
 
     @Override
     public Message<?> preSend(@NonNull Message<?> message, @NonNull MessageChannel channel) {
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+
+        if (accessor != null) {
+            Principal user = accessor.getUser();
+            if (user != null) {
+                logger.debug("STOMP current user class: {}, name: {}", user.getClass(), user.getName());
+            } else {
+                logger.debug("STOMP user is null");
+            }
+        }
 
         if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
 
@@ -51,19 +65,19 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
             if (token == null) throw new MessagingException("Missing access token");
 
             try {
-                String openId = jwtService.validateAndGetOpenId(token);
+                Jwt jwt = jwtService.parseToSpringJwt(token); // твой метод, который валидирует токен
 
-                if (openId == null) throw new MessagingException("Invalid or expired token");
+                if (jwt == null) throw new IllegalStateException("Ошибка парсинга JWT токена");
 
-                Collection<GrantedAuthority> authorities = jwtService.getAuthorities(token);
+                AbstractAuthenticationToken auth = jwtTokenConverter.convert(jwt);
 
-                Authentication authentication =
-                    new UsernamePasswordAuthenticationToken(openId, null, authorities);
+                UserAuthData authData = (UserAuthData) auth.getPrincipal();
 
-                accessor.setUser(authentication);
+                logger.debug("Авторизуем вебсокет, authData: {}", authData.toString());
 
+                accessor.setUser(auth);
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
-                context.setAuthentication(authentication);
+                context.setAuthentication(auth);
                 SecurityContextHolder.setContext(context);
 
                 logger.debug("STOMP user authenticated: {}", context);
@@ -75,5 +89,14 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
         }
 
         return message;
+    }
+    
+    @EventListener
+    public void handleWebSocketDisconnect(SessionDisconnectEvent event) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+        Authentication auth = (Authentication) accessor.getUser();
+        if (auth != null && auth.getPrincipal() instanceof UserAuthData) {
+            UserAuthData authData = (UserAuthData) auth.getPrincipal();
+        }
     }
 }

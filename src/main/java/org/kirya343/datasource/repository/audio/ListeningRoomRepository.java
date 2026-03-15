@@ -3,7 +3,9 @@ package org.kirya343.datasource.repository.audio;
 import java.util.Optional;
 
 import org.kirya343.datasource.model.user.audio.ListeningRoom;
+import org.kirya343.enums.PlaybackMode;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,4 +22,8 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
         WHERE m.id = :userId
     """)
     Optional<ListeningRoom> findRoomByUserId(@Param("userId") Long userId);
+
+    @Modifying
+    @Query("UPDATE ListeningRoom r SET r.playbackMode = :mode WHERE r.id = :roomId")
+    int updatePlaybackMode(@Param("roomId") Long roomId, @Param("mode") PlaybackMode mode);
 }

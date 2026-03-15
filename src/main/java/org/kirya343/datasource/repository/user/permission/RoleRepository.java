@@ -1,6 +1,7 @@
 package org.kirya343.datasource.repository.user.permission;
 
 import java.util.List;
+import java.util.Set;
 
 import org.kirya343.datasource.model.user.permission.Permission;
 import org.kirya343.datasource.model.user.permission.Role;
@@ -18,6 +19,15 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     
     List<Role> findByPermissionsContaining(Permission permission);
 
+    @Query("""
+        select distinct r
+        from User u
+        join u.roles r
+        join fetch r.permissions
+        where u.id = :userId
+    """)
+    Set<Role> findRolesWithPermissionsByUserId(@Param("userId") Long userId);
+    
     @Modifying
     @Transactional
     @Query(

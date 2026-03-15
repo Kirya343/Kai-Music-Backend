@@ -26,6 +26,7 @@ public class AudioQueryService {
             room.getOwner().getName() + "\'s room", 
             room.getOwner().getId(),
             room.getMembers().size(),
+            room.getPlaybackMode(),
             room.getQueue().stream().map(qi -> audioMappingService.toDTO(qi)).toList()
         );
     }
