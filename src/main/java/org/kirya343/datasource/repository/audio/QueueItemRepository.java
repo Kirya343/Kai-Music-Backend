@@ -45,11 +45,16 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
     """, nativeQuery = true)
     Optional<QueueItem> findNextTrack(@Param("roomId") Long roomId, @Param("audioId") Long audioId);
 
-     @Query("SELECT q FROM QueueItem q " +
+    @Query("SELECT q FROM QueueItem q " +
            "WHERE q.room.id = :roomId " +
            "ORDER BY q.position ASC")
     Optional<QueueItem> findFirstByRoomIdOrderByPositionAsc(@Param("roomId") Long roomId);
 
-    @Query(value = "SELECT * FROM queue_items q WHERE q.room_id = :roomId ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
-    Optional<QueueItem> findRandomTrack(@Param("roomId") Long roomId);
+    @Query(value = """
+        SELECT * FROM queue_items
+        WHERE room_id = :roomId
+        ORDER BY RAND()
+        LIMIT 1
+    """, nativeQuery = true)
+    Optional<QueueItem> findRandomTrack(Long roomId);
 }

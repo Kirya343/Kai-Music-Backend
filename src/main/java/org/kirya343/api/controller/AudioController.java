@@ -6,12 +6,16 @@ import org.kirya343.datasource.model.user.User;
 import org.kirya343.datasource.model.user.audio.AudioFile;
 import org.kirya343.datasource.model.user.audio.ListeningRoom;
 import org.kirya343.datasource.model.user.audio.QueueItem;
+import org.kirya343.datasource.model.user.audio.RoomPlaybackState;
 import org.kirya343.datasource.repository.audio.AudioFileRepository;
 import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
 import org.kirya343.datasource.repository.audio.QueueItemRepository;
+import org.kirya343.datasource.repository.audio.RoomPlaybackStateRepository;
 import org.kirya343.dto.audio.AudioDTO;
 import org.kirya343.dto.audio.ListeningRoomDTO;
+import org.kirya343.dto.audio.PlaybackStateDTO;
 import org.kirya343.dto.audio.QueueItemDTO;
+import org.kirya343.dto.audio.ShortListeningRoomDTO;
 import org.kirya343.dto.auth.UserAuthData;
 import org.kirya343.enums.PlaybackMode;
 import org.springframework.core.io.InputStreamResource;
@@ -21,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,6 +61,7 @@ public class AudioController {
     private final EntityManager entityManager;
     private final QueueItemRepository queueItemRepository;
     private final ListeningRoomRepository listeningRoomRepository;
+    private final RoomPlaybackStateRepository roomPlaybackStateRepository;
 
     @GetMapping("/{audioId}")
     public ResponseEntity<InputStreamResource> getAudio(
@@ -141,6 +147,15 @@ public class AudioController {
         return audioMappingService.toDTO(saved);
     }
 
+    @DeleteMapping("/room/{roomId}")
+    public void removeFromQueue(
+        @PathVariable Long roomId, 
+        @RequestParam Long queueItemId,
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+        queueItemRepository.deleteById(queueItemId);
+    }
+
     @PostMapping("/upload")
     public void uploadAudio(
         @RequestParam MultipartFile file,
@@ -177,5 +192,28 @@ public class AudioController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @GetMapping("/room/{roomId}/playback-state")
+    public PlaybackStateDTO getPlaybackState(
+        @PathVariable Long roomId,
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+
+        RoomPlaybackState state = roomPlaybackStateRepository.findById(roomId).orElseThrow(
+            () -> new EntityNotFoundException("Бэкап трека в комнате не найден"));
+
+        return new PlaybackStateDTO(state.getCurrentTrackId(), state.getCurrentPosition(), state.isPaused());
+    }
+
+    @GetMapping("/room/all")
+    public List<ShortListeningRoomDTO> getListingRooms() {
+        return listeningRoomRepository.findAllShortDTOs();
+    }
+
+    @PostMapping("/room")
+    public void createRoom(@AuthenticationPrincipal UserAuthData authData) {
+        ListeningRoom room = new ListeningRoom(entityManager.getReference(User.class, authData.id()));
+        listeningRoomRepository.save(room);
     }
 }

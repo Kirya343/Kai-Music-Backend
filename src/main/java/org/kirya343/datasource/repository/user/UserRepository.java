@@ -84,4 +84,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("userId") Long userId,
             @Param("roleId") Long roleId
     );
+
+    @Modifying
+    @Transactional
+    @Query("update User u set u.listeningRoom.id = :roomId where u.id = :userId")
+    void updateListeningRoom(@Param("userId") Long userId, @Param("roomId") Long roomId);
 }

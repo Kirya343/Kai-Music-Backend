@@ -10,14 +10,22 @@ import java.util.concurrent.TimeUnit;
 import org.kirya343.core.audio.AudioService;
 import org.kirya343.datasource.model.user.audio.AudioFile;
 import org.kirya343.datasource.model.user.audio.ListeningRoom;
-import org.kirya343.datasource.model.user.audio.QueueItem;
+import org.kirya343.datasource.model.user.audio.RoomPlaybackState;
+import org.kirya343.datasource.repository.audio.AudioFileRepository;
 import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
 import org.kirya343.datasource.repository.audio.QueueItemRepository;
+import org.kirya343.datasource.repository.audio.RoomPlaybackStateRepository;
 import org.kirya343.dto.audio.PlaybackStateDTO;
+import org.kirya343.dto.audio.RoomPlaybackEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -34,28 +42,28 @@ public class RoomManager {
 
     private final ListeningRoomRepository listeningRoomRepository;
     private final QueueItemRepository queueItemRepository;
+    private final AudioFileRepository audioFileRepository;
+    private final RoomPlaybackStateRepository roomPlaybackStateRepository;
+    private final EntityManager entityManager;
+
+    private final ApplicationEventPublisher publisher;
+
     private static final Logger logger = LoggerFactory.getLogger(RoomManager.class);
 
-    public RoomState getRoom(Long roomId, Long currentTrackId) {
+    public RoomState findRoom(Long roomId, Long currentTrackId) {
         return rooms.computeIfAbsent(roomId, id -> createRoomState(id, currentTrackId));
+    }
+
+    public RoomState getRoom(Long roomId) {
+        return rooms.get(roomId);
     }
 
     public void playTrack(Long roomId, PlaybackStateDTO state) {
         logger.info("Включаем трек {} в комнате {}", state.audioId(), roomId);
 
-        RoomState room = getRoom(roomId, state.audioId());
-
-        if (room.getCurrentTrackId() != state.audioId()) {
-            // TODO переключить трек в RoomState и обновить данные
-
-            QueueItem qi = queueItemRepository.findByRoomIdAndAudioId(roomId, state.audioId()).orElseThrow(
-                () -> new EntityNotFoundException("Трек не найден в очереди"));
-
-            AudioFile audio = qi.getAudio();
-            Long duration = audioService.getDuration(audio.getPath());
-
-            room.setDuration(duration);
-        }
+        RoomState initialRoom = findRoom(roomId, state.audioId());
+        
+        RoomState room = syncRoomState(initialRoom, state);
 
         logger.info("Длительность {}, позиция {}, осталось {}", room.getDuration(), state.position(), room.getDuration() - state.position());
         room.setRemaining(room.getDuration() - state.position());
@@ -81,6 +89,8 @@ public class RoomManager {
 
         PlaybackStateDTO checked = new PlaybackStateDTO(room.getCurrentTrackId(), state.position(), false);
 
+        updatePlayback(roomId, checked);
+
         webSocketService.broadcastPlaybackState(roomId, checked);
     }
 
@@ -89,7 +99,9 @@ public class RoomManager {
         logger.info("Ставим на паузу трек {} в комнате {}", state.audioId(), roomId);
         logger.info(rooms.toString());
 
-        RoomState room = getRoom(roomId, state.audioId());
+        RoomState room = findRoom(roomId, state.audioId());
+
+        room = syncRoomState(room, state);
 
         if (room.getTimer() != null) {
             room.getTimer().cancel(false);
@@ -98,6 +110,8 @@ public class RoomManager {
         room.setPaused(true);
 
         PlaybackStateDTO checked = new PlaybackStateDTO(room.getCurrentTrackId(), state.position(), true);
+
+        updatePlayback(roomId, checked);
 
         webSocketService.broadcastPlaybackState(roomId, checked);
     }
@@ -120,5 +134,43 @@ public class RoomManager {
             duration,
             false
         );
+    }
+
+    private RoomState syncRoomState(RoomState room, PlaybackStateDTO state) {
+        if (room.getCurrentTrackId() != state.audioId()) {
+            // TODO переключить трек в RoomState и обновить данные
+
+            AudioFile audio = audioFileRepository.findById(state.audioId()).orElseThrow(
+                () -> new EntityNotFoundException("Трек не найден в очереди"));
+
+            Long duration = audioService.getDuration(audio.getPath());
+
+            room.setCurrentTrackId(state.audioId());
+            room.setDuration(duration);
+        }
+        return room;
+    }
+
+    public void updatePlayback(Long roomId, PlaybackStateDTO state) {
+
+        publisher.publishEvent(
+            new RoomPlaybackEvent(roomId, state.audioId(), state.position(), state.pause())
+        );
+    }
+    
+    @Async
+    @EventListener
+    @Transactional
+    public void handlePlayback(RoomPlaybackEvent event) {
+        
+        RoomPlaybackState state = roomPlaybackStateRepository.findById(event.roomId())
+            .orElse(new RoomPlaybackState(
+                entityManager.getReference(ListeningRoom.class, event.roomId())
+            ));
+
+        state.setPosition(event.position());
+        state.setCurrentTrackId(event.audioId());
+        state.setPaused(event.pause());
+        roomPlaybackStateRepository.save(state);
     }
 }

@@ -19,6 +19,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,6 +31,8 @@ public class ListeningRoom {
 
     public ListeningRoom(User owner) {
         this.owner = owner;
+        this.members = new HashSet<>();
+        this.members.add(owner);
     }
     
     @Id
@@ -51,4 +54,7 @@ public class ListeningRoom {
     
     @CreationTimestamp
     private Instant createdAt;
+
+    @OneToOne(mappedBy = "room")
+    private RoomPlaybackState playbackState;
 }

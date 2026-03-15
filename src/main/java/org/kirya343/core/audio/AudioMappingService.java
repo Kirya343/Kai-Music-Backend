@@ -1,9 +1,11 @@
 package org.kirya343.core.audio;
 
 import org.kirya343.datasource.model.user.audio.AudioFile;
+import org.kirya343.datasource.model.user.audio.ListeningRoom;
 import org.kirya343.datasource.model.user.audio.QueueItem;
 import org.kirya343.dto.audio.AudioDTO;
 import org.kirya343.dto.audio.QueueItemDTO;
+import org.kirya343.dto.audio.ShortListeningRoomDTO;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,15 @@ public class AudioMappingService {
             qi.getAudio().getId(),
             qi.getAudio().getName(), 
             qi.getPosition()
+        );
+    }
+
+    public ShortListeningRoomDTO toShortDTO(ListeningRoom room) {
+        return new ShortListeningRoomDTO(
+            room.getId(), 
+            room.getOwner().getName() + "\'s room", 
+            room.getOwner().getId(),
+            room.getMembers().size()
         );
     }
 }
