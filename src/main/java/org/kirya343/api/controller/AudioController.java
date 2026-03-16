@@ -203,7 +203,12 @@ public class AudioController {
         RoomPlaybackState state = roomPlaybackStateRepository.findById(roomId).orElseThrow(
             () -> new EntityNotFoundException("Бэкап трека в комнате не найден"));
 
-        return new PlaybackStateDTO(state.getCurrentTrackId(), state.getCurrentPosition(), state.isPaused());
+        return new PlaybackStateDTO(
+            state.getUser(), 
+            state.getCurrentTrackId(), 
+            state.getCurrentPosition(), 
+            state.isPaused()
+        );
     }
 
     @GetMapping("/room/all")

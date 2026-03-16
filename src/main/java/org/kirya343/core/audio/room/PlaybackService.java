@@ -56,7 +56,7 @@ public class PlaybackService {
 
         room.setTimer(timer);
 
-        PlaybackStateDTO checked = new PlaybackStateDTO(room.getCurrentTrackId(), Long.valueOf(0), false);
+        PlaybackStateDTO checked = new PlaybackStateDTO("Server", room.getCurrentTrackId(), Long.valueOf(0), false);
 
         webSocketService.broadcastPlaybackState(room.getRoomId(), checked);
     }

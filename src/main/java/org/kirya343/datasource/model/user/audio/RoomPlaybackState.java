@@ -40,11 +40,14 @@ public class RoomPlaybackState {
     @UpdateTimestamp
     private Instant lastUpdate;
 
-    public RoomPlaybackState(ListeningRoom room, Long currentTrackId, Long position, boolean paused) {
+    private String user;
+
+    public RoomPlaybackState(ListeningRoom room, Long currentTrackId, Long position, boolean paused, String user) {
         this.room = room;
         this.currentTrackId = currentTrackId;
         this.position = position;
         this.paused = paused;
+        this.user = user;
     }
 
     public RoomPlaybackState(ListeningRoom room) {

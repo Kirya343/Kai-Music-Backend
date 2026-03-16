@@ -48,9 +48,9 @@ public class AudioWebSocketController {
         }
 
         if (!state.pause()) {
-            roomManager.playTrack(roomId, state);
+            roomManager.playTrack(roomId, state, authData);
         } else {
-            roomManager.pause(roomId, state);
+            roomManager.pause(roomId, state, authData);
         }
     }
 }

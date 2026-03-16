@@ -17,6 +17,7 @@ import org.kirya343.datasource.repository.audio.QueueItemRepository;
 import org.kirya343.datasource.repository.audio.RoomPlaybackStateRepository;
 import org.kirya343.dto.audio.PlaybackStateDTO;
 import org.kirya343.dto.audio.RoomPlaybackEvent;
+import org.kirya343.dto.auth.UserAuthData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -58,7 +59,7 @@ public class RoomManager {
         return rooms.get(roomId);
     }
 
-    public void playTrack(Long roomId, PlaybackStateDTO state) {
+    public void playTrack(Long roomId, PlaybackStateDTO state, UserAuthData authData) {
         logger.info("Включаем трек {} в комнате {}", state.audioId(), roomId);
 
         RoomState initialRoom = findRoom(roomId, state.audioId());
@@ -87,14 +88,14 @@ public class RoomManager {
         logger.info("Таймер запланирован: delay={}ms, isDone={}", room.getRemaining(), timer.isDone());
         room.setTimer(timer);
 
-        PlaybackStateDTO checked = new PlaybackStateDTO(room.getCurrentTrackId(), state.position(), false);
+        PlaybackStateDTO checked = new PlaybackStateDTO(authData.name(), room.getCurrentTrackId(), state.position(), false);
 
-        updatePlayback(roomId, checked);
+        updatePlayback(roomId, checked, authData);
 
         webSocketService.broadcastPlaybackState(roomId, checked);
     }
 
-    public void pause(Long roomId, PlaybackStateDTO state) {
+    public void pause(Long roomId, PlaybackStateDTO state, UserAuthData authData) {
 
         logger.info("Ставим на паузу трек {} в комнате {}", state.audioId(), roomId);
         logger.info(rooms.toString());
@@ -109,13 +110,12 @@ public class RoomManager {
 
         room.setPaused(true);
 
-        PlaybackStateDTO checked = new PlaybackStateDTO(room.getCurrentTrackId(), state.position(), true);
+        PlaybackStateDTO checked = new PlaybackStateDTO(authData.name(), room.getCurrentTrackId(), state.position(), true);
 
-        updatePlayback(roomId, checked);
+        updatePlayback(roomId, checked, authData);
 
         webSocketService.broadcastPlaybackState(roomId, checked);
     }
-
 
     private RoomState createRoomState(Long roomId, Long currentTrackId) {
 
@@ -151,10 +151,10 @@ public class RoomManager {
         return room;
     }
 
-    public void updatePlayback(Long roomId, PlaybackStateDTO state) {
+    public void updatePlayback(Long roomId, PlaybackStateDTO state, UserAuthData authData) {
 
         publisher.publishEvent(
-            new RoomPlaybackEvent(roomId, state.audioId(), state.position(), state.pause())
+            new RoomPlaybackEvent(roomId, state.audioId(), state.position(), state.pause(), authData)
         );
     }
     
@@ -171,6 +171,8 @@ public class RoomManager {
         state.setPosition(event.position());
         state.setCurrentTrackId(event.audioId());
         state.setPaused(event.pause());
+        state.setUser(event.authData().name());
+        
         roomPlaybackStateRepository.save(state);
     }
 }
