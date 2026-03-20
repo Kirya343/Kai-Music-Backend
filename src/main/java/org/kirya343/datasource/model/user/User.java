@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.kirya343.core.config.Constants;
-import org.kirya343.datasource.model.user.audio.ListeningRoom;
+import org.kirya343.datasource.model.audio.ListeningRoom;
 import org.kirya343.datasource.model.user.permission.Role;
 import org.kirya343.enums.AuthProvider;
 import org.kirya343.enums.UserStatus;

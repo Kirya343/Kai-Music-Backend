@@ -8,10 +8,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.kirya343.core.audio.AudioService;
-import org.kirya343.datasource.model.user.audio.AudioFile;
-import org.kirya343.datasource.model.user.audio.ListeningRoom;
-import org.kirya343.datasource.model.user.audio.RoomPlaybackState;
-import org.kirya343.datasource.repository.audio.AudioFileRepository;
+import org.kirya343.datasource.model.audio.AudioFile;
+import org.kirya343.datasource.model.audio.ListeningRoom;
+import org.kirya343.datasource.model.audio.RoomPlaybackState;
 import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
 import org.kirya343.datasource.repository.audio.QueueItemRepository;
 import org.kirya343.datasource.repository.audio.RoomPlaybackStateRepository;
@@ -43,7 +42,6 @@ public class RoomManager {
 
     private final ListeningRoomRepository listeningRoomRepository;
     private final QueueItemRepository queueItemRepository;
-    private final AudioFileRepository audioFileRepository;
     private final RoomPlaybackStateRepository roomPlaybackStateRepository;
     private final EntityManager entityManager;
 
@@ -60,26 +58,29 @@ public class RoomManager {
     }
 
     public void playTrack(Long roomId, PlaybackStateDTO state, UserAuthData authData) {
-        logger.info("Включаем трек {} в комнате {}", state.audioId(), roomId);
+        logger.info("Включаем трек {} в комнате {}", state.entryId(), roomId);
 
-        RoomState initialRoom = findRoom(roomId, state.audioId());
+        RoomState initialRoom = findRoom(roomId, state.entryId());
         
         RoomState room = syncRoomState(initialRoom, state);
 
-        logger.info("Длительность {}, позиция {}, осталось {}", room.getDuration(), state.position(), room.getDuration() - state.position());
+        logger.info("Длительность {}, позиция {}, осталось {}",
+            room.getDuration(), state.position(), room.getDuration() - state.position()
+        );
+
         room.setRemaining(room.getDuration() - state.position());
         room.setPaused(false);
 
         ScheduledFuture<?> oldTimer = room.getTimer();
         if (oldTimer != null && !oldTimer.isDone()) {
-            logger.info("Отменяем старый таймер трека {} в комнате {}", state.audioId(), roomId);
+            logger.info("Отменяем старый таймер трека {} в комнате {}", state.entryId(), roomId);
             oldTimer.cancel(false);
         }
 
         ScheduledFuture<?> timer = scheduler.schedule(
             () -> {
-                logger.info("🔥 Таймер сработал для трека {} в комнате {}", state.audioId(), roomId);
-                playbackService.playNext(room, state.audioId());
+                logger.info("🔥 Таймер сработал для трека {} в комнате {}", state.entryId(), roomId);
+                playbackService.playNext(room, state.entryId());
             },
             room.getRemaining(),
             TimeUnit.SECONDS
@@ -88,7 +89,7 @@ public class RoomManager {
         logger.info("Таймер запланирован: delay={}ms, isDone={}", room.getRemaining(), timer.isDone());
         room.setTimer(timer);
 
-        PlaybackStateDTO checked = new PlaybackStateDTO(authData.name(), room.getCurrentTrackId(), state.position(), false);
+        PlaybackStateDTO checked = new PlaybackStateDTO(authData.name(), room.getCurrentQueueEntryId(), state.position(), false);
 
         updatePlayback(roomId, checked, authData);
 
@@ -97,10 +98,10 @@ public class RoomManager {
 
     public void pause(Long roomId, PlaybackStateDTO state, UserAuthData authData) {
 
-        logger.info("Ставим на паузу трек {} в комнате {}", state.audioId(), roomId);
+        logger.info("Ставим на паузу трек {} в комнате {}", state.entryId(), roomId);
         logger.info(rooms.toString());
 
-        RoomState room = findRoom(roomId, state.audioId());
+        RoomState room = findRoom(roomId, state.entryId());
 
         room = syncRoomState(room, state);
 
@@ -110,19 +111,19 @@ public class RoomManager {
 
         room.setPaused(true);
 
-        PlaybackStateDTO checked = new PlaybackStateDTO(authData.name(), room.getCurrentTrackId(), state.position(), true);
+        PlaybackStateDTO checked = new PlaybackStateDTO(authData.name(), room.getCurrentQueueEntryId(), state.position(), true);
 
         updatePlayback(roomId, checked, authData);
 
         webSocketService.broadcastPlaybackState(roomId, checked);
     }
 
-    private RoomState createRoomState(Long roomId, Long currentTrackId) {
+    private RoomState createRoomState(Long roomId, Long currentQueueEntryId) {
 
         ListeningRoom room = listeningRoomRepository.findById(roomId).orElseThrow(
             () -> new EntityNotFoundException("комната не найдена"));
 
-        AudioFile audio = queueItemRepository.findAudioInRoomQueue(roomId, currentTrackId).orElseThrow(
+        AudioFile audio = queueItemRepository.findAudioInRoomQueue(roomId, currentQueueEntryId).orElseThrow(
             () -> new EntityNotFoundException("Трек не найден в очереди комнаты"));
 
         Long duration = audioService.getDuration(audio.getPath());
@@ -137,15 +138,14 @@ public class RoomManager {
     }
 
     private RoomState syncRoomState(RoomState room, PlaybackStateDTO state) {
-        if (room.getCurrentTrackId() != state.audioId()) {
+        if (room.getCurrentQueueEntryId() != state.entryId()) {
             // TODO переключить трек в RoomState и обновить данные
 
-            AudioFile audio = audioFileRepository.findById(state.audioId()).orElseThrow(
-                () -> new EntityNotFoundException("Трек не найден в очереди"));
+            AudioFile audio = queueItemRepository.findAudioById(state.entryId());
 
             Long duration = audioService.getDuration(audio.getPath());
 
-            room.setCurrentTrackId(state.audioId());
+            room.setCurrentQueueEntryId(state.entryId());
             room.setDuration(duration);
         }
         return room;
@@ -154,7 +154,7 @@ public class RoomManager {
     public void updatePlayback(Long roomId, PlaybackStateDTO state, UserAuthData authData) {
 
         publisher.publishEvent(
-            new RoomPlaybackEvent(roomId, state.audioId(), state.position(), state.pause(), authData)
+            new RoomPlaybackEvent(roomId, state.entryId(), state.position(), state.pause(), authData)
         );
     }
     
@@ -169,7 +169,7 @@ public class RoomManager {
             ));
 
         state.setPosition(event.position());
-        state.setCurrentTrackId(event.audioId());
+        state.setCurrentQueueEntryId(event.audioId());
         state.setPaused(event.pause());
         state.setUser(event.authData().name());
         

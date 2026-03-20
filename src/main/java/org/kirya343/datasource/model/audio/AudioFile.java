@@ -1,4 +1,4 @@
-package org.kirya343.datasource.model.user.audio;
+package org.kirya343.datasource.model.audio;
 
 import org.kirya343.datasource.model.user.User;
 

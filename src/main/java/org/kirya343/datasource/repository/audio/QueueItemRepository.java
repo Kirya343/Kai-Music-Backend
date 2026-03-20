@@ -5,9 +5,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-import org.kirya343.datasource.model.user.audio.AudioFile;
-import org.kirya343.datasource.model.user.audio.ListeningRoom;
-import org.kirya343.datasource.model.user.audio.QueueItem;
+import org.kirya343.datasource.model.audio.AudioFile;
+import org.kirya343.datasource.model.audio.ListeningRoom;
+import org.kirya343.datasource.model.audio.QueueItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,9 +27,12 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         SELECT q.audio
         FROM QueueItem q
         WHERE q.room.id = :roomId
-        AND q.audio.id = :audioId
+        AND q.id = :queueEntryId
     """)
-    Optional<AudioFile> findAudioInRoomQueue(Long roomId, Long audioId);
+    Optional<AudioFile> findAudioInRoomQueue(Long roomId, Long queueEntryId);
+
+    @Query("SELECT q.audio FROM QueueItem q WHERE q.id = :queueItemId")
+    AudioFile findAudioById(@Param("queueItemId") Long queueItemId);
 
     @Query(value = """
         SELECT * FROM queue_items q

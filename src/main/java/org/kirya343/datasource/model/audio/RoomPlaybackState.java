@@ -1,4 +1,4 @@
-package org.kirya343.datasource.model.user.audio;
+package org.kirya343.datasource.model.audio;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -32,7 +32,7 @@ public class RoomPlaybackState {
     private Long position = 0L;
 
     @JoinColumn(name = "audio_id")
-    private Long currentTrackId;
+    private Long currentQueueEntryId;
 
     @Column(nullable = false)
     private boolean paused = true;
@@ -42,9 +42,9 @@ public class RoomPlaybackState {
 
     private String user;
 
-    public RoomPlaybackState(ListeningRoom room, Long currentTrackId, Long position, boolean paused, String user) {
+    public RoomPlaybackState(ListeningRoom room, Long currentQueueEntryId, Long position, boolean paused, String user) {
         this.room = room;
-        this.currentTrackId = currentTrackId;
+        this.currentQueueEntryId = currentQueueEntryId;
         this.position = position;
         this.paused = paused;
         this.user = user;

@@ -3,7 +3,7 @@ package org.kirya343.datasource.repository.audio;
 import java.util.List;
 import java.util.Optional;
 
-import org.kirya343.datasource.model.user.audio.ListeningRoom;
+import org.kirya343.datasource.model.audio.ListeningRoom;
 import org.kirya343.dto.audio.ShortListeningRoomDTO;
 import org.kirya343.enums.PlaybackMode;
 import org.springframework.data.jpa.repository.JpaRepository;

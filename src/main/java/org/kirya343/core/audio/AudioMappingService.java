@@ -1,8 +1,8 @@
 package org.kirya343.core.audio;
 
-import org.kirya343.datasource.model.user.audio.AudioFile;
-import org.kirya343.datasource.model.user.audio.ListeningRoom;
-import org.kirya343.datasource.model.user.audio.QueueItem;
+import org.kirya343.datasource.model.audio.AudioFile;
+import org.kirya343.datasource.model.audio.ListeningRoom;
+import org.kirya343.datasource.model.audio.QueueItem;
 import org.kirya343.dto.audio.AudioDTO;
 import org.kirya343.dto.audio.QueueItemDTO;
 import org.kirya343.dto.audio.ShortListeningRoomDTO;

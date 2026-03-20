@@ -1,6 +1,6 @@
 package org.kirya343.core.audio;
 
-import org.kirya343.datasource.model.user.audio.ListeningRoom;
+import org.kirya343.datasource.model.audio.ListeningRoom;
 import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
 import org.kirya343.dto.audio.ListeningRoomDTO;
 import org.kirya343.dto.auth.UserAuthData;

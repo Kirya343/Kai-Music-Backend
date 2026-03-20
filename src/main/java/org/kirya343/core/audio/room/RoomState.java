@@ -10,13 +10,13 @@ public class RoomState {
 
     public RoomState(
         Long roomId,
-        Long currentTrackId,
+        Long currentQueueEntryId,
         long duration,
         long remaining,
         boolean paused
     ) {
         this.roomId = roomId;
-        this.currentTrackId = currentTrackId;
+        this.currentQueueEntryId = currentQueueEntryId;
         this.duration = duration;
         this.remaining = remaining;
         this.paused = paused;
@@ -25,7 +25,7 @@ public class RoomState {
     private Long roomId;
 
     @Setter
-    private Long currentTrackId;
+    private Long currentQueueEntryId;
 
     @Setter
     private long duration;

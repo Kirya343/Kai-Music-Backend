@@ -2,9 +2,9 @@ package org.kirya343.core.audio.room;
 
 import java.util.List;
 
-import org.kirya343.datasource.model.user.audio.AudioFile;
-import org.kirya343.datasource.model.user.audio.ListeningRoom;
-import org.kirya343.datasource.model.user.audio.QueueItem;
+import org.kirya343.datasource.model.audio.AudioFile;
+import org.kirya343.datasource.model.audio.ListeningRoom;
+import org.kirya343.datasource.model.audio.QueueItem;
 import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
 import org.kirya343.datasource.repository.audio.QueueItemRepository;
 import org.springframework.stereotype.Service;
