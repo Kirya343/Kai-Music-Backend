@@ -6,7 +6,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.kirya343.core.audio.AudioService;
-import org.kirya343.datasource.model.audio.AudioFile;
+import org.kirya343.datasource.model.audio.QueueItem;
 import org.kirya343.dto.audio.PlaybackStateDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,17 +33,17 @@ public class PlaybackService {
             room.getTimer().cancel(false);
         }
 
-        AudioFile audio = queueService.nextTrack(room.getRoomId(), previousAudioId);
+        QueueItem entry = queueService.nextTrack(room.getRoomId(), previousAudioId);
 
-        if (audio == null) {
+        if (entry == null) {
             room.setCurrentQueueEntryId(null);
             room.setPaused(true);
             return;
         }
 
-        long duration = audioService.getDuration(audio.getPath());
+        long duration = audioService.getDuration(entry.getAudio().getPath());
 
-        room.setCurrentQueueEntryId(audio.getId());
+        room.setCurrentQueueEntryId(entry.getId());
         room.setDuration(duration);
         room.setRemaining(duration);
         room.setPaused(false);

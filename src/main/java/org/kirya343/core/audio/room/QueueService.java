@@ -2,7 +2,6 @@ package org.kirya343.core.audio.room;
 
 import java.util.List;
 
-import org.kirya343.datasource.model.audio.AudioFile;
 import org.kirya343.datasource.model.audio.ListeningRoom;
 import org.kirya343.datasource.model.audio.QueueItem;
 import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
@@ -28,7 +27,7 @@ public class QueueService {
 
     }
 
-    public AudioFile nextTrack(Long roomId, Long previousAudioId) {
+    public QueueItem nextTrack(Long roomId, Long previousEntryId) {
         ListeningRoom room = listeningRoomRepository.findById(roomId).orElseThrow(
             () -> new EntityNotFoundException("Комната не найдена"));
 
@@ -37,13 +36,13 @@ public class QueueService {
         switch (room.getPlaybackMode()) {
             case NORMAL:
                 
-                queueItem = queueItemRepository.findNextTrack(roomId, previousAudioId).orElse(null);
+                queueItem = queueItemRepository.findNextTrack(roomId, previousEntryId).orElse(null);
 
                 break;
 
             case REPEAT_ALL:
                 
-                queueItem = queueItemRepository.findNextTrack(roomId, previousAudioId).orElse(null);
+                queueItem = queueItemRepository.findNextTrack(roomId, previousEntryId).orElse(null);
 
                 if (queueItem == null) {
                     queueItem = queueItemRepository.findFirstByRoomIdOrderByPositionAsc(roomId).orElse(null);
@@ -53,7 +52,7 @@ public class QueueService {
 
             case REPEAT_ONE:
                 
-                queueItem = queueItemRepository.findByRoomIdAndAudioId(roomId, previousAudioId).orElse(null);
+                queueItem = queueItemRepository.findByRoomIdAndId(roomId, previousEntryId).orElse(null);
 
                 break;
 
@@ -68,6 +67,6 @@ public class QueueService {
             throw new EntityNotFoundException("Нет подходящего трека для воспроизведения");
         } 
 
-        return queueItem.getAudio();
+        return queueItem;
     }
 }

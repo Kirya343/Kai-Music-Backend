@@ -18,7 +18,7 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
     Optional<QueueItem> findFirstByRoomOrderByPositionAsc(ListeningRoom room);
     List<QueueItem> findByRoomIdOrderByPosition(Long roomId);
 
-    Optional<QueueItem> findByRoomIdAndAudioId(Long roomId, Long audioId);
+    Optional<QueueItem> findByRoomIdAndId(Long roomId, Long entryId);
 
     @Query("SELECT COALESCE(MAX(q.position), 0) FROM QueueItem q")
     Long findMaxPosition();
@@ -39,19 +39,19 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         WHERE q.room_id = :roomId
         AND q.position > (
             SELECT q2.position FROM queue_items q2
-            WHERE q2.room_id = :roomId AND q2.audio_id = :audioId
+            WHERE q2.room_id = :roomId AND q2.id = :entryId
             ORDER BY q2.position ASC
             LIMIT 1
         )
         ORDER BY q.position ASC
         LIMIT 1
     """, nativeQuery = true)
-    Optional<QueueItem> findNextTrack(@Param("roomId") Long roomId, @Param("audioId") Long audioId);
+    Optional<QueueItem> findNextTrack(Long roomId, Long entryId);
 
     @Query("SELECT q FROM QueueItem q " +
            "WHERE q.room.id = :roomId " +
            "ORDER BY q.position ASC")
-    Optional<QueueItem> findFirstByRoomIdOrderByPositionAsc(@Param("roomId") Long roomId);
+    Optional<QueueItem> findFirstByRoomIdOrderByPositionAsc(Long roomId);
 
     @Query(value = """
         SELECT * FROM queue_items
