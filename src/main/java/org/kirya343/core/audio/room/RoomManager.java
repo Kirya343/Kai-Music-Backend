@@ -20,10 +20,7 @@ import org.kirya343.dto.auth.UserAuthData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -80,7 +77,7 @@ public class RoomManager {
         ScheduledFuture<?> timer = scheduler.schedule(
             () -> {
                 logger.info("🔥 Таймер сработал для трека {} в комнате {}", state.entryId(), roomId);
-                playbackService.playNext(room, state.entryId());
+                playbackService.playNext(room, state.entryId(), authData);
             },
             room.getRemaining(),
             TimeUnit.SECONDS
@@ -157,22 +154,22 @@ public class RoomManager {
             new RoomPlaybackEvent(roomId, state.entryId(), state.position(), state.pause(), authData)
         );
     }
-    
-    @Async
-    @EventListener
-    @Transactional
-    public void handlePlayback(RoomPlaybackEvent event) {
-        
-        RoomPlaybackState state = roomPlaybackStateRepository.findById(event.roomId())
-            .orElse(new RoomPlaybackState(
-                entityManager.getReference(ListeningRoom.class, event.roomId())
-            ));
 
-        state.setPosition(event.position());
-        state.setCurrentQueueEntryId(event.audioId());
-        state.setPaused(event.pause());
-        state.setUser(event.authData().name());
-        
-        roomPlaybackStateRepository.save(state);
+    public void playNext(Long roomId, UserAuthData authData) {
+        RoomPlaybackState state = roomPlaybackStateRepository.findById(roomId)
+            .orElse(new RoomPlaybackState(
+                entityManager.getReference(ListeningRoom.class, roomId)
+            ));
+        RoomState room = findRoom(roomId, state.getCurrentQueueEntryId());
+        playbackService.playNext(room, state.getCurrentQueueEntryId(), authData);
+    }
+
+    public void playPrev(Long roomId, UserAuthData authData) {
+        RoomPlaybackState state = roomPlaybackStateRepository.findById(roomId)
+            .orElse(new RoomPlaybackState(
+                entityManager.getReference(ListeningRoom.class, roomId)
+            ));
+        RoomState room = findRoom(roomId, state.getCurrentQueueEntryId());
+        playbackService.playPrev(room, state.getCurrentQueueEntryId(), authData);
     }
 }

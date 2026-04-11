@@ -122,6 +122,11 @@
 			<artifactId>mp3agic</artifactId>
 			<version>0.9.1</version>
 		</dependency>
+		<dependency>
+			<groupId>ws.schild</groupId>
+			<artifactId>jave-all-deps</artifactId>
+			<version>3.5.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

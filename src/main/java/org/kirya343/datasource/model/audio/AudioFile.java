@@ -15,9 +15,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AudioFile {
 
-    public AudioFile(String name, String path, User owner) {
+    public AudioFile(String name, String path, String format, User owner) {
         this.name = name;
         this.path = path;
+        this.format = format;
         this.owner = owner;
     }
     
@@ -27,6 +28,7 @@ public class AudioFile {
   
     private String name;
     private String path;
+    private String format;
 
     @ManyToOne
     private User owner;

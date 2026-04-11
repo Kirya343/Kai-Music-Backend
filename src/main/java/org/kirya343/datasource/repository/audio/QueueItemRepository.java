@@ -48,10 +48,22 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
     """, nativeQuery = true)
     Optional<QueueItem> findNextTrack(Long roomId, Long entryId);
 
-    @Query("SELECT q FROM QueueItem q " +
-           "WHERE q.room.id = :roomId " +
-           "ORDER BY q.position ASC")
+    @Query(value = """
+        SELECT * FROM queue_items q
+        WHERE q.room_id = :roomId
+        AND q.position < (
+            SELECT q2.position FROM queue_items q2
+            WHERE q2.room_id = :roomId AND q2.id = :entryId
+            ORDER BY q2.position ASC
+            LIMIT 1
+        )
+        ORDER BY q.position DESC
+        LIMIT 1
+    """, nativeQuery = true)
+    Optional<QueueItem> findPrevTrack(Long roomId, Long entryId);
+
     Optional<QueueItem> findFirstByRoomIdOrderByPositionAsc(Long roomId);
+    Optional<QueueItem> findFirstByRoomIdOrderByPositionDesc(Long roomId);
 
     @Query(value = """
         SELECT * FROM queue_items

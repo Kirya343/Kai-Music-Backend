@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 import org.springframework.http.HttpHeaders;
@@ -15,6 +16,8 @@ import org.kirya343.datasource.model.audio.AudioFile;
 import org.kirya343.datasource.model.user.User;
 import org.kirya343.datasource.repository.audio.AudioFileRepository;
 import org.kirya343.dto.auth.UserAuthData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -30,6 +33,9 @@ public class AudioFileManager {
 
     private final AudioFileRepository audioFileRepository;
     private final EntityManager entityManager;
+    private final AudioConverterService audioConverterService;
+    private static final Logger logger = LoggerFactory.getLogger(AudioFileManager.class);
+
     
     public ResponseEntity<InputStreamResource> getAudio(
         Long queueItemId, 
@@ -80,36 +86,59 @@ public class AudioFileManager {
                 .body(resource);
     }
 
-    public void updloadAudio(MultipartFile file, UserAuthData authData) {
-        String originalName = file.getOriginalFilename();
-        String title = originalName;
-        String extension = "";
+    public void uploadAudio(MultipartFile uploadedFile, UserAuthData authData) {
 
-        if (originalName != null && originalName.contains(".")) {
-            extension = originalName.substring(originalName.lastIndexOf("."));
-        }
+        logger.info("Пользователь {} загружает аудио на сервер", authData.name());
 
-        if (originalName != null && originalName.contains(".")) {
-            title = originalName.substring(0, originalName.lastIndexOf("."));
-        }
-
-        String name = UUID.randomUUID().toString() + extension;
+        File tempInput = null;
+        File converted = null;
 
         try {
+            // 1. Multipart → File
+            tempInput = audioConverterService.multipartToFile(uploadedFile);
+            logger.info("Конвертировали из MultipartFile в File");
+
+            // 2. Конвертация → MP3
+            converted = audioConverterService.convertToMp3(tempInput);
+            logger.info("Конвертировали в mp3");
+
+            // 3. Название
+            String originalName = uploadedFile.getOriginalFilename();
+            String title = originalName;
+
+            if (originalName != null && originalName.contains(".")) {
+                title = originalName.substring(0, originalName.lastIndexOf("."));
+            }
+
+            // ❗ всегда mp3 после конвертации
+            String name = UUID.randomUUID().toString() + ".mp3";
+
             Path path = Paths.get("music/" + name);
             Files.createDirectories(path.getParent());
-            Files.write(path, file.getBytes());
+            logger.info("Проверили правильность пути записи");
 
+            // 4. Копируем файл
+            Files.copy(converted.toPath(), path, StandardCopyOption.REPLACE_EXISTING);
+            logger.info("Записали файл в хранилище");
+
+            // 5. Сохраняем в БД
             AudioFile audio = new AudioFile(
-                title, 
-                "music/" + name, 
+                title,
+                path.toString(),
+                "mp3",
                 entityManager.getReference(User.class, authData.id())
             );
+            
+            logger.info("Сохранили файл в бд");
 
             audioFileRepository.save(audio);
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка загрузки аудио", e);
+        } finally {
+            // 6. Чистим временные файлы
+            if (tempInput != null && tempInput.exists()) tempInput.delete();
+            if (converted != null && converted.exists()) converted.delete();
         }
     }
 }

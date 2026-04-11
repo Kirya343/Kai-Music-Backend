@@ -53,4 +53,20 @@ public class AudioWebSocketController {
             roomManager.pause(roomId, state, authData);
         }
     }
+
+    @MessageMapping("/room/{roomId}/next")
+    public void next(
+        @DestinationVariable Long roomId,
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+        roomManager.playNext(roomId, authData);
+    }
+
+    @MessageMapping("/room/{roomId}/prev")
+    public void prev(
+        @DestinationVariable Long roomId,
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+        roomManager.playPrev(roomId, authData);
+    }
 }

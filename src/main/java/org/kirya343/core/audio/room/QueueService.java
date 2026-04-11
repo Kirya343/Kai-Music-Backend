@@ -69,4 +69,19 @@ public class QueueService {
 
         return queueItem;
     }
+
+    public QueueItem prevTrack(Long roomId, Long currentEntryId) {
+
+        QueueItem queueItem = queueItemRepository.findPrevTrack(roomId, currentEntryId).orElse(null);
+
+        if (queueItem == null) {
+            queueItem = queueItemRepository.findFirstByRoomIdOrderByPositionDesc(roomId).orElse(null);
+        }
+
+        if (queueItem == null) {
+            throw new EntityNotFoundException("Нет подходящего трека для воспроизведения");
+        } 
+
+        return queueItem;
+    }
 }

@@ -117,7 +117,7 @@ public class AudioController {
         @RequestParam MultipartFile file,
         @AuthenticationPrincipal UserAuthData authData
     ) {
-        audioFileManager.updloadAudio(file, authData);
+        audioFileManager.uploadAudio(file, authData);
     }
 
     @GetMapping("/room/{roomId}/playback-state")
