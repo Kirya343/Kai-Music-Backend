@@ -1,5 +1,6 @@
 package org.kirya343.core.audio.room;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -11,6 +12,7 @@ import org.kirya343.core.audio.AudioService;
 import org.kirya343.datasource.model.audio.AudioFile;
 import org.kirya343.datasource.model.audio.ListeningRoom;
 import org.kirya343.datasource.model.audio.RoomPlaybackState;
+import org.kirya343.datasource.repository.audio.AudioFileRepository;
 import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
 import org.kirya343.datasource.repository.audio.QueueItemRepository;
 import org.kirya343.datasource.repository.audio.RoomPlaybackStateRepository;
@@ -39,6 +41,7 @@ public class RoomManager {
 
     private final ListeningRoomRepository listeningRoomRepository;
     private final QueueItemRepository queueItemRepository;
+    private final AudioFileRepository audioFileRepository;
     private final RoomPlaybackStateRepository roomPlaybackStateRepository;
     private final EntityManager entityManager;
 
@@ -140,7 +143,13 @@ public class RoomManager {
 
             AudioFile audio = queueItemRepository.findAudioById(state.entryId());
 
-            Long duration = audioService.getDuration(audio.getPath());
+            Long duration = audio.getDuration();
+
+            if (duration == null) {
+                duration = audioService.getDuration(audio.getPath());
+                audio.setDuration(duration);
+                audioFileRepository.save(audio);
+            }
 
             room.setCurrentQueueEntryId(state.entryId());
             room.setDuration(duration);

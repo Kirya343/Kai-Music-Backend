@@ -15,14 +15,23 @@ import lombok.RequiredArgsConstructor;
 public class AudioMappingService {
     
     public AudioDTO toDTO(AudioFile audio) {
-        return new AudioDTO(audio.getId(), audio.getName());
+        return new AudioDTO(
+            audio.getId(), 
+            audio.getName(),
+            audio.getFormat(),
+            audio.getTitle(),
+            audio.getArtist(),
+            audio.getAlbum(),
+            audio.getDuration(),
+            audio.getCoverUrl()
+        );
     }
 
     public QueueItemDTO toDTO(QueueItem qi) {
         return new QueueItemDTO(
             qi.getId(), 
             qi.getAudio().getId(),
-            qi.getAudio().getName(), 
+            qi.getAudio().getTitle() != null ? qi.getAudio().getTitle() : qi.getAudio().getName(), 
             qi.getPosition()
         );
     }

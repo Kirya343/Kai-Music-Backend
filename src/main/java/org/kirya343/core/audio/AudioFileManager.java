@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.kirya343.datasource.model.audio.AudioFile;
 import org.kirya343.datasource.model.user.User;
 import org.kirya343.datasource.repository.audio.AudioFileRepository;
+import org.kirya343.dto.audio.AudioMetadataDTO;
 import org.kirya343.dto.auth.UserAuthData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,6 +99,8 @@ public class AudioFileManager {
             tempInput = audioConverterService.multipartToFile(uploadedFile);
             logger.info("Конвертировали из MultipartFile в File");
 
+            AudioMetadataDTO metadata = audioConverterService.getMetadata(tempInput);
+
             // 2. Конвертация → MP3
             converted = audioConverterService.convertToMp3(tempInput);
             logger.info("Конвертировали в mp3");
@@ -126,7 +129,12 @@ public class AudioFileManager {
                 title,
                 path.toString(),
                 "mp3",
-                entityManager.getReference(User.class, authData.id())
+                entityManager.getReference(User.class, authData.id()),
+                metadata.title(),
+                metadata.artist(),
+                metadata.album(),
+                null,
+                metadata.durationMs() / 1000
             );
             
             logger.info("Сохранили файл в бд");

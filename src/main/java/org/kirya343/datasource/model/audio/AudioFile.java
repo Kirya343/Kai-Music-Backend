@@ -9,17 +9,33 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
 @NoArgsConstructor
 public class AudioFile {
 
-    public AudioFile(String name, String path, String format, User owner) {
+    public AudioFile(
+            String name, 
+            String path, 
+            String format, 
+            User owner,
+            String title, 
+            String artist, 
+            String album, 
+            String coverUrl,
+            Long duration
+        ) {
         this.name = name;
         this.path = path;
         this.format = format;
         this.owner = owner;
+        this.title = title;
+        this.artist = artist;
+        this.album = album;
+        this.coverUrl = coverUrl;
+        this.duration = duration;
     }
     
     @Id
@@ -27,8 +43,17 @@ public class AudioFile {
     private Long id;
   
     private String name;
+
     private String path;
     private String format;
+    private String title;
+    private String artist;
+    private String album;
+
+    @Setter
+    private Long duration;
+
+    private String coverUrl;
 
     @ManyToOne
     private User owner;
