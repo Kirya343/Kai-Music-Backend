@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.kirya343.datasource.model.audio.ListeningRoom;
 import org.kirya343.datasource.model.audio.QueueItem;
+import org.kirya343.datasource.model.audio.RoomPlaybackState;
 import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
 import org.kirya343.datasource.repository.audio.QueueItemRepository;
+import org.kirya343.datasource.repository.audio.RoomPlaybackStateRepository;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -17,6 +19,7 @@ public class QueueService {
 
     private final QueueItemRepository queueItemRepository;
     private final ListeningRoomRepository listeningRoomRepository;
+    private final RoomPlaybackStateRepository roomPlaybackStateRepository;
 
     public List<Long> loadQueue(Long roomId) {
 
@@ -27,9 +30,14 @@ public class QueueService {
 
     }
 
-    public QueueItem nextTrack(Long roomId, Long previousEntryId) {
+    public QueueItem nextTrack(Long roomId) {
         ListeningRoom room = listeningRoomRepository.findById(roomId).orElseThrow(
             () -> new EntityNotFoundException("Комната не найдена"));
+
+        RoomPlaybackState playbackState = roomPlaybackStateRepository.findById(roomId).orElseThrow(
+            () -> new EntityNotFoundException("Комната не найдена"));
+
+        Long previousEntryId = playbackState.getCurrentQueueEntryId();
 
         QueueItem queueItem = null;
 
@@ -70,9 +78,12 @@ public class QueueService {
         return queueItem;
     }
 
-    public QueueItem prevTrack(Long roomId, Long currentEntryId) {
+    public QueueItem prevTrack(Long roomId) {
 
-        QueueItem queueItem = queueItemRepository.findPrevTrack(roomId, currentEntryId).orElse(null);
+        RoomPlaybackState playbackState = roomPlaybackStateRepository.findById(roomId).orElseThrow(
+            () -> new EntityNotFoundException("Комната не найдена"));
+
+        QueueItem queueItem = queueItemRepository.findPrevTrack(roomId, playbackState.getCurrentQueueEntryId()).orElse(null);
 
         if (queueItem == null) {
             queueItem = queueItemRepository.findFirstByRoomIdOrderByPositionDesc(roomId).orElse(null);

@@ -1,88 +1,115 @@
 package org.kirya343.core.audio.room;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import org.kirya343.core.audio.AudioService;
 import org.kirya343.datasource.model.audio.QueueItem;
+import org.kirya343.datasource.repository.audio.QueueItemRepository;
 import org.kirya343.dto.audio.PlaybackStateDTO;
-import org.kirya343.dto.audio.RoomPlaybackEvent;
 import org.kirya343.dto.auth.UserAuthData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
+import org.kirya343.dto.room.commands.Next;
+import org.kirya343.dto.room.commands.Pause;
+import org.kirya343.dto.room.commands.Play;
+import org.kirya343.dto.room.commands.Prev;
+import org.kirya343.dto.room.commands.RoomCommand;
+import org.kirya343.dto.room.results.NoOp;
+import org.kirya343.dto.room.results.Paused;
+import org.kirya343.dto.room.results.PlaybackResult;
+import org.kirya343.dto.room.results.Resumed;
+import org.kirya343.dto.room.results.TrackChanged;
+import org.kirya343.enums.UserStatus;
+import org.springframework.stereotype.Component;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class PlaybackService {
 
-    private final AudioService audioService;
     private final QueueService queueService;
-    private final RoomWebSocketService webSocketService;
-    private final ScheduledExecutorService scheduler =
-        Executors.newScheduledThreadPool(4);
-    private final ApplicationEventPublisher publisher;
-    private static final Logger logger = LoggerFactory.getLogger(PlaybackService.class);
+    private final RoomCommandQueue roomCommandQueue;
+    private final AudioService audioService;
+    private final QueueItemRepository queueItemRepository;
 
-    public void playNext(RoomState room, Long previousAudioId, UserAuthData authData) {
+    public PlaybackResult play(RoomState room, Play cmd) {
 
-        logger.info("Переключаем песню в комнате {} на следующую", room.getRoomId());
-        
-        if (room.getTimer() != null) {
-            room.getTimer().cancel(false);
+        PlaybackStateDTO state = cmd.state();
+
+        if (room.getDuration() == 0) {
+            QueueItem entry = queueItemRepository.findByRoomIdAndId(room.getRoomId(), state.entryId()).orElseThrow(
+                () -> new EntityNotFoundException("Такой элемент очереди не найден"));
+
+            Long durationFromDB = entry.getAudio().getDuration();
+            long duration = durationFromDB != null ? durationFromDB : audioService.getDuration(entry.getAudio().getPath());
+            room.setDuration(duration);
         }
 
-        QueueItem entry = queueService.nextTrack(room.getRoomId(), previousAudioId);
+        room.setCurrentQueueEntryId(state.entryId());
+        room.setResumedAt(System.nanoTime());
+        room.setLastPosition(state.position());
+        room.setPaused(false);
 
-        loadRoomTrack(room, entry, authData);
+        return new Resumed(room.getRoomId(), state.entryId(), state.position(), cmd.user());
     }
 
-    public void playPrev(RoomState room, Long currentAudioId, UserAuthData authData) {
+    public PlaybackResult pause(RoomState room, Pause cmd) {
+        room.setPaused(true);
 
-        logger.info("Переключаем песню в комнате {} на предыдущую", room.getRoomId());
-        
-        if (room.getTimer() != null) {
-            room.getTimer().cancel(false);
-        }
+        PlaybackStateDTO state = cmd.state();
 
-        QueueItem entry = queueService.prevTrack(room.getRoomId(), currentAudioId);
-
-        loadRoomTrack(room, entry, authData);
+        return new Paused(room.getRoomId(), state.entryId(), state.position(), cmd.user());
     }
 
-    private void loadRoomTrack(RoomState room, QueueItem entry, UserAuthData authData) {
-        if (entry == null) {
-            room.setCurrentQueueEntryId(null);
-            room.setPaused(true);
-            return;
-        }
+    public PlaybackResult next(RoomState room, Next cmd) {
+        QueueItem entry = queueService.nextTrack(room.getRoomId());
 
-        long duration = audioService.getDuration(entry.getAudio().getPath());
+        Long durationFromDB = entry.getAudio().getDuration();
+        long duration = durationFromDB != null ? durationFromDB : audioService.getDuration(entry.getAudio().getPath());
 
         room.setCurrentQueueEntryId(entry.getId());
         room.setDuration(duration);
-        room.setRemaining(duration);
+        room.setResumedAt(System.nanoTime());
+        room.setLastPosition(0);
         room.setPaused(false);
 
-        ScheduledFuture<?> timer = scheduler.schedule(
-            () -> playNext(room, room.getCurrentQueueEntryId(), authData),
-            room.getRemaining(),
-            TimeUnit.SECONDS
-        );
+        return new TrackChanged(room.getRoomId(), entry.getId(), cmd.user());
+    }
 
-        room.setTimer(timer);
+    public PlaybackResult prev(RoomState room, Prev cmd) {
+        QueueItem entry = queueService.prevTrack(room.getRoomId());
 
-        PlaybackStateDTO checked = new PlaybackStateDTO("Server", room.getCurrentQueueEntryId(), Long.valueOf(0), false);
+        Long durationFromDB = entry.getAudio().getDuration();
+        long duration = durationFromDB != null ? durationFromDB : audioService.getDuration(entry.getAudio().getPath());
 
-        publisher.publishEvent(
-            new RoomPlaybackEvent(room.getRoomId(), checked.entryId(), checked.position(), checked.pause(), authData)
-        );
- 
-        webSocketService.broadcastPlaybackState(room.getRoomId(), checked);
+        room.setCurrentQueueEntryId(entry.getId());
+        room.setDuration(duration);
+        room.setResumedAt(System.nanoTime());
+        room.setLastPosition(0);
+        room.setPaused(false);
+
+        return new TrackChanged(room.getRoomId(), entry.getId(), cmd.user());
+    }
+
+    public PlaybackResult tick(RoomState room, long now) {
+        if (room.isPaused()) return new NoOp();
+        
+        long pos = room.getPosition(now);
+
+        System.out.println("Прошло: " + pos);
+        System.out.println("Должно пройти: " + (room.getDuration() - room.getLastPosition()));
+
+        if (pos >= (room.getDuration() - room.getLastPosition())) {
+            RoomCommand cmd = new Next(
+                room.getRoomId(), 
+                new UserAuthData(
+                    Long.valueOf(0), 
+                    "", 
+                    "Server", 
+                    UserStatus.ACTIVE
+                )
+            );
+            roomCommandQueue.submit(cmd);
+        }
+
+        return new NoOp();
     }
 }

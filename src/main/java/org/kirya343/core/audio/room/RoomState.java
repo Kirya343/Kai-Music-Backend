@@ -1,7 +1,5 @@
 package org.kirya343.core.audio.room;
 
-import java.util.concurrent.ScheduledFuture;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,13 +10,11 @@ public class RoomState {
         Long roomId,
         Long currentQueueEntryId,
         long duration,
-        long remaining,
         boolean paused
     ) {
         this.roomId = roomId;
         this.currentQueueEntryId = currentQueueEntryId;
         this.duration = duration;
-        this.remaining = remaining;
         this.paused = paused;
     }
 
@@ -31,12 +27,21 @@ public class RoomState {
     private long duration;
 
     @Setter
-    private long remaining;
-
-    @Setter
     private boolean paused;
 
     @Setter
-    private ScheduledFuture<?> timer;
+    private long resumedAt;
+
+    @Setter
+    private long lastPosition;
+
+    public long getPosition(long now) {
+
+        long pos = now - resumedAt;
+        
+        long posInSeconds = pos / 1_000_000 / 1000;
+
+        return posInSeconds;
+    }
 
 }
