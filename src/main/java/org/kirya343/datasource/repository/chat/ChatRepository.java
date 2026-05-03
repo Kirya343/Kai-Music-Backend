@@ -29,16 +29,16 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
         )
         AND EXISTS (
                 SELECT 1 FROM ChatParticipant p1
-                WHERE p1.chat.id = c.id AND p1.user.id = :userId1
+                WHERE p1.chat.id = c.id AND p1.user.openId = :userOpenId1
         )
         AND EXISTS (
                 SELECT 1 FROM ChatParticipant p2
-                WHERE p2.chat.id = c.id AND p2.user.id = :userId2
+                WHERE p2.chat.id = c.id AND p2.user.openId = :userOpenId2
         )
     """)
     Optional<Chat> findChatBetweenUsersAndChatTypeAndTargetId(
-            @Param("userId1") Long userId1,
-            @Param("userId2") Long userId2,
+            @Param("userOpenId1") String userOpenId1,
+            @Param("userOpenId2") String userOpenId2,
             @Param("chatType") ChatType chatType,
             @Param("targetId") Long targetId);
 
@@ -95,6 +95,7 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     @Query("""
         SELECT new org.kirya343.dto.chat.ChatDTO(
             c.openId,
+            COALESCE(c.name, ''),
             COALESCE(SUM(CASE WHEN m.read = false AND m.senderOpenId <> :userOpenId THEN 1 ELSE 0 END), 0),
             c.status,
             c.chatType,

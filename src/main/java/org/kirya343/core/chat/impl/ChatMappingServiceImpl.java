@@ -53,6 +53,7 @@ public class ChatMappingServiceImpl implements ChatMappingService {
 
         ChatDTO dto = new ChatDTO(
             chat.getOpenId(),
+            chat.getName(),
             unreadcount,
             status,
             type,

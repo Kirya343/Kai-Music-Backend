@@ -28,7 +28,7 @@ public class ChatController {
     @GetMapping("/private-chat")
     @PermitAll
     public Long getOrCreatePrivateChat(
-        @RequestParam Long interlocutorId,
+        @RequestParam String interlocutorId,
         @AuthenticationPrincipal UserAuthData authData
     ) {
         return chatQueryService.getOrCreatePrivateChat(authData, interlocutorId).getId();

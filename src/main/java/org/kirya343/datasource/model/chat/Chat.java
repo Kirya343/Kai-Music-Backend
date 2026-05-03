@@ -62,6 +62,9 @@ public class Chat {
     @Enumerated(EnumType.STRING)
     private ChatType chatType;
 
+    @Setter
+    private String name;
+
     private Long targetId;
 
     @Transient

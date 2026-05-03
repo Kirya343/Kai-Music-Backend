@@ -26,6 +26,7 @@ import org.kirya343.datasource.model.user.User;
 import org.kirya343.datasource.repository.chat.ChatParticipantRepository;
 import org.kirya343.datasource.repository.chat.ChatRepository;
 import org.kirya343.datasource.repository.chat.MessageRepository;
+import org.kirya343.datasource.repository.user.UserRepository;
 import org.kirya343.dto.user.ShortUserDTO;
 
 import jakarta.persistence.EntityManager;
@@ -51,17 +52,21 @@ public class ChatQueryServiceImpl implements ChatQueryService {
     private final UserMappingService userMappingService;
     private final ChatMappingService mappingService;
 
+    private final UserRepository userRepository;
+
     private final ApplicationEventPublisher eventPublisher;
 
-    public Chat getOrCreatePrivateChat(UserAuthData authData, Long interlocutorId) {
-        Optional<Chat> existing = chatRepository.findChatBetweenUsersAndChatTypeAndTargetId(authData.id(), interlocutorId, ChatType.PRIVATE_CHAT, null);
+    public Chat getOrCreatePrivateChat(UserAuthData authData, String interlocutorOpenId) {
+        Optional<Chat> existing = chatRepository.findChatBetweenUsersAndChatTypeAndTargetId(authData.openId(), interlocutorOpenId, ChatType.PRIVATE_CHAT, null);
         if (existing.isPresent()) {
             return existing.get();
         }
 
-        User user1Proxy = entityManager.getReference(User.class, interlocutorId);
+        User user1 = userRepository.findByOpenId(interlocutorOpenId).orElseThrow(
+            () -> new EntityNotFoundException("Пользователь не найден"));
+
         User user2Proxy = entityManager.getReference(User.class, authData.id());
-        Set<User> participants = Set.of(user1Proxy, user2Proxy);
+        Set<User> participants = Set.of(user1, user2Proxy);
         Chat chat = new Chat(participants, ChatType.PRIVATE_CHAT, null);
         return chatRepository.save(chat);
     }

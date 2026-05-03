@@ -12,7 +12,7 @@ import org.springframework.lang.NonNull;
 
 public interface ChatQueryService {
     
-    Chat getOrCreatePrivateChat(UserAuthData authData, Long interlocutorId);
+    Chat getOrCreatePrivateChat(UserAuthData authData, String interlocutorId);
 
     ChatDTO getChatDTO(String chatOpenId, String userOpenId);
     List<ChatDTO> getChatsDTOForUser(UserAuthData authData);
