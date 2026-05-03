@@ -6,7 +6,6 @@ import java.util.List;
 import org.kirya343.enums.UserStatus;
 
 public record FullUserDTO(
-    Long id,
     String openId,
     String name,
     String avatarUrl,

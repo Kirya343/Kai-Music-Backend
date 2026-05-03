@@ -42,7 +42,7 @@ public class UserMappingServiceImpl implements UserMappingService {
     }
 
     public ShortUserDTO toShortDTO(User user) {
-        return new ShortUserDTO(user.getId(), user.getOpenId(), user.getName(), user.getAvatarUrl());
+        return new ShortUserDTO(user.getOpenId(), user.getName(), user.getAvatarUrl());
     }
 
     public List<UserDTO> toDTOList(Collection<User> users) {
@@ -60,7 +60,6 @@ public class UserMappingServiceImpl implements UserMappingService {
         List<RoleDTO> roles = user.getRoles().stream().map(role -> permissionMappingService.toDTO(role)).toList();
 
         FullUserDTO dto = new FullUserDTO(
-            user.getId(),
             user.getOpenId(),
             user.getName(),
             user.getAvatarUrl(),
