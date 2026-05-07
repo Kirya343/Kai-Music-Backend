@@ -1,4 +1,4 @@
-package org.kirya343.api.controller;
+package org.kirya343.api.controller.audio;
 
 import org.kirya343.core.audio.AudioFileManager;
 import org.kirya343.core.audio.AudioMappingService;

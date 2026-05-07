@@ -37,7 +37,6 @@ public class AudioFileManager {
     private final AudioConverterService audioConverterService;
     private static final Logger logger = LoggerFactory.getLogger(AudioFileManager.class);
 
-    
     public ResponseEntity<InputStreamResource> getAudio(
         Long queueItemId, 
         String rangeHeader, 
@@ -51,7 +50,7 @@ public class AudioFileManager {
         long fileLength = audioFile.length();
 
         String contentType = Files.probeContentType(audioFile.toPath());
-        System.out.println("contentType: " + contentType);
+        logger.debug("contentType: {}", contentType);
         if (contentType == null) {
             contentType = "application/octet-stream"; // fallback
         }

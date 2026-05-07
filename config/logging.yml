@@ -3,10 +3,10 @@ logging:
 
     org.springframework.web.multipart: INFO
     org.springframework.web.servlet.resource: INFO
-    org.springframework.security: DEBUG
+    org.springframework.security: INFO
 
     org.springframework.web.socket: DEBUG
-    org.springframework.messaging: DEBUG
+    org.springframework.messaging: INFO
 
     org.kirya343.core.audio: DEBUG
 

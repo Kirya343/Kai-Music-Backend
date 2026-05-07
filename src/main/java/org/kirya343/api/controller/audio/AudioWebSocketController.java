@@ -1,9 +1,9 @@
-package org.kirya343.api.controller;
+package org.kirya343.api.controller.audio;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kirya343.core.audio.room.RoomCommandGateway;
+import org.kirya343.core.audio.room.RoomCommandWorker;
 import org.kirya343.dto.audio.PlaybackStateDTO;
 import org.kirya343.dto.auth.UserAuthData;
 import org.kirya343.dto.room.commands.Next;
@@ -22,14 +22,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AudioWebSocketController {
 
-    private final RoomCommandGateway roomCommandQueue;
+    private final RoomCommandWorker roomCommandWorker;
     private final Map<String, Long> lastUpdate = new ConcurrentHashMap<>();
     private static final long UPDATE_DELAY_MS = 300;
 
-    private boolean shouldIgnore(Long userId, Long roomId) {
-        long now = System.nanoTime();
+    private boolean shouldIgnore(Long userId, Long roomId, String action) {
+        long now = System.currentTimeMillis();
 
-        String key = userId + ":" + roomId;
+        String key = userId + ":" + roomId + ":" + action;
 
         Long last = lastUpdate.get(key);
 
@@ -48,7 +48,7 @@ public class AudioWebSocketController {
         @AuthenticationPrincipal UserAuthData authData
     ) {
 
-        if (shouldIgnore(authData.id(), roomId)) {
+        if (shouldIgnore(authData.id(), roomId, "updatePlayback")) {
             return;
         }
 
@@ -60,7 +60,7 @@ public class AudioWebSocketController {
             cmd = new Pause(roomId, state, authData);
         }
 
-        roomCommandQueue.submit(cmd);
+        roomCommandWorker.submit(cmd);
     }
 
     @MessageMapping("/room/{roomId}/next")
@@ -68,8 +68,11 @@ public class AudioWebSocketController {
         @DestinationVariable Long roomId,
         @AuthenticationPrincipal UserAuthData authData
     ) {
+        if (shouldIgnore(authData.id(), roomId, "next")) {
+            return;
+        }
         RoomCommand cmd = new Next(roomId, authData);
-        roomCommandQueue.submit(cmd);
+        roomCommandWorker.submit(cmd);
     }
 
     @MessageMapping("/room/{roomId}/prev")
@@ -77,7 +80,10 @@ public class AudioWebSocketController {
         @DestinationVariable Long roomId,
         @AuthenticationPrincipal UserAuthData authData
     ) {
+        if (shouldIgnore(authData.id(), roomId, "prev")) {
+            return;
+        }
         RoomCommand cmd = new Prev(roomId, authData);
-        roomCommandQueue.submit(cmd);
+        roomCommandWorker.submit(cmd);
     }
 }

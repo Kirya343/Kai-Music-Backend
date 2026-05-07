@@ -1,10 +1,6 @@
 package org.kirya343.core.audio.room;
 
-import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.kirya343.datasource.model.audio.ListeningRoom;
 import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
@@ -37,27 +33,18 @@ public class RoomCommandWorker {
     private final ApplicationEventPublisher publisher;
     private final RoomStateStore rooms;
     private final PlaybackService playbackService;
-    private final ExecutorService executor = Executors.newFixedThreadPool(16);
-    private final Set<Long> startedRooms = ConcurrentHashMap.newKeySet();
     private final ListeningRoomRepository listeningRoomRepository;
     private final RoomWebSocketService webSocketService;
+    private final RoomExecutorRegistry executorRegistry;
     private static final Logger logger = LoggerFactory.getLogger(RoomCommandWorker.class);
 
-    public void start(RoomCommandQueue queue, Long roomId) {
+    public void submit(RoomCommand cmd) {
 
-        if (!startedRooms.add(roomId)) {
-            return; // уже запущен
-        }
+        ThreadPoolExecutor executor = executorRegistry.get(cmd.roomId());
 
-        executor.submit(() -> {
+        logExecutorsState();    
 
-            BlockingQueue<RoomCommand> q = queue.getQueue(roomId);
-
-            while (true) {
-                RoomCommand cmd = q.take();
-                handle(cmd);
-            }
-        });
+        executor.submit(() -> handle(cmd));
     }
 
     private void handle(RoomCommand cmd) {
@@ -70,22 +57,38 @@ public class RoomCommandWorker {
 
         PlaybackResult result = switch (cmd) {
             case Play c -> {
-                logger.debug("Включаем трек");
+                PlaybackStateDTO state = c.state();
+                logger.debug(
+                    "\n\nВключаем трек: {} \nВ комнате: {} \nИнициировано пользователем: {}\n", 
+                    state.entryId(), room.getRoomId(), c.user().name()
+                );
+
                 authData = c.user();
                 yield playbackService.play(room, c);
             }
             case Pause c -> {
-                logger.debug("Ставим трек на паузу");
+                PlaybackStateDTO state = c.state();
+                logger.debug(
+                    "\n\nСтавим трек на паузу: {} \nВ комнате: {} \nИнициировано пользователем: {}\n", 
+                    state.entryId(), room.getRoomId(), c.user().name()
+                );
+
                 authData = c.user();
                 yield playbackService.pause(room, c);
             }
             case Next c -> {
-                logger.debug("Переключаем трек вперёд");
+                logger.debug(
+                    "\n\nПереключаем трек вперёд \nВ комнате: {} \nИнициировано пользователем: {}\n", 
+                    room.getRoomId(), c.user().name()
+                );
                 authData = c.user();
                 yield playbackService.next(room, c);
             }
             case Prev c -> {
-                logger.debug("Переключаем трек назад");
+                logger.debug(
+                    "\n\nПереключаем трек назад \nВ комнате: {} \nИнициировано пользователем: {}\n", 
+                    room.getRoomId(), c.user().name()
+                );
                 authData = c.user();
                 yield playbackService.prev(room, c);
             }
@@ -146,5 +149,20 @@ public class RoomCommandWorker {
             }
             default -> throw new RuntimeException("Введена неверная команда");
         }
+    }
+
+    private void logExecutorsState() {
+
+        executorRegistry.getAll().forEach((roomId, executor) -> {
+
+            int queueSize = executor.getQueue().size();
+            int active = executor.getActiveCount();
+            int poolSize = executor.getPoolSize();
+
+            logger.debug(
+                "Room {} | queue={} | active={} | pool={}",
+                roomId, queueSize, active, poolSize
+            );
+        });
     }
 }

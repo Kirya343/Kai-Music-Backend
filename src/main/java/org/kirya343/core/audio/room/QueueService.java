@@ -8,6 +8,8 @@ import org.kirya343.datasource.model.audio.RoomPlaybackState;
 import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
 import org.kirya343.datasource.repository.audio.QueueItemRepository;
 import org.kirya343.datasource.repository.audio.RoomPlaybackStateRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -20,6 +22,7 @@ public class QueueService {
     private final QueueItemRepository queueItemRepository;
     private final ListeningRoomRepository listeningRoomRepository;
     private final RoomPlaybackStateRepository roomPlaybackStateRepository;
+    private static final Logger logger = LoggerFactory.getLogger(QueueService.class);
 
     public List<Long> loadQueue(Long roomId) {
 
@@ -39,11 +42,13 @@ public class QueueService {
 
         Long previousEntryId = playbackState.getCurrentQueueEntryId();
 
+        logger.debug("Переключаем трек в комнате {}, номер предыдущего трека: {}", roomId, previousEntryId);
+
         QueueItem queueItem = null;
 
         switch (room.getPlaybackMode()) {
             case NORMAL:
-                
+
                 queueItem = queueItemRepository.findNextTrack(roomId, previousEntryId).orElse(null);
 
                 break;
@@ -74,6 +79,9 @@ public class QueueService {
         if (queueItem == null) {
             throw new EntityNotFoundException("Нет подходящего трека для воспроизведения");
         } 
+
+        logger.debug("Режим проигрывания комнаты: {}", room.getPlaybackMode());
+        logger.debug("Id следующего трека: {}", queueItem.getId());
 
         return queueItem;
     }

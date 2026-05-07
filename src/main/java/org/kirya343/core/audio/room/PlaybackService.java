@@ -16,6 +16,8 @@ import org.kirya343.dto.room.results.PlaybackResult;
 import org.kirya343.dto.room.results.Resumed;
 import org.kirya343.dto.room.results.TrackChanged;
 import org.kirya343.enums.UserStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -29,10 +31,12 @@ public class PlaybackService {
     private final RoomCommandQueue roomCommandQueue;
     private final AudioService audioService;
     private final QueueItemRepository queueItemRepository;
+    private static final Logger logger = LoggerFactory.getLogger(PlaybackService.class);
 
     public PlaybackResult play(RoomState room, Play cmd) {
 
         PlaybackStateDTO state = cmd.state();
+        long pos = room.getPosition(System.nanoTime());
 
         if (room.getDuration() == 0) {
             QueueItem entry = queueItemRepository.findByRoomIdAndId(room.getRoomId(), state.entryId()).orElseThrow(
@@ -48,6 +52,10 @@ public class PlaybackService {
         room.setLastPosition(state.position());
         room.setPaused(false);
 
+        logger.debug(
+            "\n\nВозобновляем проигрывание песни: {} \nВ комнате: {} \nИнициировано пользователем: {}\n\nСледующая песня через: {} сек\n", 
+            state.entryId(), room.getRoomId(), cmd.user().name(), room.getDuration() - room.getLastPosition() - pos);
+
         return new Resumed(room.getRoomId(), state.entryId(), state.position(), cmd.user());
     }
 
@@ -56,6 +64,9 @@ public class PlaybackService {
 
         PlaybackStateDTO state = cmd.state();
 
+        logger.debug(
+            "\n\nСтавим на паузу песню: {} \nВ комнате: {} \nИнициировано пользователем: {}\n", 
+            state.entryId(), room.getRoomId(), cmd.user().name());
         return new Paused(room.getRoomId(), state.entryId(), state.position(), cmd.user());
     }
 
@@ -94,8 +105,8 @@ public class PlaybackService {
         
         long pos = room.getPosition(now);
 
-        System.out.println("Прошло: " + pos);
-        System.out.println("Должно пройти: " + (room.getDuration() - room.getLastPosition()));
+        /* System.out.println("Прошло: " + pos);
+        System.out.println("Должно пройти: " + (room.getDuration() - room.getLastPosition())); */
 
         if (pos >= (room.getDuration() - room.getLastPosition())) {
             RoomCommand cmd = new Next(
