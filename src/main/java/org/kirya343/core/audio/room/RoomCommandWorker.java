@@ -18,6 +18,7 @@ import org.kirya343.dto.room.results.Paused;
 import org.kirya343.dto.room.results.PlaybackResult;
 import org.kirya343.dto.room.results.Resumed;
 import org.kirya343.dto.room.results.TrackChanged;
+import org.kirya343.enums.UserStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -92,7 +93,24 @@ public class RoomCommandWorker {
                 authData = c.user();
                 yield playbackService.prev(room, c);
             }
-            case Tick c -> playbackService.tick(room, c.now());
+            case Tick c -> {
+                logger.debug("Тикаем комнату {}", room.getRoomId());
+
+                boolean turnOnNext = playbackService.tick(room, c.now());
+                if (turnOnNext) {
+                    RoomCommand command = new Next(
+                        room.getRoomId(), 
+                        new UserAuthData(
+                            Long.valueOf(0), 
+                            "", 
+                            "Server", 
+                            UserStatus.ACTIVE
+                        )
+                    );
+                    submit(command);
+                }
+                yield new NoOp();
+            }
             default -> throw new RuntimeException("Введена неверная команда");
         };
 

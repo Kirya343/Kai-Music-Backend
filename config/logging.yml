@@ -8,7 +8,7 @@ logging:
     org.springframework.web.socket: DEBUG
     org.springframework.messaging: INFO
 
-    org.kirya343.core.audio: DEBUG
+    org.kirya343.core.audio: INFO
 
     com.zaxxer.hikari: INFO
     org.hibernate.SQL: INFO

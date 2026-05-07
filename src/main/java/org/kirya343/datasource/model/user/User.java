@@ -84,6 +84,13 @@ public class User {
     @Setter
     private String passwordHash;
 
+    @Column(length = 40, nullable = false, unique = true)
+    private String apiKey = NanoIdUtils.randomNanoId(
+        NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
+        Constants.ALPHANUMERIC,
+        40
+    );
+
     @Setter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

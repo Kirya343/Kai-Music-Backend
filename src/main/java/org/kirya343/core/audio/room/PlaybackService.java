@@ -4,18 +4,14 @@ import org.kirya343.core.audio.AudioService;
 import org.kirya343.datasource.model.audio.QueueItem;
 import org.kirya343.datasource.repository.audio.QueueItemRepository;
 import org.kirya343.dto.audio.PlaybackStateDTO;
-import org.kirya343.dto.auth.UserAuthData;
 import org.kirya343.dto.room.commands.Next;
 import org.kirya343.dto.room.commands.Pause;
 import org.kirya343.dto.room.commands.Play;
 import org.kirya343.dto.room.commands.Prev;
-import org.kirya343.dto.room.commands.RoomCommand;
-import org.kirya343.dto.room.results.NoOp;
 import org.kirya343.dto.room.results.Paused;
 import org.kirya343.dto.room.results.PlaybackResult;
 import org.kirya343.dto.room.results.Resumed;
 import org.kirya343.dto.room.results.TrackChanged;
-import org.kirya343.enums.UserStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -28,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class PlaybackService {
 
     private final QueueService queueService;
-    private final RoomCommandQueue roomCommandQueue;
     private final AudioService audioService;
     private final QueueItemRepository queueItemRepository;
     private static final Logger logger = LoggerFactory.getLogger(PlaybackService.class);
@@ -53,8 +48,16 @@ public class PlaybackService {
         room.setPaused(false);
 
         logger.debug(
-            "\n\nВозобновляем проигрывание песни: {} \nВ комнате: {} \nИнициировано пользователем: {}\n\nСледующая песня через: {} сек\n", 
-            state.entryId(), room.getRoomId(), cmd.user().name(), room.getDuration() - room.getLastPosition() - pos);
+            "\n\nВозобновляем проигрывание песни: {} \nВ комнате: {} \nИнициировано пользователем: {}\n", 
+            state.entryId(), room.getRoomId(), cmd.user().name());
+
+        logger.debug(
+            "Следующая песня через: {} сек", 
+            room.getDuration() - room.getLastPosition() - pos);
+
+        logger.debug(
+            "Длина песни: {} сек, последняя позиция на: {} сек, текущая позиция на: {} сек", 
+            room.getDuration(), room.getLastPosition(), pos);
 
         return new Resumed(room.getRoomId(), state.entryId(), state.position(), cmd.user());
     }
@@ -100,27 +103,19 @@ public class PlaybackService {
         return new TrackChanged(room.getRoomId(), entry.getId(), cmd.user());
     }
 
-    public PlaybackResult tick(RoomState room, long now) {
-        if (room.isPaused()) return new NoOp();
+    public boolean tick(RoomState room, long now) {
+        if (room.isPaused()) return false;
         
         long pos = room.getPosition(now);
 
-        /* System.out.println("Прошло: " + pos);
-        System.out.println("Должно пройти: " + (room.getDuration() - room.getLastPosition())); */
+        logger.debug("Тикаем комнату: {}, переключим? {}", room.getRoomId(), pos >= (room.getDuration() - room.getLastPosition()));
 
         if (pos >= (room.getDuration() - room.getLastPosition())) {
-            RoomCommand cmd = new Next(
-                room.getRoomId(), 
-                new UserAuthData(
-                    Long.valueOf(0), 
-                    "", 
-                    "Server", 
-                    UserStatus.ACTIVE
-                )
-            );
-            roomCommandQueue.submit(cmd);
+            logger.debug("Отправляем команду на переключение следующей песни");
+
+            return true;
         }
 
-        return new NoOp();
+        return false;
     }
 }

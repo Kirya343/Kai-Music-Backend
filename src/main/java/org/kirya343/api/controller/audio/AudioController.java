@@ -3,6 +3,7 @@ package org.kirya343.api.controller.audio;
 import org.kirya343.core.audio.AudioFileManager;
 import org.kirya343.core.audio.AudioMappingService;
 import org.kirya343.core.audio.AudioQueryService;
+import org.kirya343.core.security.services.UserAuthDataService;
 import org.kirya343.datasource.model.audio.AudioFile;
 import org.kirya343.datasource.model.audio.ListeningRoom;
 import org.kirya343.datasource.model.audio.QueueItem;
@@ -53,6 +54,7 @@ public class AudioController {
     private final ListeningRoomRepository listeningRoomRepository;
     private final RoomPlaybackStateRepository roomPlaybackStateRepository;
     private final AudioFileManager audioFileManager;
+    private final UserAuthDataService userAuthDataService;
 
     @GetMapping("/{queueItemId}")
     public ResponseEntity<InputStreamResource> getAudio(
@@ -115,8 +117,15 @@ public class AudioController {
     @PostMapping("/upload")
     public void uploadAudio(
         @RequestParam MultipartFile file,
+        @RequestParam(required = false) String apiKey,
         @AuthenticationPrincipal UserAuthData authData
     ) {
+
+        if (apiKey != null) {
+            System.out.println("apiKey: " + apiKey);
+            authData = userAuthDataService.load(apiKey);
+        }
+
         audioFileManager.uploadAudio(file, authData);
     }
 
