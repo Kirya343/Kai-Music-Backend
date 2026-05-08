@@ -33,6 +33,7 @@ public class ListeningRoom {
         this.owner = owner;
         this.members = new HashSet<>();
         this.members.add(owner);
+        this.title = owner.getName() + "\'s room";
     }
     
     @Id
@@ -41,6 +42,9 @@ public class ListeningRoom {
  
     @ManyToOne
     private User owner;
+
+    @Setter
+    private String title;
 
     @OneToMany(mappedBy = "listeningRoom")
     private Set<User> members = new HashSet<>();

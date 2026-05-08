@@ -14,8 +14,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AudioMappingService {
     
-    public AudioDTO toDTO(AudioFile audio) {
-        return new AudioDTO(
+    public AudioDTO.Get toDTO(AudioFile audio) {
+        return new AudioDTO.Get(
             audio.getId(), 
             audio.getName(),
             audio.getFormat(),
@@ -39,7 +39,7 @@ public class AudioMappingService {
     public ShortListeningRoomDTO toShortDTO(ListeningRoom room) {
         return new ShortListeningRoomDTO(
             room.getId(), 
-            room.getOwner().getName() + "\'s room", 
+            room.getTitle() != null ? room.getTitle() : room.getOwner().getName() + "\'s room", 
             room.getOwner().getId(),
             room.getMembers().size()
         );

@@ -46,13 +46,18 @@ public class AudioFile {
 
     private String path;
     private String format;
+
+    @Setter
     private String title;
+    @Setter
     private String artist;
+    @Setter
     private String album;
 
     @Setter
     private Long duration;
 
+    @Setter
     private String coverUrl;
 
     @ManyToOne

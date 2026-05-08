@@ -3,7 +3,7 @@ logging:
 
     org.springframework.web.multipart: INFO
     org.springframework.web.servlet.resource: INFO
-    org.springframework.security: INFO
+    org.springframework.security: DEBUG
 
     org.springframework.web.socket: DEBUG
     org.springframework.messaging: INFO

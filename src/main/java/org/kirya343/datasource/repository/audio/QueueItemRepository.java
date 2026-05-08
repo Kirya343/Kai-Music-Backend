@@ -17,6 +17,7 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
  
     Optional<QueueItem> findFirstByRoomOrderByPositionAsc(ListeningRoom room);
     List<QueueItem> findByRoomIdOrderByPosition(Long roomId);
+    void deleteByIdAndRoomId(Long id, Long roomId);
 
     Optional<QueueItem> findByRoomIdAndId(Long roomId, Long entryId);
 

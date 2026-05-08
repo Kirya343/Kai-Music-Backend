@@ -100,6 +100,8 @@ public class AudioFileManager {
 
             AudioMetadataDTO metadata = audioConverterService.getMetadata(tempInput);
 
+            logger.info("Полученные метаданные файла: {}", metadata.toString());
+
             // 2. Конвертация → MP3
             converted = audioConverterService.convertToMp3(tempInput);
             logger.info("Конвертировали в mp3");
@@ -108,9 +110,13 @@ public class AudioFileManager {
             String originalName = uploadedFile.getOriginalFilename();
             String title = originalName;
 
+            logger.info("Оригинальное название файла: {}", originalName);
+
             if (originalName != null && originalName.contains(".")) {
                 title = originalName.substring(0, originalName.lastIndexOf("."));
             }
+
+            logger.info("Итоговое название файла: {}", title);
 
             // ❗ всегда mp3 после конвертации
             String name = UUID.randomUUID().toString() + ".mp3";

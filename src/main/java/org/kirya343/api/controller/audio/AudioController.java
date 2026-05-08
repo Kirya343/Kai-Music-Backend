@@ -14,7 +14,7 @@ import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
 import org.kirya343.datasource.repository.audio.QueueItemRepository;
 import org.kirya343.datasource.repository.audio.RoomPlaybackStateRepository;
 import org.kirya343.dto.audio.AudioDTO;
-import org.kirya343.dto.audio.ListeningRoomDTO;
+import org.kirya343.dto.audio.RoomDTO;
 import org.kirya343.dto.audio.PlaybackStateDTO;
 import org.kirya343.dto.audio.QueueItemDTO;
 import org.kirya343.dto.audio.ShortListeningRoomDTO;
@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -66,14 +67,14 @@ public class AudioController {
     }
 
     @GetMapping("/{queueItemId}/info")
-    public AudioDTO getAudioInfo(@PathVariable Long queueItemId) {
+    public AudioDTO.Get getAudioInfo(@PathVariable Long queueItemId) {
         AudioFile audio = queueItemRepository.findAudioById(queueItemId);
 
         return audioMappingService.toDTO(audio);
     }
 
     @GetMapping("/room")
-    public ListeningRoomDTO getCurrentRoom(@AuthenticationPrincipal UserAuthData authData) {
+    public RoomDTO.Get getCurrentRoom(@AuthenticationPrincipal UserAuthData authData) {
         return audioQueryService.getCurrentRoom(authData);
     }
 
@@ -83,12 +84,12 @@ public class AudioController {
     }
 
     @GetMapping("/library")
-    public List<AudioDTO> getUserLibrary(@AuthenticationPrincipal UserAuthData authData) {
+    public List<AudioDTO.Get> getUserLibrary(@AuthenticationPrincipal UserAuthData authData) {
         return audioFileRepository.findByOwnerId(authData.id())
             .stream().map(a -> audioMappingService.toDTO(a)).toList();
     }
 
-    @PatchMapping("/room/{roomId}")
+    @PatchMapping("/room/{roomId}/queue")
     public QueueItemDTO addToQueue(
         @PathVariable Long roomId, 
         @RequestParam Long audioId,
@@ -105,13 +106,13 @@ public class AudioController {
         return audioMappingService.toDTO(saved);
     }
 
-    @DeleteMapping("/room/{roomId}")
+    @DeleteMapping("/room/{roomId}/queue")
     public void removeFromQueue(
         @PathVariable Long roomId, 
         @RequestParam Long queueItemId,
         @AuthenticationPrincipal UserAuthData authData
     ) {
-        queueItemRepository.deleteById(queueItemId);
+        queueItemRepository.deleteByIdAndRoomId(queueItemId, roomId);
     }
 
     @PostMapping("/upload")
@@ -155,5 +156,38 @@ public class AudioController {
     public void createRoom(@AuthenticationPrincipal UserAuthData authData) {
         ListeningRoom room = new ListeningRoom(entityManager.getReference(User.class, authData.id()));
         listeningRoomRepository.save(room);
+    }
+
+    @PatchMapping("/room/{roomId}")
+    public void updateRoom(
+        @PathVariable Long roomId,
+        @RequestBody RoomDTO.Update roomDto,
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+        
+        ListeningRoom room = listeningRoomRepository.findById(roomId).orElseThrow(
+            () -> new EntityNotFoundException("Комнаты не существует"));
+
+        if (roomDto.title() != null) room.setTitle(roomDto.title());
+
+        listeningRoomRepository.save(room);
+    }
+
+    @PatchMapping("/{audioId}")
+    public void updateAudio(
+        @PathVariable Long audioId,
+        @RequestBody AudioDTO.Update dto,
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+        
+        AudioFile audio = audioFileRepository.findById(audioId).orElseThrow(
+            () -> new EntityNotFoundException("Трека не существует"));
+
+        if (dto.album() != null && dto.album().length() > 0) audio.setAlbum(dto.album());
+        if (dto.artist() != null && dto.artist().length() > 0) audio.setArtist(dto.artist());
+        if (dto.title() != null && dto.title().length() > 0) audio.setTitle(dto.title());
+        if (dto.coverUrl() != null && dto.coverUrl().length() > 0) audio.setCoverUrl(dto.coverUrl());
+
+        audioFileRepository.save(audio);
     }
 }
