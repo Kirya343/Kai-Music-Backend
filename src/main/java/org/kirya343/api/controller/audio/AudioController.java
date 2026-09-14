@@ -1,7 +1,6 @@
 package org.kirya343.api.controller.audio;
 
 import org.kirya343.core.audio.AudioFileManager;
-import org.kirya343.core.audio.AudioMappingService;
 import org.kirya343.core.audio.AudioQueryService;
 import org.kirya343.core.security.services.UserAuthDataService;
 import org.kirya343.datasource.model.audio.AudioFile;
@@ -49,7 +48,6 @@ public class AudioController {
 
     private final AudioQueryService audioQueryService;
     private final AudioFileRepository audioFileRepository;
-    private final AudioMappingService audioMappingService;
     private final EntityManager entityManager;
     private final QueueItemRepository queueItemRepository;
     private final ListeningRoomRepository listeningRoomRepository;
@@ -70,7 +68,7 @@ public class AudioController {
     public AudioDTO.Get getAudioInfo(@PathVariable Long queueItemId) {
         AudioFile audio = queueItemRepository.findAudioById(queueItemId);
 
-        return audioMappingService.toDTO(audio);
+        return AudioDTO.Get.ofAudioFile(audio);
     }
 
     @GetMapping("/room")
@@ -85,8 +83,8 @@ public class AudioController {
 
     @GetMapping("/library")
     public List<AudioDTO.Get> getUserLibrary(@AuthenticationPrincipal UserAuthData authData) {
-        return audioFileRepository.findByOwnerId(authData.id())
-            .stream().map(a -> audioMappingService.toDTO(a)).toList();
+        List<AudioFile> audios = audioFileRepository.findByOwnerId(authData.id());
+        return AudioDTO.Get.ofList(audios);
     }
 
     @PatchMapping("/room/{roomId}/queue")
@@ -103,7 +101,7 @@ public class AudioController {
         );
 
         QueueItem saved = queueItemRepository.save(qi);
-        return audioMappingService.toDTO(saved);
+        return QueueItemDTO.ofQueueItem(saved);
     }
 
     @DeleteMapping("/room/{roomId}/queue")

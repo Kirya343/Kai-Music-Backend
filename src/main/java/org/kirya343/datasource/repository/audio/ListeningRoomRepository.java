@@ -32,13 +32,13 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
     int updatePlaybackMode(@Param("roomId") Long roomId, @Param("mode") PlaybackMode mode);
 
     @Query("""
-        select new org.kirya343.dto.audio.ShortListeningRoomDTO(
+        SELECT new org.kirya343.dto.audio.ShortListeningRoomDTO(
             r.id,
-            concat(r.owner.name, '''s room'),
+            COALESCE(r.title, CONCAT(r.owner.name, '''s room')),
             r.owner.id,
-            size(r.members)
+            SIZE(r.members)
         )
-        from ListeningRoom r
+        FROM ListeningRoom r
     """)
     List<ShortListeningRoomDTO> findAllShortDTOs();
 }

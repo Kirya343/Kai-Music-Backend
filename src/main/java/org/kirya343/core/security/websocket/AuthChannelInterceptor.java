@@ -96,7 +96,7 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         Authentication auth = (Authentication) accessor.getUser();
         if (auth != null && auth.getPrincipal() instanceof UserAuthData) {
-            UserAuthData authData = (UserAuthData) auth.getPrincipal();
+            //UserAuthData authData = (UserAuthData) auth.getPrincipal();
         }
     }
 }

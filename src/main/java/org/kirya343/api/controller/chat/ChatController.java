@@ -3,7 +3,6 @@ package org.kirya343.api.controller.chat;
 import org.kirya343.core.chat.ChatCommandService;
 import org.kirya343.core.chat.ChatQueryService;
 import org.kirya343.dto.auth.UserAuthData;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
