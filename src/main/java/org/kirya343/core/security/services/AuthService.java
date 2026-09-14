@@ -17,7 +17,6 @@ import org.kirya343.dto.auth.RegisterRequest;
 import org.kirya343.enums.AuthProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -45,15 +44,15 @@ public class AuthService {
         User user = userRepository.findByEmail(request.email()).orElse(null);
 
         if (user == null) {
-            return ResponseEntity.ok(Map.of("success", false, "message", "Аккаунт не существует"));
+            return ResponseEntity.ok(Map.of("success", false, "message", "Account does not exist"));
         }
 
         if (!user.getProviders().contains(AuthProvider.LOCAL)) {
-            return ResponseEntity.ok(Map.of("success", false, "message", "В этот аккаунт нельзя зайти через пароль"));
+            return ResponseEntity.ok(Map.of("success", false, "message", "This account does not support local logging in"));
         }
 
         if (!userCommandService.authenticate(user, request.password())) {
-            return ResponseEntity.ok(Map.of("success", false, "message", "Неверный пароль"));
+            return ResponseEntity.ok(Map.of("success", false, "message", "Incorrect password"));
         }
 
         try {
@@ -62,7 +61,7 @@ public class AuthService {
             e.printStackTrace();
         }
 
-        return ResponseEntity.ok(Map.of("success", true, "message", "Вы успешно авторизовались"));
+        return ResponseEntity.ok(Map.of("success", true, "message", "You successfuly signed in"));
     }
 
     public ResponseEntity<?> registerLocal(
@@ -75,21 +74,11 @@ public class AuthService {
             logger.debug("Пользователь с таким именем уже зарегистрирован");
             return ResponseEntity.ok(
                 Map.of("success", false, 
-                       "message", "Это имя уже используется"
+                       "message", "This name is already registered"
                 ));
         }
 
-        User user;
-        
-        try {
-            user = userCommandService.registerLocal(regRequest, request);
-        } catch (DataIntegrityViolationException e) {
-            logger.warn("User register constraint violated: {}", e.getMessage());
-            return ResponseEntity.ok(
-                Map.of("success", false, "message", "Никнейм или почта уже зарегистрированы")
-            );
-        }
-        logger.debug("User registered");
+        User user = userCommandService.registerLocal(regRequest, request);
 
         try {
             cookiesService.setAuthCookies(response, user);
@@ -97,7 +86,7 @@ public class AuthService {
             e.printStackTrace();
         }
 
-        return ResponseEntity.ok(Map.of("success", true, "message", "register_success"));
+        return ResponseEntity.ok(Map.of("success", true, "message", "You successfully signed up"));
     }
 
     public void refreshToken( HttpServletRequest request, HttpServletResponse response) {

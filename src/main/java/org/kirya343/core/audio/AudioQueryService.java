@@ -3,8 +3,8 @@ package org.kirya343.core.audio;
 import org.kirya343.datasource.model.audio.ListeningRoom;
 import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
 import org.kirya343.dto.audio.QueueItemDTO;
-import org.kirya343.dto.audio.RoomDTO;
 import org.kirya343.dto.auth.UserAuthData;
+import org.kirya343.dto.room.RoomDTO;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;

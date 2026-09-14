@@ -13,7 +13,6 @@ import org.kirya343.dto.auth.LoginRequest;
 import org.kirya343.dto.auth.RegisterRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,18 +41,6 @@ public class AuthController {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final AuthService authService;
-    
-    @Value("${api.url}")
-    private String apiUrl;
-
-    @Value("${app.cookie.secure}")
-    private boolean cookieSecure;
-
-    @Value("${app.cookie.domain}")
-    private String cookieDomain;
-
-    @Value("${app.cookie.sameSite}")
-    private String cookieSameSite;
 
     @PostMapping("/login")
     @PermitAll
@@ -108,7 +95,7 @@ public class AuthController {
 
             logger.debug("Айди пользователя: {}", user != null ? user.getId() : 0);
 
-            if (user == null) throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Пользователя не сущестует");
+            if (user == null) throw new ResponseStatusException(HttpStatus.NO_CONTENT, "User does not exist");
 
             cookiesService.setAuthCookies(response, user);
 
@@ -138,7 +125,7 @@ public class AuthController {
             
             cookiesService.deleteAuthCookies(response);
 
-            return ResponseEntity.ok(Map.of("message", "Вы успешно вышли из аккаунта"));
+            return ResponseEntity.ok(Map.of("message", "You are successfully logged out"));
 
         } catch (Exception e) {
             return ResponseEntity.internalServerError()

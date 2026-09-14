@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.kirya343.datasource.model.audio.ListeningRoom;
-import org.kirya343.dto.audio.ShortListeningRoomDTO;
+import org.kirya343.dto.room.ShortListeningRoomDTO;
 import org.kirya343.enums.PlaybackMode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

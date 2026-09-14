@@ -1,4 +1,4 @@
-package org.kirya343.dto.audio;
+package org.kirya343.dto.room;
 
 import org.kirya343.datasource.model.audio.ListeningRoom;
 

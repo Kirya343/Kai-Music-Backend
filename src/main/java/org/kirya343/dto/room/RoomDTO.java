@@ -1,7 +1,8 @@
-package org.kirya343.dto.audio;
+package org.kirya343.dto.room;
 
 import java.util.List;
 
+import org.kirya343.dto.audio.QueueItemDTO;
 import org.kirya343.enums.PlaybackMode;
 
 public class RoomDTO {
