@@ -109,6 +109,7 @@ public class User {
     private Set<AuthProvider> providers = new HashSet<>(Set.of(AuthProvider.LOCAL));
 
     @ManyToOne
+    @Setter
     private ListeningRoom listeningRoom;
 
     @Transient

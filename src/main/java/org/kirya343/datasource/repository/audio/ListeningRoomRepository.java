@@ -26,16 +26,23 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
     """)
     Optional<ListeningRoom> findRoomByUserId(@Param("userId") Long userId);
 
+    boolean existsByOwnerId(Long ownerId);
+    void deleteByOwnerId(Long ownerId);
+
+    List<ListeningRoom> findAllByOwnerId(Long ownerId);
+    Optional<ListeningRoom> findByCode(String code);
+
     @Modifying
     @Transactional
     @Query("UPDATE ListeningRoom r SET r.playbackMode = :mode WHERE r.id = :roomId")
     int updatePlaybackMode(@Param("roomId") Long roomId, @Param("mode") PlaybackMode mode);
 
     @Query("""
-        SELECT new org.kirya343.dto.audio.ShortListeningRoomDTO(
+        SELECT new org.kirya343.dto.room.ShortListeningRoomDTO(
             r.id,
             COALESCE(r.title, CONCAT(r.owner.name, '''s room')),
             r.owner.id,
+            r.code,
             SIZE(r.members)
         )
         FROM ListeningRoom r

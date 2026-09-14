@@ -1,4 +1,4 @@
-package org.kirya343.core.audio.room;
+package org.kirya343.core.audio.playback;
 
 import org.kirya343.dto.audio.PlaybackStateDTO;
 import org.kirya343.dto.auth.UserAuthData;

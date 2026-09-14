@@ -1,4 +1,4 @@
-package org.kirya343.core.audio.room;
+package org.kirya343.core.audio.playback;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

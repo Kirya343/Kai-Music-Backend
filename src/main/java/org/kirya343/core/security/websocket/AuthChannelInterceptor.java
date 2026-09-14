@@ -3,11 +3,14 @@ package org.kirya343.core.security.websocket;
 import java.security.Principal;
 import java.util.Map;
 
+import org.kirya343.core.presence.event.PresenceChangedEvent;
 import org.kirya343.core.security.JwtService;
 import org.kirya343.core.security.services.CachedPermissionsJwtTokenConverter;
 import org.kirya343.dto.auth.UserAuthData;
+import org.kirya343.enums.UserPresence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
@@ -40,6 +43,7 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
 
     private final JwtService jwtService;
     private final CachedPermissionsJwtTokenConverter jwtTokenConverter;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public Message<?> preSend(@NonNull Message<?> message, @NonNull MessageChannel channel) {
@@ -73,7 +77,9 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
 
                 UserAuthData authData = (UserAuthData) auth.getPrincipal();
 
-                logger.debug("Авторизуем вебсокет, authData: {}", authData.toString());
+                eventPublisher.publishEvent(new PresenceChangedEvent(authData.openId(), UserPresence.ONLINE));
+
+                logger.debug("Пользователь подключался от WS: {}", authData.name());
 
                 accessor.setUser(auth);
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -96,7 +102,11 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         Authentication auth = (Authentication) accessor.getUser();
         if (auth != null && auth.getPrincipal() instanceof UserAuthData) {
-            //UserAuthData authData = (UserAuthData) auth.getPrincipal();
+            UserAuthData authData = (UserAuthData) auth.getPrincipal();
+
+            eventPublisher.publishEvent(new PresenceChangedEvent(authData.openId(), UserPresence.OFFLINE));
+
+            logger.debug("Пользователь отключился от WS: {}", authData.name());
         }
     }
 }

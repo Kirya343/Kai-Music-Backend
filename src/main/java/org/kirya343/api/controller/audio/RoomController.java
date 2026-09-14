@@ -3,6 +3,8 @@ package org.kirya343.api.controller.audio;
 import java.util.List;
 
 import org.kirya343.core.audio.AudioQueryService;
+import org.kirya343.core.presence.PresenceService;
+import org.kirya343.core.room.RoomCommandService;
 import org.kirya343.datasource.model.audio.AudioFile;
 import org.kirya343.datasource.model.audio.ListeningRoom;
 import org.kirya343.datasource.model.audio.QueueItem;
@@ -11,9 +13,11 @@ import org.kirya343.datasource.model.user.User;
 import org.kirya343.datasource.repository.audio.ListeningRoomRepository;
 import org.kirya343.datasource.repository.audio.QueueItemRepository;
 import org.kirya343.datasource.repository.audio.RoomPlaybackStateRepository;
+import org.kirya343.datasource.repository.user.UserRepository;
 import org.kirya343.dto.audio.PlaybackStateDTO;
 import org.kirya343.dto.audio.QueueItemDTO;
 import org.kirya343.dto.auth.UserAuthData;
+import org.kirya343.dto.room.MainPageRequest;
 import org.kirya343.dto.room.RoomDTO;
 import org.kirya343.dto.room.ShortListeningRoomDTO;
 import org.kirya343.enums.PlaybackMode;
@@ -42,6 +46,9 @@ public class RoomController {
     private final AudioQueryService audioQueryService;
     private final EntityManager entityManager;
     private final QueueItemRepository queueItemRepository;
+    private final PresenceService presenceService;
+    private final UserRepository userRepository;
+    private final RoomCommandService roomCommandService;
 
     @GetMapping
     public RoomDTO.Get getCurrentRoom(@AuthenticationPrincipal UserAuthData authData) {
@@ -50,13 +57,29 @@ public class RoomController {
 
     @PostMapping
     public void createRoom(@AuthenticationPrincipal UserAuthData authData) {
-        ListeningRoom room = new ListeningRoom(entityManager.getReference(User.class, authData.id()));
-        listeningRoomRepository.save(room);
+        roomCommandService.createRoom(authData.id());
     }
 
-    @GetMapping("/all")
-    public List<ShortListeningRoomDTO> getListingRooms() {
-        return listeningRoomRepository.findAllShortDTOs();
+    @PostMapping("/join")
+    public void setUserRoom(
+        @RequestParam String code,
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+        ListeningRoom room = listeningRoomRepository.findByCode(code).orElseThrow();
+        userRepository.updateListeningRoom(authData.id(), room.getId());
+    }
+
+    @GetMapping("/list/page")
+    public MainPageRequest getMainPage() {
+
+        List<ShortListeningRoomDTO> rooms = listeningRoomRepository.findAllShortDTOs();
+        long roomsCount = listeningRoomRepository.count();
+
+        return new MainPageRequest(
+            rooms,
+            presenceService.countAll(),
+            roomsCount
+        );
     }
 
     @PatchMapping("/{roomId}/mode")
@@ -70,8 +93,7 @@ public class RoomController {
         @AuthenticationPrincipal UserAuthData authData
     ) {
 
-        RoomPlaybackState state = roomPlaybackStateRepository.findById(roomId).orElseThrow(
-            () -> new EntityNotFoundException("Бэкап трека в комнате не найден"));
+        RoomPlaybackState state = roomPlaybackStateRepository.findById(roomId).orElseThrow();
 
         return new PlaybackStateDTO(
             state.getUser(), 

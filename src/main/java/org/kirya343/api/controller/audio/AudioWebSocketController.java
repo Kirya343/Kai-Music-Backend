@@ -3,7 +3,7 @@ package org.kirya343.api.controller.audio;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kirya343.core.audio.room.RoomCommandWorker;
+import org.kirya343.core.audio.playback.RoomCommandWorker;
 import org.kirya343.dto.audio.PlaybackStateDTO;
 import org.kirya343.dto.auth.UserAuthData;
 import org.kirya343.dto.room.commands.Next;

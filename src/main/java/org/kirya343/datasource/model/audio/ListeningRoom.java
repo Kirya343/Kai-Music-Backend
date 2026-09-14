@@ -7,10 +7,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.kirya343.core.config.Constants;
 import org.kirya343.datasource.model.user.User;
 import org.kirya343.enums.PlaybackMode;
 
+import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
+
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -39,6 +43,13 @@ public class ListeningRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true, length = 6)
+    private String code = NanoIdUtils.randomNanoId(
+        NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
+        Constants.ALPHANUMERIC,
+        6
+    );
  
     @ManyToOne
     private User owner;
@@ -49,7 +60,7 @@ public class ListeningRoom {
     @OneToMany(mappedBy = "listeningRoom")
     private Set<User> members = new HashSet<>();
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QueueItem> queue = new ArrayList<>();
     
     @Setter
@@ -59,6 +70,6 @@ public class ListeningRoom {
     @CreationTimestamp
     private Instant createdAt;
 
-    @OneToOne(mappedBy = "room")
+    @OneToOne(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private RoomPlaybackState playbackState;
 }
