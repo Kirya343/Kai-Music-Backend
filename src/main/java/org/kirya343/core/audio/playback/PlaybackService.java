@@ -1,6 +1,7 @@
 package org.kirya343.core.audio.playback;
 
 import org.kirya343.core.audio.AudioService;
+import org.kirya343.core.audio.streaming.AudioStreamWorkerManager;
 import org.kirya343.datasource.model.audio.QueueItem;
 import org.kirya343.datasource.repository.audio.QueueItemRepository;
 import org.kirya343.dto.audio.PlaybackStateDTO;
@@ -12,21 +13,21 @@ import org.kirya343.dto.room.results.Paused;
 import org.kirya343.dto.room.results.PlaybackResult;
 import org.kirya343.dto.room.results.Resumed;
 import org.kirya343.dto.room.results.TrackChanged;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j 
 @RequiredArgsConstructor
 public class PlaybackService {
 
     private final QueueService queueService;
     private final AudioService audioService;
     private final QueueItemRepository queueItemRepository;
-    private static final Logger logger = LoggerFactory.getLogger(PlaybackService.class);
+    private final AudioStreamWorkerManager audioStreamWorkerManager;
 
     public PlaybackResult play(RoomState room, Play cmd) {
 
@@ -47,17 +48,19 @@ public class PlaybackService {
         room.setLastPosition(state.position());
         room.setPaused(false);
 
-        logger.debug(
+        log.debug(
             "\n\nВозобновляем проигрывание песни: {} \nВ комнате: {} \nИнициировано пользователем: {}\n", 
             state.entryId(), room.getRoomId(), cmd.user().name());
 
-        logger.debug(
+        log.debug(
             "Следующая песня через: {} сек", 
             room.getDuration() - room.getLastPosition() - pos);
 
-        logger.debug(
+        log.debug(
             "Длина песни: {} сек, последняя позиция на: {} сек, текущая позиция на: {} сек", 
             room.getDuration(), room.getLastPosition(), pos);
+
+        audioStreamWorkerManager.getWorker(room.getRoomId()).start();
 
         return new Resumed(room.getRoomId(), state.entryId(), state.position(), cmd.user());
     }
@@ -67,9 +70,12 @@ public class PlaybackService {
 
         PlaybackStateDTO state = cmd.state();
 
-        logger.debug(
+        log.debug(
             "\n\nСтавим на паузу песню: {} \nВ комнате: {} \nИнициировано пользователем: {}\n", 
             state.entryId(), room.getRoomId(), cmd.user().name());
+
+        audioStreamWorkerManager.getWorker(room.getRoomId()).stop();
+
         return new Paused(room.getRoomId(), state.entryId(), state.position(), cmd.user());
     }
 
@@ -84,6 +90,8 @@ public class PlaybackService {
         room.setResumedAt(System.nanoTime());
         room.setLastPosition(0);
         room.setPaused(false);
+
+        audioStreamWorkerManager.getWorker(room.getRoomId()).switchTrack(entry.getAudio().getId());
 
         return new TrackChanged(room.getRoomId(), entry.getId(), cmd.user());
     }
@@ -100,6 +108,8 @@ public class PlaybackService {
         room.setLastPosition(0);
         room.setPaused(false);
 
+        audioStreamWorkerManager.getWorker(room.getRoomId()).switchTrack(entry.getAudio().getId());
+
         return new TrackChanged(room.getRoomId(), entry.getId(), cmd.user());
     }
 
@@ -108,10 +118,10 @@ public class PlaybackService {
         
         long pos = room.getPosition(now);
 
-        logger.debug("Тикаем комнату: {}, переключим? {}", room.getRoomId(), pos >= (room.getDuration() - room.getLastPosition()));
+        log.debug("Тикаем комнату: {}, переключим? {}", room.getRoomId(), pos >= (room.getDuration() - room.getLastPosition()));
 
         if (pos >= (room.getDuration() - room.getLastPosition())) {
-            logger.debug("Отправляем команду на переключение следующей песни");
+            log.debug("Отправляем команду на переключение следующей песни");
 
             return true;
         }

@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.kirya343.core.audio.util.AudioConverter;
 import org.kirya343.datasource.model.audio.AudioFile;
 import org.kirya343.datasource.model.user.User;
 import org.kirya343.datasource.repository.audio.AudioFileRepository;
@@ -34,7 +35,6 @@ public class AudioFileManager {
 
     private final AudioFileRepository audioFileRepository;
     private final EntityManager entityManager;
-    private final AudioConverterService audioConverterService;
     private static final Logger logger = LoggerFactory.getLogger(AudioFileManager.class);
 
     public ResponseEntity<InputStreamResource> getAudio(
@@ -95,15 +95,15 @@ public class AudioFileManager {
 
         try {
             // 1. Multipart → File
-            tempInput = audioConverterService.multipartToFile(uploadedFile);
+            tempInput = AudioConverter.multipartToFile(uploadedFile);
             logger.info("Конвертировали из MultipartFile в File");
 
-            AudioMetadataDTO metadata = audioConverterService.getMetadata(tempInput);
+            AudioMetadataDTO metadata = AudioConverter.getMetadata(tempInput);
 
             logger.info("Полученные метаданные файла: {}", metadata.toString());
 
             // 2. Конвертация → MP3
-            converted = audioConverterService.convertToMp3(tempInput);
+            converted = AudioConverter.convertToMp3(tempInput);
             logger.info("Конвертировали в mp3");
 
             // 3. Название

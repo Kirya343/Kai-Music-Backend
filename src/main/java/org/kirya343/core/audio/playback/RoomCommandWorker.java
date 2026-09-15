@@ -115,13 +115,13 @@ public class RoomCommandWorker {
         };
 
         if (!(result instanceof NoOp)) {
-            PlaybackStateDTO dto = mapToDto(result, room);
+            PlaybackStateDTO stateDto = mapToDto(result, room);
 
             publisher.publishEvent(
-                new RoomPlaybackEvent(room.getRoomId(), dto.entryId(), dto.position(), dto.pause(), authData)
+                new RoomPlaybackEvent(room.getRoomId(), stateDto.entryId(), stateDto.position(), stateDto.pause(), authData)
             );
     
-            webSocketService.broadcastPlaybackState(room.getRoomId(), dto);
+            webSocketService.broadcastPlaybackState(room.getRoomId(), stateDto);
         }
     }
 

@@ -1,4 +1,4 @@
-package org.kirya343.core.audio;
+package org.kirya343.core.audio.util;
 
 import ws.schild.jave.Encoder;
 import ws.schild.jave.MultimediaObject;
@@ -18,13 +18,11 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.datatype.Artwork;
 import org.kirya343.dto.audio.AudioMetadataDTO;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service
-public class AudioConverterService {
+public class AudioConverter {
 
-    public File convertToMp3(File inputFile) {
+    public static File convertToMp3(File inputFile) {
         try {
             MultimediaObject multimediaObject = new MultimediaObject(inputFile);
             MultimediaInfo info = multimediaObject.getInfo();
@@ -62,19 +60,19 @@ public class AudioConverterService {
         }
     }
 
-    private String getName(File file) {
+    private static String getName(File file) {
         String name = file.getName();
         int dot = name.lastIndexOf(".");
         return dot == -1 ? name : name.substring(0, dot);
     }
 
-    public File multipartToFile(MultipartFile multipart) throws IOException {
+    public static File multipartToFile(MultipartFile multipart) throws IOException {
         File file = File.createTempFile("upload_", getExtension(multipart));
         multipart.transferTo(file);
         return file;
     }
 
-    private String getExtension(MultipartFile file) {
+    private static String getExtension(MultipartFile file) {
         String name = file.getOriginalFilename();
         if (name == null || !name.contains(".")) {
             return ".tmp";
@@ -82,7 +80,7 @@ public class AudioConverterService {
         return name.substring(name.lastIndexOf("."));
     }
 
-    public AudioMetadataDTO getMetadata(File file) {
+    public static AudioMetadataDTO getMetadata(File file) {
          try {
 
             // ⚙ техническая информация (JAVE / ffmpeg)
@@ -167,7 +165,7 @@ public class AudioConverterService {
         }
     }
 
-    private Integer parseIntSafe(String value) {
+    private static Integer parseIntSafe(String value) {
         try {
             if (value == null || value.isBlank()) return null;
             return Integer.parseInt(value.replaceAll("[^0-9]", ""));
@@ -176,7 +174,7 @@ public class AudioConverterService {
         }
     }
 
-    private String emptyIfNull(String value, String fallback) {
+    private static String emptyIfNull(String value, String fallback) {
         return (value == null || value.isBlank()) ? fallback : value;
     }
 }
