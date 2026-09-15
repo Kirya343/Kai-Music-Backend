@@ -58,7 +58,7 @@ public class RoomController {
 
     @PostMapping
     public void createRoom(@AuthenticationPrincipal UserAuthData authData) {
-        roomCommandService.createRoom(authData.id());
+        roomCommandService.createRoom(authData);
     }
 
     @PostMapping("/join")

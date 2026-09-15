@@ -3,9 +3,11 @@ package org.kirya343.api.controller.audio;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.kirya343.core.audio.AudioQueryService;
 import org.kirya343.core.audio.playback.RoomCommandWorker;
 import org.kirya343.dto.audio.PlaybackStateDTO;
 import org.kirya343.dto.auth.UserAuthData;
+import org.kirya343.dto.room.RoomDTO;
 import org.kirya343.dto.room.commands.Next;
 import org.kirya343.dto.room.commands.Pause;
 import org.kirya343.dto.room.commands.Play;
@@ -13,16 +15,20 @@ import org.kirya343.dto.room.commands.Prev;
 import org.kirya343.dto.room.commands.RoomCommand;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
+@Slf4j 
 @RequiredArgsConstructor
-public class AudioWebSocketController {
+public class RoomWebSocketController {
 
     private final RoomCommandWorker roomCommandWorker;
+    private final AudioQueryService audioQueryService;
     private final Map<String, Long> lastUpdate = new ConcurrentHashMap<>();
     private static final long UPDATE_DELAY_MS = 300;
 
@@ -85,5 +91,14 @@ public class AudioWebSocketController {
         }
         RoomCommand cmd = new Prev(roomId, authData);
         roomCommandWorker.submit(cmd);
+    }
+
+    @MessageMapping("/room/load")
+    @SendToUser("/queue/room")
+    public RoomDTO.Get prev(
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+        log.info("Catched /room/load");
+        return audioQueryService.getCurrentRoom(authData);
     }
 }
