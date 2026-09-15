@@ -48,7 +48,7 @@ public class AudioController {
 
     @GetMapping("/{queueItemId}/info")
     public AudioDTO.Get getAudioInfo(@PathVariable Long queueItemId) {
-        AudioFile audio = queueItemRepository.findAudioById(queueItemId);
+        AudioFile audio = queueItemRepository.findAudioById(queueItemId).orElseThrow();
 
         return AudioDTO.Get.ofAudioFile(audio);
     }
@@ -67,7 +67,6 @@ public class AudioController {
     ) {
 
         if (apiKey != null) {
-            System.out.println("apiKey: " + apiKey);
             authData = userAuthDataService.load(apiKey);
         }
 

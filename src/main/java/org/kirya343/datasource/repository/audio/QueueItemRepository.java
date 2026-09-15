@@ -33,7 +33,7 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
     Optional<AudioFile> findAudioInRoomQueue(Long roomId, Long queueEntryId);
 
     @Query("SELECT q.audio FROM QueueItem q WHERE q.id = :queueItemId")
-    AudioFile findAudioById(@Param("queueItemId") Long queueItemId);
+    Optional<AudioFile> findAudioById(@Param("queueItemId") Long queueItemId);
 
     @Query(value = """
         SELECT * FROM queue_items q

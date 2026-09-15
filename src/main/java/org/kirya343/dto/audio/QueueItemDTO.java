@@ -8,6 +8,7 @@ import org.kirya343.datasource.model.audio.QueueItem;
 public record QueueItemDTO(
     Long id,
     Long audioId,
+    String artist,
     String name,
     Long position
 ) {
@@ -16,6 +17,7 @@ public record QueueItemDTO(
         return new QueueItemDTO(
             qi.getId(), 
             qi.getAudio().getId(),
+            qi.getAudio().getArtist(),
             qi.getAudio().getTitle() != null ? qi.getAudio().getTitle() : qi.getAudio().getName(), 
             qi.getPosition()
         );

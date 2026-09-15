@@ -18,6 +18,9 @@ public class AudioDTO {
         String coverUrl
     ) {
         public static AudioDTO.Get ofAudioFile(AudioFile audio) {
+
+            if (audio == null) return null;
+            
             return new AudioDTO.Get(
                 audio.getId(), 
                 audio.getName(),

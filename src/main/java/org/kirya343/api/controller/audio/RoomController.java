@@ -22,6 +22,7 @@ import org.kirya343.dto.room.RoomDTO;
 import org.kirya343.dto.room.ShortListeningRoomDTO;
 import org.kirya343.enums.PlaybackMode;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -120,6 +121,7 @@ public class RoomController {
         return QueueItemDTO.ofQueueItem(saved);
     }
 
+    @Transactional 
     @DeleteMapping("/{roomId}/queue")
     public void removeFromQueue(
         @PathVariable Long roomId, 
