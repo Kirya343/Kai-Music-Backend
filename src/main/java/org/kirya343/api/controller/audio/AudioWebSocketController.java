@@ -23,40 +23,40 @@ public class AudioWebSocketController {
     @MessageMapping("/audio/get")
     public void getAudioChunk(Principal principal) throws IOException, InterruptedException {
 
-        File file = new File("music/Не все дома.mp3");
+        // File file = new File("music/Не все дома.mp3");
 
-        byte[] audio = Files.readAllBytes(file.toPath());
+        // byte[] audio = Files.readAllBytes(file.toPath());
 
-        log.info("Audio size: {}", audio.length);
+        // log.info("Audio size: {}", audio.length);
 
-        // Примерно 128 KB/s для MP3 1024 kbps.
-        // Для теста можно подобрать размер экспериментально.
-        int chunkSize = 256 * 1024;
+        // // Примерно 128 KB/s для MP3 1024 kbps.
+        // // Для теста можно подобрать размер экспериментально.
+        // int chunkSize = 256 * 1024;
 
-        // Отправляем каждые 4 секунды
-        for (int offset = 0; offset < audio.length; offset += chunkSize) {
+        // // Отправляем каждые 4 секунды
+        // for (int offset = 0; offset < audio.length; offset += chunkSize) {
 
-            int length = Math.min(chunkSize, audio.length - offset);
+        //     int length = Math.min(chunkSize, audio.length - offset);
 
-            byte[] chunk = Arrays.copyOfRange(
-                audio,
-                offset,
-                offset + length
-            );
+        //     byte[] chunk = Arrays.copyOfRange(
+        //         audio,
+        //         offset,
+        //         offset + length
+        //     );
 
-            log.info(
-                "Sending chunk: offset={}, size={}",
-                offset,
-                chunk.length
-            );
+        //     log.info(
+        //         "Sending chunk: offset={}, size={}",
+        //         offset,
+        //         chunk.length
+        //     );
 
-            messagingTemplate.convertAndSendToUser(
-                principal.getName(),
-                "/queue/audio",
-                chunk
-            );
+        //     messagingTemplate.convertAndSendToUser(
+        //         principal.getName(),
+        //         "/queue/audio",
+        //         chunk
+        //     );
 
-            Thread.sleep(4000);
-        }
+        //     Thread.sleep(4000);
+        // }
     }
 }

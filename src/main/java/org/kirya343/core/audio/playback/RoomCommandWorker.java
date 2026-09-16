@@ -43,7 +43,7 @@ public class RoomCommandWorker {
 
         ThreadPoolExecutor executor = executorRegistry.get(cmd.roomId());
 
-        logExecutorsState();    
+        //logExecutorsState();    
 
         executor.submit(() -> handle(cmd));
     }
@@ -94,21 +94,21 @@ public class RoomCommandWorker {
                 yield playbackService.prev(room, c);
             }
             case Tick c -> {
-                logger.debug("Тикаем комнату {}", room.getRoomId());
+                //logger.debug("Тикаем комнату {}", room.getRoomId());
 
-                boolean turnOnNext = playbackService.tick(room, c.now());
-                if (turnOnNext) {
-                    RoomCommand command = new Next(
-                        room.getRoomId(), 
-                        new UserAuthData(
-                            Long.valueOf(0), 
-                            "", 
-                            "Server", 
-                            UserStatus.ACTIVE
-                        )
-                    );
-                    submit(command);
-                }
+                // boolean turnOnNext = playbackService.tick(room, c.now());
+                // if (turnOnNext) {
+                //     RoomCommand command = new Next(
+                //         room.getRoomId(), 
+                //         new UserAuthData(
+                //             Long.valueOf(0), 
+                //             "", 
+                //             "Server", 
+                //             UserStatus.ACTIVE
+                //         )
+                //     );
+                //     submit(command);
+                // }
                 yield new NoOp();
             }
             default -> throw new RuntimeException("Введена неверная команда");

@@ -30,7 +30,7 @@ public class RoomCommandScheduler {
 
         scheduler.scheduleAtFixedRate(() -> {
 
-            logger.debug("Таймер на тик комнаты сработал, команты: {}", rooms.roomIds().size());
+            //logger.debug("Таймер на тик комнаты сработал, команты: {}", rooms.roomIds().size());
 
             long now = System.nanoTime();
 

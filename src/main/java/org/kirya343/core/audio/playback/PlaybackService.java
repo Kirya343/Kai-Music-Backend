@@ -60,7 +60,13 @@ public class PlaybackService {
             "Длина песни: {} сек, последняя позиция на: {} сек, текущая позиция на: {} сек", 
             room.getDuration(), room.getLastPosition(), pos);
 
-        audioStreamWorkerManager.getWorker(room.getRoomId()).start();
+        audioStreamWorkerManager.getWorker(room.getRoomId()).start(
+            new PlaybackStateDTO(
+                cmd.user().name(), 
+                state.entryId(), 
+                state.position(), 
+                false)
+        );
 
         return new Resumed(room.getRoomId(), state.entryId(), state.position(), cmd.user());
     }
@@ -91,7 +97,13 @@ public class PlaybackService {
         room.setLastPosition(0);
         room.setPaused(false);
 
-        audioStreamWorkerManager.getWorker(room.getRoomId()).switchTrack(entry.getAudio().getId());
+        audioStreamWorkerManager.getWorker(room.getRoomId()).switchTrack(
+            new PlaybackStateDTO(
+                cmd.user().name(), 
+                entry.getAudio().getId(), 
+                Long.valueOf(0), 
+                false
+            ));
 
         return new TrackChanged(room.getRoomId(), entry.getId(), cmd.user());
     }
@@ -108,7 +120,13 @@ public class PlaybackService {
         room.setLastPosition(0);
         room.setPaused(false);
 
-        audioStreamWorkerManager.getWorker(room.getRoomId()).switchTrack(entry.getAudio().getId());
+        audioStreamWorkerManager.getWorker(room.getRoomId()).switchTrack(
+            new PlaybackStateDTO(
+                cmd.user().name(), 
+                entry.getAudio().getId(), 
+                Long.valueOf(0), 
+                false
+            ));
 
         return new TrackChanged(room.getRoomId(), entry.getId(), cmd.user());
     }
@@ -118,7 +136,7 @@ public class PlaybackService {
         
         long pos = room.getPosition(now);
 
-        log.debug("Тикаем комнату: {}, переключим? {}", room.getRoomId(), pos >= (room.getDuration() - room.getLastPosition()));
+        //log.debug("Тикаем комнату: {}, переключим? {}", room.getRoomId(), pos >= (room.getDuration() - room.getLastPosition()));
 
         if (pos >= (room.getDuration() - room.getLastPosition())) {
             log.debug("Отправляем команду на переключение следующей песни");

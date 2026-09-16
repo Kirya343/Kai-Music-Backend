@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.kirya343.datasource.model.audio.AudioFile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -23,6 +24,28 @@ public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
     Optional<AudioFile> findAudioInUserRoom(
         Long userId,
         Long queueItemId
+    );
+
+    @Query("""
+        SELECT a
+        FROM QueueItem q
+        JOIN q.audio a
+        WHERE q.id = :queueItemId
+    """)
+    Optional<AudioFile> findAudioByQueueItem(
+        Long queueItemId
+    );
+
+    @Query("""
+        SELECT a
+        FROM QueueItem q
+        JOIN q.audio a
+        JOIN q.room r
+        JOIN r.playbackState ps
+        WHERE r.id = :roomId AND ps.currentQueueEntryId = q.id
+    """)
+    Optional<AudioFile> findCurrentAudioByRoom(
+        @Param("roomId") Long roomId
     );
 
     List<AudioFile> findByOwnerId(Long ownerId);
