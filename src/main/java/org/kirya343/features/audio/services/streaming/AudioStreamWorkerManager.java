@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
+import org.kirya343.features.audio.services.cache.RoomPlaybackStateStore;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ public class AudioStreamWorkerManager {
 
     private final AudioFileRepository audioFileRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final RoomPlaybackStateStore roomPlaybackStateStore;
 
     private final Map<Long, AudioStreamWorker> workers =
             new ConcurrentHashMap<>();
@@ -29,6 +31,7 @@ public class AudioStreamWorkerManager {
                 roomId,
                 id -> new AudioStreamWorker(
                         id,
+                        roomPlaybackStateStore,
                         audioFileRepository,
                         messagingTemplate
                 )

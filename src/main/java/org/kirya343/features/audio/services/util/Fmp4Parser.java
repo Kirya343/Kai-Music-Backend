@@ -2,7 +2,6 @@ package org.kirya343.features.audio.services.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,9 +9,11 @@ import org.kirya343.features.audio.dto.AudioChunk;
 
 public class Fmp4Parser {
 
-    public Result parse(byte[] data) throws IOException {
-        List<AudioChunk> chunks = new ArrayList<>();
-        List<Double> startTimes = new ArrayList<>();
+    private AudioChunk initializationChunk;
+    private List<AudioChunk> chunks;
+    private List<Double> startTimes;
+
+    public void parse(byte[] data) throws IOException {
 
         ByteArrayOutputStream initialization =
             new ByteArrayOutputStream();
@@ -115,25 +116,23 @@ public class Fmp4Parser {
             );
         }
 
-        AudioChunk initializationChunk =
-            new AudioChunk(
-                initialization.toByteArray(),
-                -1,
-                0,
-                true
-            );
-
-        return new Result(
-            initializationChunk,
-            chunks,
-            startTimes
+        initializationChunk = new AudioChunk(
+            initialization.toByteArray(),
+            -1,
+            0,
+            true
         );
     }
     
-    public record Result(
-        AudioChunk initializationChunk,
-        List<AudioChunk> chunks,
-        List<Double> startTimes
-    ) {
+    public AudioChunk getInitializationChunk() {
+        return initializationChunk;
+    }
+
+    public List<AudioChunk> getAudioChunks() {
+        return chunks;
+    }
+
+    public List<Double> getStartTimes() {
+        return startTimes;
     }
 }

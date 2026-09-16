@@ -3,12 +3,15 @@ package org.kirya343.features.audio.services.streaming;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.kirya343.features.audio.services.cache.RoomPlaybackStateStore;
 import org.kirya343.features.audio.services.util.Fmp4Chunker;
 import org.kirya343.features.audio.datasource.model.AudioFile;
 import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
@@ -23,6 +26,7 @@ public class AudioStreamWorker {
 
     private final AudioFileRepository audioFileRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final RoomPlaybackStateStore roomPlaybackStateStore;
     private final ScheduledExecutorService scheduler =
         Executors.newSingleThreadScheduledExecutor();
 
@@ -30,15 +34,18 @@ public class AudioStreamWorker {
 
     private AudioFile audioFile;
     private Fmp4Chunker chunker;
+    private Set<String> initializedListeners = new HashSet<>();
     private ScheduledFuture<?> task;
 
     public AudioStreamWorker(
         Long roomId,
+        RoomPlaybackStateStore roomPlaybackStateStore,
         AudioFileRepository audioFileRepository,
         SimpMessagingTemplate messagingTemplate
     ) {
 
         this.roomId = roomId;
+        this.roomPlaybackStateStore = roomPlaybackStateStore;
         this.audioFileRepository = audioFileRepository;
         this.messagingTemplate = messagingTemplate;
 
@@ -135,63 +142,63 @@ public class AudioStreamWorker {
 
     private void sendNextChunk() {
 
-        try {
+        Set<String> listeners = roomPlaybackStateStore.get(roomId).getListeners();
 
-            AudioChunk chunk = chunker.nextChunk();
+        // удаляем из списка инициализции вышедших пользователей
+        initializedListeners.retainAll(listeners);
 
-            if (chunk == null) {
+        Set<String> newListeners = new HashSet<>(listeners);
 
-                log.info(
-                    "Audio stream finished: room={}, audio={}",
-                    roomId,
-                    audioFile.getName()
-                );
+        // Получаем новых пользователей в комнате
+        newListeners.removeAll(initializedListeners);
 
-                stop();
-
-                return;
-            }
-
-            log.info(
-                "Sending audio chunk: room={}, audio={}, sequence={}, bytes={}, initialization={}",
-                roomId,
-                audioFile.getName(),
-                chunk.sequence(),
-                chunk.data().length,
-                chunk.initialization()
-            );
-
-            Map<String, Object> headers = new HashMap<>();
-
-            headers.put("content-type", "audio/mp4");
-            headers.put("sequence", chunk.sequence());
-            headers.put("duration", chunk.durationMs());
-            headers.put("initialization", chunk.initialization());
-
-            headers.put("audioId", audioFile.getId());
-            headers.put("audioName", audioFile.getName());
-            headers.put("audioFormat", audioFile.getFormat());
-            headers.put("audioTitle", audioFile.getTitle());
-            headers.put("audioArtist", audioFile.getArtist());
-            headers.put("audioAlbum", audioFile.getAlbum());
-            headers.put("audioDuration", audioFile.getDuration());
-            headers.put("audioCoverUrl", audioFile.getCoverUrl());
-
-            messagingTemplate.convertAndSend(
-                "/topic/room/" + roomId + "/audio",
-                chunk.data(),
-                headers
-            );
-
-        } catch (Exception e) {
-
-            log.error(
-                "WORKER FAILED: room={}, audio={}",
-                roomId,
-                audioFile.getName(),
-                e
-            );
+        // Отправка всем новым пользователям чанка инициализации
+        for (String user : newListeners) {
+            sendChunk(user, chunker.initializationChunk());
+            initializedListeners.add(user);
         }
+
+        if (initializedListeners.isEmpty()) {
+            return;
+        }
+
+        AudioChunk chunk = chunker.nextAudioChunk();
+
+        if (chunk == null) {
+            stop();
+            return;
+        }
+
+        // Отправка музыки всем инициализированным пользователям
+        for (String user : initializedListeners) {
+            sendChunk(user, chunk);
+        }
+    }
+
+    private void sendChunk(String user, AudioChunk chunk) {
+        Map<String, Object> headers = new HashMap<>();
+
+        headers.put("content-type", "audio/mp4");
+        headers.put("sequence", chunk.sequence());
+        headers.put("duration", chunk.durationMs());
+        headers.put("initialization", chunk.initialization());
+
+        headers.put("audioId", audioFile.getId());
+        headers.put("audioName", audioFile.getName());
+        headers.put("audioFormat", audioFile.getFormat());
+        headers.put("audioTitle", audioFile.getTitle());
+        headers.put("audioArtist", audioFile.getArtist());
+        headers.put("audioAlbum", audioFile.getAlbum());
+        headers.put("audioDuration", audioFile.getDuration());
+        headers.put("audioCoverUrl", audioFile.getCoverUrl());
+
+
+        messagingTemplate.convertAndSendToUser(
+            user,
+            "/queue/audio",
+            chunk.data(),
+            headers
+        );
     }
 
     private void loadAudio(Long queueItemId) {

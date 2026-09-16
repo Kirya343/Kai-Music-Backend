@@ -1,4 +1,4 @@
-package org.kirya343.features.audio.services.playback;
+package org.kirya343.features.audio.services.eventhandlers;
 
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.audio.datasource.model.RoomPlaybackState;

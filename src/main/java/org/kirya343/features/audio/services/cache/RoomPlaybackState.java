@@ -1,7 +1,7 @@
 package org.kirya343.features.audio.services.cache;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +19,7 @@ public class RoomPlaybackState {
         this.currentQueueEntryId = currentQueueEntryId;
         this.duration = duration;
         this.paused = paused;
-        this.listners = new ArrayList<>();
+        this.listeners = new HashSet<>();
     }
 
     private Long roomId;
@@ -40,7 +40,7 @@ public class RoomPlaybackState {
     private long lastPosition;
 
     @Setter
-    private List<String> listners;
+    private Set<String> listeners;
 
     public long getPosition(long now) {
 
@@ -50,5 +50,4 @@ public class RoomPlaybackState {
 
         return posInSeconds;
     }
-
 }
