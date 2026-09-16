@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AudioUserConnectionEventHandler {
+public class PresenseUserConnectionEventHandler {
 
     private final PresenceService presenceService;
 

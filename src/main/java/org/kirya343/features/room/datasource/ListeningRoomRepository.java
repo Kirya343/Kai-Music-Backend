@@ -28,13 +28,6 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
     boolean existsByOwnerId(Long ownerId);
     void deleteByOwnerId(Long ownerId);
 
-    @Query("""
-        SELECT u.listeningRoom
-        FROM User u
-        WHERE u.id = :userId
-    """)
-    Optional<ListeningRoom> findUserListeningRoom(@Param("userId") Long userId);
-
     List<ListeningRoom> findAllByOwnerId(Long ownerId);
     Optional<ListeningRoom> findByCode(String code);
 

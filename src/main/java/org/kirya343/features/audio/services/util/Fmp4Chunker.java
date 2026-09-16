@@ -13,6 +13,7 @@ public class Fmp4Chunker {
 
     private final List<AudioChunk> chunks;
     private final List<Double> startTimes;
+    private final long durationMs;
     private AudioChunk initializationChunk;
 
     private int index = 0;
@@ -20,10 +21,15 @@ public class Fmp4Chunker {
     public Fmp4Chunker(Path file) throws IOException {
         Fmp4Parser parser = new Fmp4Parser();
 
+        log.info("создаём чанкер");
+
         parser.parse(
             Fmp4Encoder.encode(file)
         );
 
+        log.info("парсим чанки");
+
+        this.durationMs = parser.getDurationMs();
         this.chunks = parser.getAudioChunks();
         this.startTimes = parser.getStartTimes();
         this.initializationChunk = parser.getInitializationChunk();
@@ -43,6 +49,10 @@ public class Fmp4Chunker {
 
     public boolean hasNext() {
         return index < chunks.size();
+    }
+
+    public long getDurationSec() {
+        return durationMs / 1000;
     }
 
     public void seek(double positionSeconds) {

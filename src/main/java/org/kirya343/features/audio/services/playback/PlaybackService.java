@@ -1,8 +1,8 @@
 package org.kirya343.features.audio.services.playback;
 
-import org.kirya343.features.audio.services.AudioService;
-import org.kirya343.features.audio.services.cache.RoomPlaybackState;
+import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
 import org.kirya343.features.audio.services.streaming.AudioStreamWorkerManager;
+import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.audio.datasource.model.QueueItem;
 import org.kirya343.features.audio.datasource.repository.QueueItemRepository;
 import org.kirya343.features.audio.dto.PlaybackStateDTO;
@@ -25,11 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 public class PlaybackService {
 
     private final QueueService queueService;
-    private final AudioService audioService;
     private final QueueItemRepository queueItemRepository;
     private final AudioStreamWorkerManager audioStreamWorkerManager;
 
-    public PlaybackResult play(RoomPlaybackState room, Play cmd) {
+    public PlaybackResult play(RoomPlaybackContext room, Play cmd) {
 
         PlaybackStateDTO state = cmd.state();
         long pos = room.getPosition(System.nanoTime());
@@ -41,12 +40,7 @@ public class PlaybackService {
                 )
                 .orElseThrow();
 
-            Long durationFromDB = entry.getAudio().getDuration();
-            long duration = durationFromDB != null 
-                    ? durationFromDB 
-                    : audioService.getDuration(entry.getAudio().getPath());
-
-            room.setDuration(duration);
+            room.setDuration(AudioMp3Service.getDuration(entry.getAudio()));
         }
 
         room.setCurrentQueueEntryId(state.entryId());
@@ -77,7 +71,7 @@ public class PlaybackService {
         return new Resumed(room.getRoomId(), state.entryId(), state.position(), cmd.user());
     }
 
-    public PlaybackResult pause(RoomPlaybackState room, Pause cmd) {
+    public PlaybackResult pause(RoomPlaybackContext room, Pause cmd) {
         room.setPaused(true);
 
         PlaybackStateDTO state = cmd.state();
@@ -91,11 +85,10 @@ public class PlaybackService {
         return new Paused(room.getRoomId(), state.entryId(), state.position(), cmd.user());
     }
 
-    public PlaybackResult next(RoomPlaybackState room, Next cmd) {
+    public PlaybackResult next(RoomPlaybackContext room, Next cmd) {
         QueueItem entry = queueService.nextTrack(room.getRoomId());
 
-        Long durationFromDB = entry.getAudio().getDuration();
-        long duration = durationFromDB != null ? durationFromDB : audioService.getDuration(entry.getAudio().getPath());
+        long duration = AudioMp3Service.getDuration(entry.getAudio());
 
         room.setCurrentQueueEntryId(entry.getId());
         room.setDuration(duration);
@@ -106,7 +99,7 @@ public class PlaybackService {
         audioStreamWorkerManager.getWorker(room.getRoomId()).switchTrack(
             new PlaybackStateDTO(
                 cmd.user().name(), 
-                entry.getAudio().getId(), 
+                entry.getId(), 
                 Long.valueOf(0), 
                 false
             ));
@@ -114,14 +107,11 @@ public class PlaybackService {
         return new TrackChanged(room.getRoomId(), entry.getId(), cmd.user());
     }
 
-    public PlaybackResult prev(RoomPlaybackState room, Prev cmd) {
+    public PlaybackResult prev(RoomPlaybackContext room, Prev cmd) {
         QueueItem entry = queueService.prevTrack(room.getRoomId());
 
-        Long durationFromDB = entry.getAudio().getDuration();
-        long duration = durationFromDB != null ? durationFromDB : audioService.getDuration(entry.getAudio().getPath());
-
         room.setCurrentQueueEntryId(entry.getId());
-        room.setDuration(duration);
+        room.setDuration(AudioMp3Service.getDuration(entry.getAudio()));
         room.setResumedAt(System.nanoTime());
         room.setLastPosition(0);
         room.setPaused(false);
@@ -129,7 +119,7 @@ public class PlaybackService {
         audioStreamWorkerManager.getWorker(room.getRoomId()).switchTrack(
             new PlaybackStateDTO(
                 cmd.user().name(), 
-                entry.getAudio().getId(), 
+                entry.getId(), 
                 Long.valueOf(0), 
                 false
             ));
@@ -137,7 +127,7 @@ public class PlaybackService {
         return new TrackChanged(room.getRoomId(), entry.getId(), cmd.user());
     }
 
-    public boolean tick(RoomPlaybackState room, long now) {
+    public boolean tick(RoomPlaybackContext room, long now) {
         if (room.isPaused()) return false;
         
         long pos = room.getPosition(now);

@@ -96,12 +96,7 @@ public class RoomController {
 
         RoomPlaybackState state = roomPlaybackStateRepository.findById(roomId).orElseThrow();
 
-        return new PlaybackStateDTO(
-            state.getUser(), 
-            state.getCurrentQueueEntryId(), 
-            state.getCurrentPosition(), 
-            state.isPaused()
-        );
+        return PlaybackStateDTO.ofState(state);
     }
 
     @PatchMapping("/{roomId}/queue")

@@ -45,7 +45,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("""
         select distinct u
         from User u
-        left join fetch u.settings
         left join fetch u.roles r
         left join fetch r.permissions
         where u.id = :id

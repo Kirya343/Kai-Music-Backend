@@ -2,16 +2,21 @@ package org.kirya343.features.audio.services.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.kirya343.features.audio.dto.AudioChunk;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j 
 public class Fmp4Parser {
 
     private AudioChunk initializationChunk;
-    private List<AudioChunk> chunks;
-    private List<Double> startTimes;
+    private List<AudioChunk> chunks = new ArrayList<>();
+    private List<Double> startTimes = new ArrayList<>();
+    private long durationMs = 0;
 
     public void parse(byte[] data) throws IOException {
 
@@ -44,6 +49,8 @@ public class Fmp4Parser {
                 offset + box.size()
             );
 
+            //log.debug("Chunk {}, type: {}", sequence, box.type());
+
             switch (box.type()) {
                 case "ftyp" -> {
                     initialization.write(boxData);
@@ -58,6 +65,14 @@ public class Fmp4Parser {
                                 boxData
                             );
                     }
+
+                    if (durationMs == 0) {
+                        durationMs =
+                            Mp4MetadataReader.readAudioDuration(boxData);
+
+                    }
+
+                    log.info("audioDuration: {}", durationMs);
                 }
 
                 case "moof" -> {
@@ -76,6 +91,7 @@ public class Fmp4Parser {
                 }
 
                 case "mdat" -> {
+
                     if (currentFragment == null) {
                         throw new IOException(
                             "mdat found without preceding moof"
@@ -84,14 +100,12 @@ public class Fmp4Parser {
 
                     currentFragment.write(boxData);
 
-                    chunks.add(
-                        new AudioChunk(
-                            currentFragment.toByteArray(),
-                            sequence++,
-                            5000,
-                            false
-                        )
-                    );
+                    chunks.add(new AudioChunk(
+                        currentFragment.toByteArray(),
+                        sequence++,
+                        5000,
+                        false
+                    ));
 
                     startTimes.add(currentStartTime);
 
@@ -122,10 +136,16 @@ public class Fmp4Parser {
             0,
             true
         );
+
+        log.info("данные парсера заполнены");
     }
     
     public AudioChunk getInitializationChunk() {
         return initializationChunk;
+    }
+
+    public long getDurationMs() {
+        return durationMs;
     }
 
     public List<AudioChunk> getAudioChunks() {

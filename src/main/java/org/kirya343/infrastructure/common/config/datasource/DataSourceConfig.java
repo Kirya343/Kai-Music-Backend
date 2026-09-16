@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-    basePackages = "org.kirya343.datasource.repository", // Пакет основной БД
+    basePackages = "org.kirya343", // Пакет основной БД
     entityManagerFactoryRef = "entityManagerFactory",
     transactionManagerRef = "transactionManager"
 )
@@ -42,7 +42,7 @@ public class DataSourceConfig {
     ) {
         return builder
                 .dataSource(dataSource())
-                .packages("org.kirya343.datasource.model") // Пакет с @Entity
+                .packages("org.kirya343") // Пакет с @Entity
                 .persistenceUnit("central")
                 .build();
     }

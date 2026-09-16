@@ -7,9 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-public class RoomPlaybackState {
+public class RoomPlaybackContext {
 
-    public RoomPlaybackState(
+    public RoomPlaybackContext(
         Long roomId,
         Long currentQueueEntryId,
         long duration,

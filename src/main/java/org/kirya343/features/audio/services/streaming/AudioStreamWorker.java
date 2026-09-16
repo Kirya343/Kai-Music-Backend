@@ -1,6 +1,5 @@
 package org.kirya343.features.audio.services.streaming;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,11 +11,16 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.kirya343.features.audio.services.cache.RoomPlaybackStateStore;
+import org.kirya343.features.audio.services.playback.RoomWebSocketService;
+import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.audio.services.util.Fmp4Chunker;
+import org.kirya343.features.authentication.dto.UserAuthData;
+import org.kirya343.features.room.dto.commands.Next;
 import org.kirya343.features.audio.datasource.model.AudioFile;
 import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
 import org.kirya343.features.audio.dto.AudioChunk;
 import org.kirya343.features.audio.dto.PlaybackStateDTO;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +33,14 @@ public class AudioStreamWorker {
     private final RoomPlaybackStateStore roomPlaybackStateStore;
     private final ScheduledExecutorService scheduler =
         Executors.newSingleThreadScheduledExecutor();
+    private final ApplicationEventPublisher eventPublisher;
+    private final RoomWebSocketService roomWebSocketService;
 
     private final Long roomId;
 
     private AudioFile audioFile;
     private Fmp4Chunker chunker;
+    private long audioTimeLeft;
     private Set<String> initializedListeners = new HashSet<>();
     private ScheduledFuture<?> task;
 
@@ -41,13 +48,17 @@ public class AudioStreamWorker {
         Long roomId,
         RoomPlaybackStateStore roomPlaybackStateStore,
         AudioFileRepository audioFileRepository,
-        SimpMessagingTemplate messagingTemplate
+        SimpMessagingTemplate messagingTemplate,
+        ApplicationEventPublisher eventPublisher,
+        RoomWebSocketService roomWebSocketService
     ) {
 
         this.roomId = roomId;
         this.roomPlaybackStateStore = roomPlaybackStateStore;
         this.audioFileRepository = audioFileRepository;
         this.messagingTemplate = messagingTemplate;
+        this.eventPublisher = eventPublisher;
+        this.roomWebSocketService = roomWebSocketService;
 
         log.info(
             "Created AudioStreamWorker for room {}",
@@ -83,6 +94,12 @@ public class AudioStreamWorker {
 
         loadAudio(stateDTO.entryId());
 
+        long duration = AudioMp3Service.getDuration(audioFile);
+
+        log.info("audioDuration: {}, pos: {}", duration, stateDTO.position());
+
+        audioTimeLeft = duration - stateDTO.position();
+
         chunker.seek(stateDTO.position());
 
         log.info(
@@ -112,7 +129,22 @@ public class AudioStreamWorker {
             () -> {
 
                 try {
-                    sendNextChunk();
+                    if (audioTimeLeft < 0) {
+
+                        log.debug("Sending NEXT event: room={}", roomId);
+                        eventPublisher.publishEvent(new Next(roomId, UserAuthData.server()));
+                        stop();
+                        return;
+                    }
+
+                    sendNextChunk(new PlaybackStateDTO(
+                        stateDTO.user(), 
+                        stateDTO.entryId(), 
+                        chunker.getDurationSec() - audioTimeLeft, 
+                        stateDTO.pause())
+                    );
+
+                    audioTimeLeft = audioTimeLeft - 3;
 
                 } catch (Throwable e) {
 
@@ -140,9 +172,9 @@ public class AudioStreamWorker {
         }
     }
 
-    private void sendNextChunk() {
+    private void sendNextChunk(PlaybackStateDTO stateDTO) {
 
-        Set<String> listeners = roomPlaybackStateStore.get(roomId).getListeners();
+        Set<String> listeners = roomPlaybackStateStore.computeIfAbsent(roomId).getListeners();
 
         // удаляем из списка инициализции вышедших пользователей
         initializedListeners.retainAll(listeners);
@@ -154,8 +186,18 @@ public class AudioStreamWorker {
 
         // Отправка всем новым пользователям чанка инициализации
         for (String user : newListeners) {
-            sendChunk(user, chunker.initializationChunk());
+
+            AudioChunk initializationChunk = chunker.initializationChunk();
+            sendChunk(user, initializationChunk);
+            roomWebSocketService.broadcastPlaybackState(user, stateDTO);
+
             initializedListeners.add(user);
+
+            log.info(
+                "SEND INITIZLIZE CHUNK to {}: idx: {}",
+                user,
+                initializationChunk.sequence()
+            );
         }
 
         if (initializedListeners.isEmpty()) {
@@ -172,6 +214,12 @@ public class AudioStreamWorker {
         // Отправка музыки всем инициализированным пользователям
         for (String user : initializedListeners) {
             sendChunk(user, chunk);
+
+            log.info(
+                "SEND MUSIC CHUNK to {}: idx: {}",
+                user,
+                chunk.sequence()
+            );
         }
     }
 
@@ -232,7 +280,7 @@ public class AudioStreamWorker {
 
             this.chunker = new Fmp4Chunker(path);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
 
             throw new RuntimeException(
                 "Failed to create Fmp4Chunker for audio: "

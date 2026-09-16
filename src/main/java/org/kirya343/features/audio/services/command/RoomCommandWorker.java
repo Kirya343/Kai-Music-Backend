@@ -2,12 +2,10 @@ package org.kirya343.features.audio.services.command;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.kirya343.features.audio.services.cache.RoomPlaybackState;
+import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
 import org.kirya343.features.audio.services.cache.RoomPlaybackStateStore;
 import org.kirya343.features.audio.services.playback.PlaybackService;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
-import org.kirya343.features.room.datasource.ListeningRoom;
-import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.audio.dto.PlaybackStateDTO;
 import org.kirya343.features.audio.dto.RoomPlaybackEvent;
 import org.kirya343.features.authentication.dto.UserAuthData;
@@ -22,25 +20,22 @@ import org.kirya343.features.room.dto.results.Paused;
 import org.kirya343.features.room.dto.results.PlaybackResult;
 import org.kirya343.features.room.dto.results.Resumed;
 import org.kirya343.features.room.dto.results.TrackChanged;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j 
 @RequiredArgsConstructor
 public class RoomCommandWorker {
 
     private final ApplicationEventPublisher publisher;
     private final RoomPlaybackStateStore rooms;
     private final PlaybackService playbackService;
-    private final ListeningRoomRepository listeningRoomRepository;
     private final RoomWebSocketService webSocketService;
     private final RoomExecutorRegistry executorRegistry;
-    private static final Logger logger = LoggerFactory.getLogger(RoomCommandWorker.class);
 
     public void submit(RoomCommand cmd) {
 
@@ -50,17 +45,14 @@ public class RoomCommandWorker {
     }
 
     private void handle(RoomCommand cmd) {
-        RoomPlaybackState room = rooms.computeIfAbsent(
-            cmd.roomId(),
-            () -> createRoomPlaybackState(cmd.roomId())
-        );
+        RoomPlaybackContext room = rooms.computeIfAbsent(cmd.roomId());
 
         UserAuthData authData = null;
 
         PlaybackResult result = switch (cmd) {
             case Play c -> {
                 PlaybackStateDTO state = c.state();
-                logger.debug(
+                log.debug(
                     "\n\nВключаем трек: {} \nВ комнате: {} \nИнициировано пользователем: {}\n", 
                     state.entryId(), room.getRoomId(), c.user().name()
                 );
@@ -70,7 +62,7 @@ public class RoomCommandWorker {
             }
             case Pause c -> {
                 PlaybackStateDTO state = c.state();
-                logger.debug(
+                log.debug(
                     "\n\nСтавим трек на паузу: {} \nВ комнате: {} \nИнициировано пользователем: {}\n", 
                     state.entryId(), room.getRoomId(), c.user().name()
                 );
@@ -79,7 +71,7 @@ public class RoomCommandWorker {
                 yield playbackService.pause(room, c);
             }
             case Next c -> {
-                logger.debug(
+                log.debug(
                     "\n\nПереключаем трек вперёд \nВ комнате: {} \nИнициировано пользователем: {}\n", 
                     room.getRoomId(), c.user().name()
                 );
@@ -87,7 +79,7 @@ public class RoomCommandWorker {
                 yield playbackService.next(room, c);
             }
             case Prev c -> {
-                logger.debug(
+                log.debug(
                     "\n\nПереключаем трек назад \nВ комнате: {} \nИнициировано пользователем: {}\n", 
                     room.getRoomId(), c.user().name()
                 );
@@ -122,25 +114,14 @@ public class RoomCommandWorker {
             publisher.publishEvent(
                 new RoomPlaybackEvent(room.getRoomId(), stateDto.entryId(), stateDto.position(), stateDto.pause(), authData)
             );
-    
-            webSocketService.broadcastPlaybackState(room.getRoomId(), stateDto);
+
+            for (String user : room.getListeners()) {
+                webSocketService.broadcastPlaybackState(user, stateDto);
+            }
         }
     }
 
-    private RoomPlaybackState createRoomPlaybackState(Long roomId) {
-
-        ListeningRoom room = listeningRoomRepository.findById(roomId).orElseThrow(
-            () -> new EntityNotFoundException("комната не найдена"));
-
-        return new RoomPlaybackState(
-            room.getId(),
-            null,
-            0,
-            false
-        );
-    }
-
-    private PlaybackStateDTO mapToDto(PlaybackResult result, RoomPlaybackState room) {
+    private PlaybackStateDTO mapToDto(PlaybackResult result, RoomPlaybackContext room) {
 
         switch (result) {
             case Resumed r -> {
