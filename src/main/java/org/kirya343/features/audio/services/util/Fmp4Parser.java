@@ -2,6 +2,7 @@ package org.kirya343.features.audio.services.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,8 +18,15 @@ public class Fmp4Parser {
     private List<AudioChunk> chunks = new ArrayList<>();
     private List<Double> startTimes = new ArrayList<>();
     private long durationMs = 0;
+    private byte[] data;
 
-    public void parse(byte[] data) throws IOException {
+    public Fmp4Parser(Path file) throws IOException {
+        this.data = Fmp4Encoder.encode(file);
+
+        parse();
+    }
+
+    public void parse() throws IOException {
 
         ByteArrayOutputStream initialization =
             new ByteArrayOutputStream();

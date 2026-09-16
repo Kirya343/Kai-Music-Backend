@@ -1,5 +1,6 @@
 package org.kirya343.features.audio.services.streaming;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,6 +15,7 @@ import org.kirya343.features.audio.services.cache.RoomPlaybackStateStore;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.audio.services.util.Fmp4Chunker;
+import org.kirya343.features.audio.services.util.Fmp4Parser;
 import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.room.dto.commands.Next;
 import org.kirya343.features.audio.datasource.model.AudioFile;
@@ -39,10 +41,11 @@ public class AudioStreamWorker {
     private final Long roomId;
 
     private AudioFile audioFile;
-    private Fmp4Chunker chunker;
+    private Fmp4Parser parser;
     private long audioTimeLeft;
     private Set<String> initializedListeners = new HashSet<>();
     private ScheduledFuture<?> task;
+    private final Map<String, Fmp4Chunker> userChunkers = new HashMap<>();
 
     public AudioStreamWorker(
         Long roomId,
@@ -74,6 +77,8 @@ public class AudioStreamWorker {
             stateDTO.entryId()
         );
 
+        initializedListeners.clear();
+
         stop();
 
         start(stateDTO);
@@ -100,20 +105,12 @@ public class AudioStreamWorker {
 
         audioTimeLeft = duration - stateDTO.position();
 
-        chunker.seek(stateDTO.position());
-
         log.info(
             "START: room={}, audio={}, chunker={}",
             roomId,
             audioFile.getName(),
-            chunker
+            parser
         );
-
-        if (chunker == null) {
-            throw new IllegalStateException(
-                "Cannot start audio stream without audio"
-            );
-        }
 
         if (task != null && !task.isDone() && !task.isCancelled()) {
 
@@ -129,6 +126,12 @@ public class AudioStreamWorker {
             () -> {
 
                 try {
+
+                    Set<String> listeners = roomPlaybackStateStore.computeIfAbsent(roomId).getListeners();
+
+                    // удаляем из списка инициализции вышедших пользователей
+                    initializedListeners.retainAll(listeners);              
+
                     if (audioTimeLeft < 0) {
 
                         log.debug("Sending NEXT event: room={}", roomId);
@@ -137,12 +140,33 @@ public class AudioStreamWorker {
                         return;
                     }
 
-                    sendNextChunk(new PlaybackStateDTO(
-                        stateDTO.user(), 
-                        stateDTO.entryId(), 
-                        chunker.getDurationSec() - audioTimeLeft, 
-                        stateDTO.pause())
-                    );
+                    for (String user : listeners) {
+                        Fmp4Chunker chunker = userChunkers.computeIfAbsent(
+                            user,
+                            ignored -> {
+                                Fmp4Chunker newChunker = null;
+                                try {
+                                    newChunker = new Fmp4Chunker(parser);
+                                } catch (IOException e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
+                                }
+                                newChunker.seek(stateDTO.position());
+                                return newChunker;
+                            }
+                        );
+
+                        if (!initializedListeners.contains(user)) {
+                            sendChunk(user, chunker.initializationChunk());
+                            initializedListeners.add(user);
+                        }
+
+                        AudioChunk chunk = chunker.nextAudioChunk();
+
+                        if (chunk != null) {
+                            sendChunk(user, chunk);
+                        }
+                    }
 
                     audioTimeLeft = audioTimeLeft - 3;
 
@@ -169,57 +193,6 @@ public class AudioStreamWorker {
             task.cancel(false);
             task = null;
 
-        }
-    }
-
-    private void sendNextChunk(PlaybackStateDTO stateDTO) {
-
-        Set<String> listeners = roomPlaybackStateStore.computeIfAbsent(roomId).getListeners();
-
-        // удаляем из списка инициализции вышедших пользователей
-        initializedListeners.retainAll(listeners);
-
-        Set<String> newListeners = new HashSet<>(listeners);
-
-        // Получаем новых пользователей в комнате
-        newListeners.removeAll(initializedListeners);
-
-        // Отправка всем новым пользователям чанка инициализации
-        for (String user : newListeners) {
-
-            AudioChunk initializationChunk = chunker.initializationChunk();
-            sendChunk(user, initializationChunk);
-            roomWebSocketService.broadcastPlaybackState(user, stateDTO);
-
-            initializedListeners.add(user);
-
-            log.info(
-                "SEND INITIZLIZE CHUNK to {}: idx: {}",
-                user,
-                initializationChunk.sequence()
-            );
-        }
-
-        if (initializedListeners.isEmpty()) {
-            return;
-        }
-
-        AudioChunk chunk = chunker.nextAudioChunk();
-
-        if (chunk == null) {
-            stop();
-            return;
-        }
-
-        // Отправка музыки всем инициализированным пользователям
-        for (String user : initializedListeners) {
-            sendChunk(user, chunk);
-
-            log.info(
-                "SEND MUSIC CHUNK to {}: idx: {}",
-                user,
-                chunk.sequence()
-            );
         }
     }
 
@@ -262,10 +235,10 @@ public class AudioStreamWorker {
             audioFile.getPath()
         );
 
-        loadChunker(this.audioFile);
+        loadParser(this.audioFile);
     }
 
-    private void loadChunker(AudioFile audioFile) {
+    private void loadParser(AudioFile audioFile) {
 
         log.info(
             "Loading fMP4 chunker: {}",
@@ -278,7 +251,7 @@ public class AudioStreamWorker {
 
         try {
 
-            this.chunker = new Fmp4Chunker(path);
+            this.parser = new Fmp4Parser(path);
 
         } catch (Exception e) {
 

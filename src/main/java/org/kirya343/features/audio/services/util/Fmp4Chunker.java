@@ -18,16 +18,9 @@ public class Fmp4Chunker {
 
     private int index = 0;
 
-    public Fmp4Chunker(Path file) throws IOException {
-        Fmp4Parser parser = new Fmp4Parser();
+    public Fmp4Chunker(Fmp4Parser parser) throws IOException {
 
         log.info("создаём чанкер");
-
-        parser.parse(
-            Fmp4Encoder.encode(file)
-        );
-
-        log.info("парсим чанки");
 
         this.durationMs = parser.getDurationMs();
         this.chunks = parser.getAudioChunks();
