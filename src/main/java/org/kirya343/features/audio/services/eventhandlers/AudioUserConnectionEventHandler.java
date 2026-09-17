@@ -3,7 +3,7 @@ package org.kirya343.features.audio.services.eventhandlers;
 import org.kirya343.features.audio.datasource.model.RoomPlaybackState;
 import org.kirya343.features.audio.dto.PlaybackStateDTO;
 import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
-import org.kirya343.features.audio.services.cache.RoomPlaybackStateStore;
+import org.kirya343.features.audio.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class AudioUserConnectionEventHandler {
 
     private final ListeningRoomRepository listeningRoomRepository;
-    private final RoomPlaybackStateStore roomPlaybackStateStore;
+    private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final RoomWebSocketService roomWebSocketService;
 
     @Async 
@@ -36,10 +36,10 @@ public class AudioUserConnectionEventHandler {
         
         if (room == null) return;
 
-        roomPlaybackStateStore.computeIfAbsent(room.getId()).getListeners().add(event.authData().openId());
+        roomPlaybackContextStore.computeIfAbsent(room.getId()).getListeners().add(event.authData().openId());
 
         RoomPlaybackState state = room.getPlaybackState();
-        RoomPlaybackContext roomContext = roomPlaybackStateStore.computeIfAbsent(room.getId());
+        RoomPlaybackContext roomContext = roomPlaybackContextStore.computeIfAbsent(room.getId());
 
         roomWebSocketService.broadcastPlaybackState(event.authData().openId(), PlaybackStateDTO.ofState(state));
         roomWebSocketService.broadcastRoomInfo(event.authData().openId(), RoomDTO.ofRoomPlaybackContext(roomContext));
@@ -55,6 +55,6 @@ public class AudioUserConnectionEventHandler {
 
         if (room == null) return;
 
-        roomPlaybackStateStore.computeIfAbsent(room.getId()).getListeners().remove(event.authData().openId());
+        roomPlaybackContextStore.computeIfAbsent(room.getId()).getListeners().remove(event.authData().openId());
     }
 }

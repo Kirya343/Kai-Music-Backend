@@ -37,8 +37,7 @@ public class QueueService {
         ListeningRoom room = listeningRoomRepository.findById(roomId).orElseThrow(
             () -> new EntityNotFoundException("Комната не найдена"));
 
-        RoomPlaybackState playbackState = roomPlaybackStateRepository.findById(roomId).orElseThrow(
-            () -> new EntityNotFoundException("Комната не найдена"));
+        RoomPlaybackState playbackState = roomPlaybackStateRepository.findById(roomId).orElseThrow();
 
         Long previousEntryId = playbackState.getCurrentQueueEntryId();
 

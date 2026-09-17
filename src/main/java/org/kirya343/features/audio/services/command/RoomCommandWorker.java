@@ -3,11 +3,11 @@ package org.kirya343.features.audio.services.command;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
-import org.kirya343.features.audio.services.cache.RoomPlaybackStateStore;
+import org.kirya343.features.audio.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.audio.services.playback.PlaybackService;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.audio.dto.PlaybackStateDTO;
-import org.kirya343.features.audio.dto.RoomPlaybackEvent;
+import org.kirya343.features.audio.dto.event.RoomPlaybackEvent;
 import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.room.dto.commands.Next;
 import org.kirya343.features.room.dto.commands.Pause;
@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RoomCommandWorker {
 
     private final ApplicationEventPublisher publisher;
-    private final RoomPlaybackStateStore rooms;
+    private final RoomPlaybackContextStore rooms;
     private final PlaybackService playbackService;
     private final RoomWebSocketService webSocketService;
     private final RoomExecutorRegistry executorRegistry;

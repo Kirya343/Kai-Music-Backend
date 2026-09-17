@@ -3,7 +3,7 @@ package org.kirya343.features.audio.services.eventhandlers;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.audio.datasource.model.RoomPlaybackState;
 import org.kirya343.features.audio.datasource.repository.RoomPlaybackStateRepository;
-import org.kirya343.features.audio.dto.RoomPlaybackEvent;
+import org.kirya343.features.audio.dto.event.RoomPlaybackEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;

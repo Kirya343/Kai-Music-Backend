@@ -12,7 +12,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
-import org.kirya343.features.audio.services.cache.RoomPlaybackStateStore;
+import org.kirya343.features.audio.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.audio.services.util.Fmp4Chunker;
@@ -34,7 +34,7 @@ public class AudioStreamWorker {
 
     private final AudioFileRepository audioFileRepository;
     private final SimpMessagingTemplate messagingTemplate;
-    private final RoomPlaybackStateStore roomPlaybackStateStore;
+    private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final ScheduledExecutorService scheduler =
         Executors.newSingleThreadScheduledExecutor();
     private final ApplicationEventPublisher eventPublisher;
@@ -51,7 +51,7 @@ public class AudioStreamWorker {
 
     public AudioStreamWorker(
         Long roomId,
-        RoomPlaybackStateStore roomPlaybackStateStore,
+        RoomPlaybackContextStore roomPlaybackContextStore,
         AudioFileRepository audioFileRepository,
         SimpMessagingTemplate messagingTemplate,
         ApplicationEventPublisher eventPublisher,
@@ -59,7 +59,7 @@ public class AudioStreamWorker {
     ) {
 
         this.roomId = roomId;
-        this.roomPlaybackStateStore = roomPlaybackStateStore;
+        this.roomPlaybackContextStore = roomPlaybackContextStore;
         this.audioFileRepository = audioFileRepository;
         this.messagingTemplate = messagingTemplate;
         this.eventPublisher = eventPublisher;
@@ -72,7 +72,7 @@ public class AudioStreamWorker {
     }
 
     private AudioFile getAudioFile() {
-        return roomPlaybackStateStore
+        return roomPlaybackContextStore
             .computeIfAbsent(roomId)
             .getCurrentAudio();
     }
@@ -135,7 +135,7 @@ public class AudioStreamWorker {
 
                 try {
 
-                    Set<String> listeners = roomPlaybackStateStore.computeIfAbsent(roomId).getListeners();
+                    Set<String> listeners = roomPlaybackContextStore.computeIfAbsent(roomId).getListeners();
 
                     // удаляем из списка инициализции вышедших пользователей
                     initializedListeners.retainAll(listeners);
@@ -222,9 +222,9 @@ public class AudioStreamWorker {
                 .findAudioByQueueItem(state.entryId())
                 .orElseThrow();
 
-            roomPlaybackStateStore.get(roomId).setCurrentAudio(audioFile);
+            roomPlaybackContextStore.get(roomId).setCurrentAudio(audioFile);
 
-            RoomPlaybackContext context = roomPlaybackStateStore.get(this.roomId);
+            RoomPlaybackContext context = roomPlaybackContextStore.get(this.roomId);
 
             this.currentState = state;
 

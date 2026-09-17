@@ -1,4 +1,4 @@
-package org.kirya343.features.audio.dto;
+package org.kirya343.features.audio.dto.event;
 
 import org.kirya343.features.authentication.dto.UserAuthData;
 

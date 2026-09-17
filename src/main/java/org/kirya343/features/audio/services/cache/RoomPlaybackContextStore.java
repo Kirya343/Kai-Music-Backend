@@ -6,30 +6,44 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.kirya343.features.audio.datasource.model.AudioFile;
 import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
+import org.kirya343.features.audio.dto.event.RoomContextCreatedEvent;
 import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor 
-public class RoomPlaybackStateStore {
+public class RoomPlaybackContextStore {
 
     private final Map<Long, RoomPlaybackContext> rooms = new ConcurrentHashMap<>();
     private final ListeningRoomRepository listeningRoomRepository;
     private final AudioFileRepository audioFileRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public RoomPlaybackContext get(Long roomId) {
         return rooms.get(roomId);
     }
 
-    public RoomPlaybackContext computeIfAbsent(Long id) {
-        return rooms.computeIfAbsent(
-            id,
-            this::createRoomPlaybackState
-        );
+    public RoomPlaybackContext computeIfAbsent(Long roomId) {
+        RoomPlaybackContext existing = rooms.get(roomId);
+
+        if (existing != null) {
+            return existing;
+        }
+
+        RoomPlaybackContext created = createRoomPlaybackState(roomId);
+        RoomPlaybackContext context = rooms.putIfAbsent(roomId, created);
+
+        if (context == null) {
+            eventPublisher.publishEvent(new RoomContextCreatedEvent(roomId));
+            return created;
+        }
+
+        return context;
     }
 
     public Set<Long> roomIds() {

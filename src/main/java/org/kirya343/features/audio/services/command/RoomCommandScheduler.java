@@ -4,7 +4,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.kirya343.features.audio.services.cache.RoomPlaybackStateStore;
+import org.kirya343.features.audio.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.audio.services.playback.PlaybackService;
 import org.kirya343.features.room.dto.commands.Tick;
 import org.slf4j.Logger;
@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RoomCommandScheduler {
 
-    private final RoomPlaybackStateStore rooms;
+    private final RoomPlaybackContextStore rooms;
     private final RoomCommandWorker roomCommandWorker;
     private static final Logger logger = LoggerFactory.getLogger(PlaybackService.class);
 
