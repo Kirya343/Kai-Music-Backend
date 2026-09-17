@@ -28,7 +28,7 @@ public class RoomWebSocketService {
         );
     }
 
-    public void broadcastRoomInfo(String userOpenId, RoomDTO.Get dto) {
+    public void broadcastRoomInfo(String userOpenId, RoomDTO dto) {
 
         log.debug("Sending room({}) info to user {}", dto.id(), userOpenId);
 

@@ -31,7 +31,7 @@ public class RoomCommandService {
 
         ListeningRoom saved = listeningRoomRepository.save(room);
 
-        roomWebSocketService.broadcastRoomInfo(authData.openId(), RoomDTO.Get.ofRoom(saved));
+        roomWebSocketService.broadcastRoomInfo(authData.openId(), RoomDTO.ofRoom(saved));
 
         return saved;
     }

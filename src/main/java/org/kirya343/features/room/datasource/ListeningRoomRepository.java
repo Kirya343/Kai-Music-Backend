@@ -25,6 +25,13 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
     """)
     Optional<ListeningRoom> findRoomByUserId(@Param("userId") Long userId);
 
+    @Query("""
+        SELECT r FROM ListeningRoom r
+        LEFT JOIN FETCH r.owner
+        WHERE r.id = :roomId
+    """)
+    Optional<ListeningRoom> findFullRoomById(@Param("roomId") Long roomId);
+
     boolean existsByOwnerId(Long ownerId);
     void deleteByOwnerId(Long ownerId);
 

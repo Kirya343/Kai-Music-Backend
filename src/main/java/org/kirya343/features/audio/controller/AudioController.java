@@ -5,6 +5,7 @@ import org.kirya343.features.audio.datasource.model.AudioFile;
 import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
 import org.kirya343.features.audio.datasource.repository.QueueItemRepository;
 import org.kirya343.features.audio.dto.AudioDTO;
+import org.kirya343.features.audio.dto.AudioUpdateDTO;
 import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.audio.services.AudioFileManager;
 import org.springframework.core.io.InputStreamResource;
@@ -47,16 +48,16 @@ public class AudioController {
     }
 
     @GetMapping("/{queueItemId}/info")
-    public AudioDTO.Get getAudioInfo(@PathVariable Long queueItemId) {
+    public AudioDTO getAudioInfo(@PathVariable Long queueItemId) {
         AudioFile audio = queueItemRepository.findAudioById(queueItemId).orElseThrow();
 
-        return AudioDTO.Get.ofAudioFile(audio);
+        return AudioDTO.ofAudioFile(audio);
     }
 
     @GetMapping("/library")
-    public List<AudioDTO.Get> getUserLibrary(@AuthenticationPrincipal UserAuthData authData) {
+    public List<AudioDTO> getUserLibrary(@AuthenticationPrincipal UserAuthData authData) {
         List<AudioFile> audios = audioFileRepository.findByOwnerId(authData.id());
-        return AudioDTO.Get.ofList(audios);
+        return AudioDTO.ofList(audios);
     }
 
     @PostMapping("/upload")
@@ -76,7 +77,7 @@ public class AudioController {
     @PatchMapping("/{audioId}")
     public void updateAudio(
         @PathVariable Long audioId,
-        @RequestBody AudioDTO.Update dto,
+        @RequestBody AudioUpdateDTO dto,
         @AuthenticationPrincipal UserAuthData authData
     ) {
         

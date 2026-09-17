@@ -11,12 +11,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
 import org.kirya343.features.audio.services.cache.RoomPlaybackStateStore;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.audio.services.util.Fmp4Chunker;
 import org.kirya343.features.audio.services.util.Fmp4Parser;
 import org.kirya343.features.authentication.dto.UserAuthData;
+import org.kirya343.features.room.dto.RoomDTO;
 import org.kirya343.features.room.dto.commands.Next;
 import org.kirya343.features.audio.datasource.model.AudioFile;
 import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
@@ -40,7 +42,7 @@ public class AudioStreamWorker {
 
     private final Long roomId;
 
-    private AudioFile audioFile;
+    private PlaybackStateDTO currentState;
     private Fmp4Parser parser;
     private long audioTimeLeft;
     private Set<String> initializedListeners = new HashSet<>();
@@ -67,6 +69,12 @@ public class AudioStreamWorker {
             "Created AudioStreamWorker for room {}",
             roomId
         );
+    }
+
+    private AudioFile getAudioFile() {
+        return roomPlaybackStateStore
+            .computeIfAbsent(roomId)
+            .getCurrentAudio();
     }
 
     public void switchTrack(PlaybackStateDTO stateDTO) {
@@ -97,9 +105,9 @@ public class AudioStreamWorker {
             stateDTO.position()
         );
 
-        loadAudio(stateDTO.entryId());
+        loadAudio(stateDTO);
 
-        long duration = AudioMp3Service.getDuration(audioFile);
+        long duration = AudioMp3Service.getDuration(getAudioFile());
 
         log.info("audioDuration: {}, pos: {}", duration, stateDTO.position());
 
@@ -108,7 +116,7 @@ public class AudioStreamWorker {
         log.info(
             "START: room={}, audio={}, chunker={}",
             roomId,
-            audioFile.getName(),
+            getAudioFile().getName(),
             parser
         );
 
@@ -130,7 +138,11 @@ public class AudioStreamWorker {
                     Set<String> listeners = roomPlaybackStateStore.computeIfAbsent(roomId).getListeners();
 
                     // удаляем из списка инициализции вышедших пользователей
-                    initializedListeners.retainAll(listeners);              
+                    initializedListeners.retainAll(listeners);
+
+                    log.info("listeners: {}", String.join(",", listeners));
+                    log.info("initializedListeners: {}", String.join(",", initializedListeners));
+                    log.info("audioTimeLeft: {}", audioTimeLeft);
 
                     if (audioTimeLeft < 0) {
 
@@ -141,20 +153,7 @@ public class AudioStreamWorker {
                     }
 
                     for (String user : listeners) {
-                        Fmp4Chunker chunker = userChunkers.computeIfAbsent(
-                            user,
-                            ignored -> {
-                                Fmp4Chunker newChunker = null;
-                                try {
-                                    newChunker = new Fmp4Chunker(parser);
-                                } catch (IOException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                                newChunker.seek(stateDTO.position());
-                                return newChunker;
-                            }
-                        );
+                        Fmp4Chunker chunker = getChunker(user, stateDTO);
 
                         if (!initializedListeners.contains(user)) {
                             sendChunk(user, chunker.initializationChunk());
@@ -204,16 +203,6 @@ public class AudioStreamWorker {
         headers.put("duration", chunk.durationMs());
         headers.put("initialization", chunk.initialization());
 
-        headers.put("audioId", audioFile.getId());
-        headers.put("audioName", audioFile.getName());
-        headers.put("audioFormat", audioFile.getFormat());
-        headers.put("audioTitle", audioFile.getTitle());
-        headers.put("audioArtist", audioFile.getArtist());
-        headers.put("audioAlbum", audioFile.getAlbum());
-        headers.put("audioDuration", audioFile.getDuration());
-        headers.put("audioCoverUrl", audioFile.getCoverUrl());
-
-
         messagingTemplate.convertAndSendToUser(
             user,
             "/queue/audio",
@@ -222,31 +211,53 @@ public class AudioStreamWorker {
         );
     }
 
-    private void loadAudio(Long queueItemId) {
+    private void loadAudio(PlaybackStateDTO state) {
 
-        this.audioFile = audioFileRepository
-            .findAudioByQueueItem(queueItemId)
-            .orElseThrow();
+        if (
+            getAudioFile() == null || 
+            currentState == null ||
+            !currentState.entryId().equals(state.entryId())
+        ) {
+            AudioFile audioFile = audioFileRepository
+                .findAudioByQueueItem(state.entryId())
+                .orElseThrow();
 
-        log.info(
-            "NEW AUDIO: id={}, name={}, path={}",
-            audioFile.getId(),
-            audioFile.getName(),
-            audioFile.getPath()
-        );
+            roomPlaybackStateStore.get(roomId).setCurrentAudio(audioFile);
 
-        loadParser(this.audioFile);
+            RoomPlaybackContext context = roomPlaybackStateStore.get(this.roomId);
+
+            this.currentState = state;
+
+            log.info(
+                "NEW AUDIO: id={}, name={}, path={}",
+                getAudioFile().getId(),
+                getAudioFile().getName(),
+                getAudioFile().getPath()
+            );
+
+            loadParser();
+
+            try {
+                for (String user : context.getListeners()) {
+                    getChunker(user, state);
+
+                    roomWebSocketService.broadcastRoomInfo(user, RoomDTO.ofRoomPlaybackContext(context));
+                }
+            } catch (Exception e) {
+                log.info("Exception {}", e);
+            }
+        }
     }
 
-    private void loadParser(AudioFile audioFile) {
+    private void loadParser() {
 
         log.info(
             "Loading fMP4 chunker: {}",
-            audioFile.getPath()
+            getAudioFile().getPath()
         );
 
         Path path = Path.of(
-            audioFile.getPath()
+            getAudioFile().getPath()
         );
 
         try {
@@ -257,9 +268,28 @@ public class AudioStreamWorker {
 
             throw new RuntimeException(
                 "Failed to create Fmp4Chunker for audio: "
-                    + audioFile.getPath(),
+                    + getAudioFile().getPath(),
                 e
             );
         }
+    }
+
+    private Fmp4Chunker getChunker(String user, PlaybackStateDTO stateDTO) {
+        Fmp4Chunker chunker = userChunkers.computeIfAbsent(
+                user,
+                ignored -> {
+                    Fmp4Chunker newChunker = null;
+                    try {
+                        newChunker = new Fmp4Chunker(parser);
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    log.debug("Перематываем чанкер для пользователя {} на позицию: {}", user, stateDTO.position());
+                    newChunker.seek(stateDTO.position());
+                    return newChunker;
+                }
+            );
+        return chunker;
     }
 }

@@ -3,6 +3,9 @@ package org.kirya343.features.audio.services.cache;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.kirya343.features.audio.datasource.model.AudioFile;
+import org.kirya343.features.room.datasource.ListeningRoom;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,13 +16,17 @@ public class RoomPlaybackContext {
         Long roomId,
         Long currentQueueEntryId,
         long duration,
-        boolean paused
+        boolean paused,
+        AudioFile currentAudio,
+        ListeningRoom room
     ) {
         this.roomId = roomId;
         this.currentQueueEntryId = currentQueueEntryId;
         this.duration = duration;
         this.paused = paused;
         this.listeners = new HashSet<>();
+        this.currentAudio = currentAudio;
+        this.room = room;
     }
 
     private Long roomId;
@@ -41,6 +48,11 @@ public class RoomPlaybackContext {
 
     @Setter
     private Set<String> listeners;
+
+    @Setter 
+    private AudioFile currentAudio;
+
+    private ListeningRoom room;
 
     public long getPosition(long now) {
 

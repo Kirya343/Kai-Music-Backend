@@ -3,6 +3,7 @@ package org.kirya343.features.audio.controller;
 import java.util.List;
 
 import org.kirya343.features.audio.services.AudioQueryService;
+import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.presence.services.PresenceService;
 import org.kirya343.features.room.services.RoomCommandService;
 import org.kirya343.features.audio.datasource.model.AudioFile;
@@ -19,6 +20,7 @@ import org.kirya343.features.audio.dto.QueueItemDTO;
 import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.room.dto.MainPageRequest;
 import org.kirya343.features.room.dto.RoomDTO;
+import org.kirya343.features.room.dto.RoomUpdateDTO;
 import org.kirya343.features.room.dto.ShortListeningRoomDTO;
 import org.kirya343.features.audio.enums.PlaybackMode;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,9 +52,10 @@ public class RoomController {
     private final PresenceService presenceService;
     private final UserRepository userRepository;
     private final RoomCommandService roomCommandService;
+    private final RoomWebSocketService roomWebSocketService;
 
     @GetMapping
-    public RoomDTO.Get getCurrentRoom(@AuthenticationPrincipal UserAuthData authData) {
+    public RoomDTO getCurrentRoom(@AuthenticationPrincipal UserAuthData authData) {
         return audioQueryService.getCurrentRoom(authData);
     }
 
@@ -68,6 +71,8 @@ public class RoomController {
     ) {
         ListeningRoom room = listeningRoomRepository.findByCode(code).orElseThrow();
         userRepository.updateListeningRoom(authData.id(), room.getId());
+
+        roomWebSocketService.broadcastRoomInfo(authData.openId(), RoomDTO.ofRoom(room));
     }
 
     @GetMapping("/list/page")
@@ -129,7 +134,7 @@ public class RoomController {
     @PatchMapping("/{roomId}")
     public void updateRoom(
         @PathVariable Long roomId,
-        @RequestBody RoomDTO.Update roomDto,
+        @RequestBody RoomUpdateDTO roomDto,
         @AuthenticationPrincipal UserAuthData authData
     ) {
         

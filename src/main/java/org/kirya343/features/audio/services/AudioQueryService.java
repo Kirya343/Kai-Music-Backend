@@ -14,9 +14,9 @@ public class AudioQueryService {
 
     private final ListeningRoomRepository listeningRoomRepository;
     
-    public RoomDTO.Get getCurrentRoom(UserAuthData authData) {
+    public RoomDTO getCurrentRoom(UserAuthData authData) {
         ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
 
-        return RoomDTO.Get.ofRoom(room);
+        return RoomDTO.ofRoom(room);
     }
 }

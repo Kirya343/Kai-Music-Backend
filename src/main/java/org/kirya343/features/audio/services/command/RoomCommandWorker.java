@@ -41,6 +41,10 @@ public class RoomCommandWorker {
 
         ThreadPoolExecutor executor = executorRegistry.get(cmd.roomId());
 
+        if (cmd.getClass() != Tick.class) {
+            log.debug("Submit command {}", cmd.getClass());
+        }
+        
         executor.submit(() -> handle(cmd));
     }
 
@@ -112,8 +116,13 @@ public class RoomCommandWorker {
             PlaybackStateDTO stateDto = mapToDto(result, room);
 
             publisher.publishEvent(
-                new RoomPlaybackEvent(room.getRoomId(), stateDto.entryId(), stateDto.position(), stateDto.pause(), authData)
-            );
+                new RoomPlaybackEvent(
+                    room.getRoomId(), 
+                    stateDto.entryId(), 
+                    stateDto.position(), 
+                    stateDto.pause(), 
+                    authData
+                ));
 
             for (String user : room.getListeners()) {
                 webSocketService.broadcastPlaybackState(user, stateDto);

@@ -77,6 +77,7 @@ public class RoomWebSocketController {
         if (shouldIgnore(authData.id(), roomId, "next")) {
             return;
         }
+
         RoomCommand cmd = new Next(roomId, authData);
         roomCommandWorker.submit(cmd);
     }
@@ -89,13 +90,14 @@ public class RoomWebSocketController {
         if (shouldIgnore(authData.id(), roomId, "prev")) {
             return;
         }
+        
         RoomCommand cmd = new Prev(roomId, authData);
         roomCommandWorker.submit(cmd);
     }
 
     @MessageMapping("/room/load")
     @SendToUser("/queue/room")
-    public RoomDTO.Get prev(
+    public RoomDTO prev(
         @AuthenticationPrincipal UserAuthData authData
     ) {
         log.info("Catched /room/load");

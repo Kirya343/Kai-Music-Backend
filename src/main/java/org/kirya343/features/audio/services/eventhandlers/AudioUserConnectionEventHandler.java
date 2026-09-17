@@ -2,6 +2,7 @@ package org.kirya343.features.audio.services.eventhandlers;
 
 import org.kirya343.features.audio.datasource.model.RoomPlaybackState;
 import org.kirya343.features.audio.dto.PlaybackStateDTO;
+import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
 import org.kirya343.features.audio.services.cache.RoomPlaybackStateStore;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.room.datasource.ListeningRoom;
@@ -38,9 +39,10 @@ public class AudioUserConnectionEventHandler {
         roomPlaybackStateStore.computeIfAbsent(room.getId()).getListeners().add(event.authData().openId());
 
         RoomPlaybackState state = room.getPlaybackState();
+        RoomPlaybackContext roomContext = roomPlaybackStateStore.computeIfAbsent(room.getId());
 
         roomWebSocketService.broadcastPlaybackState(event.authData().openId(), PlaybackStateDTO.ofState(state));
-        roomWebSocketService.broadcastRoomInfo(event.authData().openId(), RoomDTO.Get.ofRoom(room));
+        roomWebSocketService.broadcastRoomInfo(event.authData().openId(), RoomDTO.ofRoomPlaybackContext(roomContext));
     }
 
     @Async

@@ -4,11 +4,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.kirya343.features.audio.datasource.model.AudioFile;
+import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
+import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.springframework.stereotype.Component;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -17,6 +19,7 @@ public class RoomPlaybackStateStore {
 
     private final Map<Long, RoomPlaybackContext> rooms = new ConcurrentHashMap<>();
     private final ListeningRoomRepository listeningRoomRepository;
+    private final AudioFileRepository audioFileRepository;
 
     public RoomPlaybackContext get(Long roomId) {
         return rooms.get(roomId);
@@ -35,14 +38,17 @@ public class RoomPlaybackStateStore {
 
     private RoomPlaybackContext createRoomPlaybackState(Long roomId) {
 
-        ListeningRoom room = listeningRoomRepository.findById(roomId).orElseThrow(
-            () -> new EntityNotFoundException("комната не найдена"));
+        ListeningRoom room = listeningRoomRepository.findFullRoomById(roomId).orElseThrow();
+
+        AudioFile audioFile = audioFileRepository.findCurrentAudioByRoom(roomId).orElse(null);
 
         return new RoomPlaybackContext(
             room.getId(),
             null,
-            0,
-            false
+            AudioMp3Service.getDuration(audioFile),
+            false,
+            audioFile,
+            room
         );
     }
 }
