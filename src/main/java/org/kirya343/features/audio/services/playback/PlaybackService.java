@@ -103,7 +103,7 @@ public class PlaybackService {
         room.setLastPosition(0);
         room.setPaused(false);
 
-        audioStreamWorkerManager.getWorker(room.getRoomId()).switchTrack(
+        audioStreamWorkerManager.getWorker(room.getRoomId()).start(
             new PlaybackStateDTO(
                 cmd.user().name(), 
                 entry.getId(), 
@@ -123,7 +123,7 @@ public class PlaybackService {
         room.setLastPosition(0);
         room.setPaused(false);
 
-        audioStreamWorkerManager.getWorker(room.getRoomId()).switchTrack(
+        audioStreamWorkerManager.getWorker(room.getRoomId()).start(
             new PlaybackStateDTO(
                 cmd.user().name(), 
                 entry.getId(), 

@@ -79,8 +79,6 @@ public class Fmp4Parser {
                             Mp4MetadataReader.readAudioDuration(boxData);
 
                     }
-
-                    log.info("audioDuration: {}", durationMs);
                 }
 
                 case "moof" -> {

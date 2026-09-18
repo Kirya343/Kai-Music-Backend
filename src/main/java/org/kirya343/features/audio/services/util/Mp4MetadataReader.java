@@ -242,8 +242,6 @@ public class Mp4MetadataReader {
 
                 Long duration = readAudioDurationFromTrak(trakData);
 
-                log.info("audioDuration: {}", duration);
-
                 if (duration != null) {
                     return duration;
                 }

@@ -81,31 +81,22 @@ public class AudioStreamWorker {
         this.initializedListeners.remove(user);
     }
 
-    public void switchTrack(PlaybackStateDTO stateDTO) {
-
-        log.info(
-            "SWITCH TRACK START: room={}, queueEntryId={}",
-            roomId,
-            stateDTO.entryId()
-        );
-
-        initializedListeners.clear();
-
-        stop(stateDTO);
-
-        start(stateDTO);
-
-        log.info(
-            "SWITCH TRACK END: room={}",
-            roomId
-        );
-    }
-
     public void updateState(PlaybackStateDTO stateDTO) {
         loadAudio(stateDTO);
     }
 
     public void start(PlaybackStateDTO stateDTO) {
+
+        if (currentState != null && stateDTO.entryId() != currentState.entryId()) {
+            log.info(
+                "SWITCH TRACK: {} => {}",
+                currentState.entryId(),
+                stateDTO.entryId()
+            );
+
+            stop(stateDTO);
+            initializedListeners.clear();
+        }
 
         log.info(
             "START STATE: entryId={}, position={}",
@@ -208,7 +199,12 @@ public class AudioStreamWorker {
     private void sendChunk(String user, AudioChunk chunk) {
         Map<String, Object> headers = new HashMap<>();
 
-        log.debug("Sending chunk to {}: chunk={}", user, chunk.sequence());
+        log.debug(
+            "Sending {} chunk to {}: chunk={}, audio={}", 
+            chunk.initialization() ? "initialization" : "media", 
+            user, 
+            chunk.sequence(),
+            getAudioFile().getName());
 
         headers.put("content-type", "audio/mp4");
         headers.put("sequence", chunk.sequence());
