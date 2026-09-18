@@ -4,6 +4,7 @@ import org.kirya343.features.audio.datasource.model.RoomPlaybackState;
 import org.kirya343.features.audio.datasource.repository.RoomPlaybackStateRepository;
 import org.kirya343.features.audio.dto.PlaybackStateDTO;
 import org.kirya343.features.audio.dto.event.RoomContextCreatedEvent;
+import org.kirya343.features.audio.services.streaming.AudioStreamWorker;
 import org.kirya343.features.audio.services.streaming.AudioStreamWorkerManager;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,10 @@ public class RoomContextEventHandler {
         
         RoomPlaybackState state = roomPlaybackStateRepository.findById(event.roomId()).orElseThrow();
 
-        audioStreamWorkerManager.getWorker(event.roomId()).start(PlaybackStateDTO.ofState(state));
+        AudioStreamWorker worker = audioStreamWorkerManager.getWorker(event.roomId());
+
+        if (worker != null) {
+            worker.start(PlaybackStateDTO.ofState(state));
+        }
     }
 }

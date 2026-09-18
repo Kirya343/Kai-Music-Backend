@@ -48,6 +48,15 @@ public class Fmp4Chunker {
     }
 
     public void seek(double positionSeconds) {
+
+        log.debug("chunker seek to {}", positionSeconds);
+
+        if (positionSeconds <= 4) {
+            positionSeconds = 0;
+        } else {
+            positionSeconds = positionSeconds - 3;                        
+        }
+
         int targetIndex = 0;
 
         for (int i = 0; i < startTimes.size(); i++) {

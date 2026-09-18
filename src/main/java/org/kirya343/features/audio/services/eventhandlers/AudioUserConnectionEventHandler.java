@@ -5,6 +5,7 @@ import org.kirya343.features.audio.dto.PlaybackStateDTO;
 import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
 import org.kirya343.features.audio.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
+import org.kirya343.features.audio.services.streaming.AudioStreamWorkerManager;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.room.dto.RoomDTO;
@@ -24,6 +25,7 @@ public class AudioUserConnectionEventHandler {
     private final ListeningRoomRepository listeningRoomRepository;
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final RoomWebSocketService roomWebSocketService;
+    private final AudioStreamWorkerManager audioStreamWorkerManager;
 
     @Async 
     @EventListener
@@ -56,5 +58,6 @@ public class AudioUserConnectionEventHandler {
         if (room == null) return;
 
         roomPlaybackContextStore.computeIfAbsent(room.getId()).getListeners().remove(event.authData().openId());
+        audioStreamWorkerManager.getWorker(room.getId()).deleteInitializedListener(event.authData().openId());
     }
 }

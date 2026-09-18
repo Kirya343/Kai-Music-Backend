@@ -6,7 +6,8 @@ import com.mpatric.mp3agic.Mp3File;
 
 public class AudioMp3Service {
 
-    public static Long getDuration(AudioFile audio) {
+    public static long getDuration(AudioFile audio) {
+        if (audio == null) return 0;
         Long durationFromDB = audio.getDuration();
         return durationFromDB != null ? durationFromDB : AudioMp3Service.calculateDuration(audio.getPath());
     }

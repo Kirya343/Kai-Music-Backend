@@ -77,6 +77,10 @@ public class AudioStreamWorker {
             .getCurrentAudio();
     }
 
+    public void deleteInitializedListener(String user) {
+        this.initializedListeners.remove(user);
+    }
+
     public void switchTrack(PlaybackStateDTO stateDTO) {
 
         log.info(
@@ -87,7 +91,7 @@ public class AudioStreamWorker {
 
         initializedListeners.clear();
 
-        stop();
+        stop(stateDTO);
 
         start(stateDTO);
 
@@ -95,6 +99,10 @@ public class AudioStreamWorker {
             "SWITCH TRACK END: room={}",
             roomId
         );
+    }
+
+    public void updateState(PlaybackStateDTO stateDTO) {
+        loadAudio(stateDTO);
     }
 
     public void start(PlaybackStateDTO stateDTO) {
@@ -105,7 +113,10 @@ public class AudioStreamWorker {
             stateDTO.position()
         );
 
-        loadAudio(stateDTO);
+        updateState(stateDTO);
+        if (parser == null) return;
+
+        initializedListeners.forEach(u -> getChunker(u, stateDTO).seek(stateDTO.position()));
 
         long duration = AudioMp3Service.getDuration(getAudioFile());
 
@@ -137,18 +148,15 @@ public class AudioStreamWorker {
 
                     Set<String> listeners = roomPlaybackContextStore.computeIfAbsent(roomId).getListeners();
 
-                    // удаляем из списка инициализции вышедших пользователей
-                    initializedListeners.retainAll(listeners);
-
-                    log.info("listeners: {}", String.join(",", listeners));
-                    log.info("initializedListeners: {}", String.join(",", initializedListeners));
-                    log.info("audioTimeLeft: {}", audioTimeLeft);
+                    //log.info("listeners: {}", String.join(",", listeners));
+                    //log.info("initializedListeners: {}", String.join(",", initializedListeners));
+                    //log.info("audioTimeLeft: {}", audioTimeLeft);
 
                     if (audioTimeLeft < 0) {
 
                         log.debug("Sending NEXT event: room={}", roomId);
                         eventPublisher.publishEvent(new Next(roomId, UserAuthData.server()));
-                        stop();
+                        stop(stateDTO);
                         return;
                     }
 
@@ -185,7 +193,9 @@ public class AudioStreamWorker {
         );
     }
 
-    public void stop() {
+    public void stop(PlaybackStateDTO stateDTO) {
+
+        loadAudio(stateDTO);
 
         if (task != null) {
 
@@ -197,6 +207,8 @@ public class AudioStreamWorker {
 
     private void sendChunk(String user, AudioChunk chunk) {
         Map<String, Object> headers = new HashMap<>();
+
+        log.debug("Sending chunk to {}: chunk={}", user, chunk.sequence());
 
         headers.put("content-type", "audio/mp4");
         headers.put("sequence", chunk.sequence());
@@ -212,6 +224,8 @@ public class AudioStreamWorker {
     }
 
     private void loadAudio(PlaybackStateDTO state) {
+
+        if (state.entryId() == null) return;
 
         if (
             getAudioFile() == null || 
@@ -286,6 +300,7 @@ public class AudioStreamWorker {
                         e.printStackTrace();
                     }
                     log.debug("Перематываем чанкер для пользователя {} на позицию: {}", user, stateDTO.position());
+
                     newChunker.seek(stateDTO.position());
                     return newChunker;
                 }

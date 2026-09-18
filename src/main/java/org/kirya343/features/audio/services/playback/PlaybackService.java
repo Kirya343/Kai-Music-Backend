@@ -81,7 +81,13 @@ public class PlaybackService {
             "\n\nСтавим на паузу песню: {} \nВ комнате: {} \nИнициировано пользователем: {}\n", 
             state.entryId(), room.getRoomId(), cmd.user().name());
 
-        audioStreamWorkerManager.getWorker(room.getRoomId()).stop();
+        audioStreamWorkerManager.getWorker(room.getRoomId()).stop(
+            new PlaybackStateDTO(
+                cmd.user().name(), 
+                state.entryId(), 
+                state.position(), 
+                true)
+        );
 
         return new Paused(room.getRoomId(), state.entryId(), state.position(), cmd.user());
     }

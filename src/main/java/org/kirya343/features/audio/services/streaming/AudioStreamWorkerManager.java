@@ -49,7 +49,7 @@ public class AudioStreamWorkerManager {
         AudioStreamWorker worker = workers.remove(roomId);
 
         if (worker != null) {
-            worker.stop();
+            worker.stop(null);
         }
     }
 }

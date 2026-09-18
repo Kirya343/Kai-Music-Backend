@@ -19,7 +19,7 @@ public class RoomWebSocketService {
 
     public void broadcastPlaybackState(String userOpenId, PlaybackStateDTO state) {
 
-        log.debug("Sending state info to user {}", userOpenId);
+        log.debug("Sending state info to user {}, pos {}, qi {}", userOpenId, state.position(), state.entryId());
 
         messagingTemplate.convertAndSendToUser(
             userOpenId,
