@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.kirya343.features.audio.datasource.model.AudioFile;
 import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
+import org.kirya343.features.audio.dto.PlaybackStateDTO;
 import org.kirya343.features.audio.dto.event.RoomContextCreatedEvent;
 import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.room.datasource.ListeningRoom;
@@ -64,5 +65,14 @@ public class RoomPlaybackContextStore {
             audioFile,
             room
         );
+    }
+
+    public void updateRoomAudio(Long roomId, PlaybackStateDTO state) {
+
+        AudioFile audioFile = audioFileRepository
+            .findAudioByQueueItem(state.entryId())
+            .orElseThrow();
+
+        this.computeIfAbsent(roomId).setCurrentAudio(audioFile);
     }
 }

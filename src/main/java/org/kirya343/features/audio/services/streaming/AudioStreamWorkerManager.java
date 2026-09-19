@@ -3,7 +3,6 @@ package org.kirya343.features.audio.services.streaming;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
 import org.kirya343.features.audio.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.springframework.context.ApplicationEventPublisher;
@@ -18,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AudioStreamWorkerManager {
 
-    private final AudioFileRepository audioFileRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final ApplicationEventPublisher eventPublisher;
@@ -36,7 +34,6 @@ public class AudioStreamWorkerManager {
                 id -> new AudioStreamWorker(
                         id,
                         roomPlaybackContextStore,
-                        audioFileRepository,
                         messagingTemplate,
                         eventPublisher,
                         roomWebSocketService

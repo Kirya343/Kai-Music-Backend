@@ -21,7 +21,6 @@ import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.room.dto.RoomDTO;
 import org.kirya343.features.room.dto.commands.Next;
 import org.kirya343.features.audio.datasource.model.AudioFile;
-import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
 import org.kirya343.features.audio.dto.AudioChunk;
 import org.kirya343.features.audio.dto.PlaybackStateDTO;
 import org.springframework.context.ApplicationEventPublisher;
@@ -32,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AudioStreamWorker {
 
-    private final AudioFileRepository audioFileRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final ScheduledExecutorService scheduler =
@@ -42,17 +40,21 @@ public class AudioStreamWorker {
 
     private final Long roomId;
 
+    private static final int CHUNK_INTERVAL_SECONDS = 3;
+
     private PlaybackStateDTO currentState;
     private Fmp4Parser parser;
-    private long audioTimeLeft;
+    private double playbackPosition;
     private Set<String> initializedListeners = new HashSet<>();
     private ScheduledFuture<?> task;
     private final Map<String, Fmp4Chunker> userChunkers = new HashMap<>();
 
+    private final Map<String, Double> bufferedUntil = new HashMap<>();
+    private static final int PAUSED_BUFFER_SECONDS = 15;
+
     public AudioStreamWorker(
         Long roomId,
         RoomPlaybackContextStore roomPlaybackContextStore,
-        AudioFileRepository audioFileRepository,
         SimpMessagingTemplate messagingTemplate,
         ApplicationEventPublisher eventPublisher,
         RoomWebSocketService roomWebSocketService
@@ -60,7 +62,6 @@ public class AudioStreamWorker {
 
         this.roomId = roomId;
         this.roomPlaybackContextStore = roomPlaybackContextStore;
-        this.audioFileRepository = audioFileRepository;
         this.messagingTemplate = messagingTemplate;
         this.eventPublisher = eventPublisher;
         this.roomWebSocketService = roomWebSocketService;
@@ -81,13 +82,18 @@ public class AudioStreamWorker {
         this.initializedListeners.remove(user);
     }
 
-    public void updateState(PlaybackStateDTO stateDTO) {
-        loadAudio(stateDTO);
-    }
-
     public void start(PlaybackStateDTO stateDTO) {
 
-        if (currentState != null && stateDTO.entryId() != currentState.entryId()) {
+        boolean trackChanged =
+            currentState != null &&
+            !currentState.entryId().equals(stateDTO.entryId());
+
+        /**
+         * if track is changed - clear all users and user chunkers,
+         * becouse for new track audioStreamWorker have to create new parser with new track
+         * and recreate all user chunkers with new parser
+         */
+        if (trackChanged) {
             log.info(
                 "SWITCH TRACK: {} => {}",
                 currentState.entryId(),
@@ -96,15 +102,13 @@ public class AudioStreamWorker {
 
             stop(stateDTO);
             initializedListeners.clear();
+            userChunkers.clear();
         }
 
-        log.info(
-            "START STATE: entryId={}, position={}",
-            stateDTO.entryId(),
-            stateDTO.position()
-        );
+        log.info("START STATE: entryId={}, position={}", stateDTO.entryId(), stateDTO.position());
 
         updateState(stateDTO);
+
         if (parser == null) return;
 
         initializedListeners.forEach(u -> getChunker(u, stateDTO).seek(stateDTO.position()));
@@ -113,7 +117,7 @@ public class AudioStreamWorker {
 
         log.info("audioDuration: {}, pos: {}", duration, stateDTO.position());
 
-        audioTimeLeft = duration - stateDTO.position();
+        playbackPosition = stateDTO.position();
 
         log.info(
             "START: room={}, audio={}, chunker={}",
@@ -137,56 +141,76 @@ public class AudioStreamWorker {
 
                 try {
 
-                    Set<String> listeners = roomPlaybackContextStore.computeIfAbsent(roomId).getListeners();
-
-                    //log.info("listeners: {}", String.join(",", listeners));
-                    //log.info("initializedListeners: {}", String.join(",", initializedListeners));
-                    //log.info("audioTimeLeft: {}", audioTimeLeft);
-
-                    if (audioTimeLeft < 0) {
-
-                        log.debug("Sending NEXT event: room={}", roomId);
-                        eventPublisher.publishEvent(new Next(roomId, UserAuthData.server()));
-                        stop(stateDTO);
-                        return;
-                    }
-
-                    for (String user : listeners) {
-                        Fmp4Chunker chunker = getChunker(user, stateDTO);
-
-                        if (!initializedListeners.contains(user)) {
-                            sendChunk(user, chunker.initializationChunk());
-                            initializedListeners.add(user);
-                        }
-
-                        AudioChunk chunk = chunker.nextAudioChunk();
-
-                        if (chunk != null) {
-                            sendChunk(user, chunk);
-                        }
-                    }
-
-                    audioTimeLeft = audioTimeLeft - 3;
+                    streamTick(stateDTO);
 
                 } catch (Throwable e) {
 
-                    log.error(
-                        "SCHEDULED TASK CRASHED: room={}",
-                        roomId,
-                        e
-                    );
+                    log.error("SCHEDULED TASK CRASHED: room={}", roomId, e);
                 }
 
             },
             0,
-            3,
+            CHUNK_INTERVAL_SECONDS,
             TimeUnit.SECONDS
         );
     }
 
-    public void stop(PlaybackStateDTO stateDTO) {
+    public void streamTick(PlaybackStateDTO stateDTO) {
+        Set<String> listeners = roomPlaybackContextStore.computeIfAbsent(roomId).getListeners();
 
-        loadAudio(stateDTO);
+        //log.info("listeners: {}", String.join(",", listeners));
+        //log.info("initializedListeners: {}", String.join(",", initializedListeners));
+        //log.info("audioTimeLeft: {}", audioTimeLeft);
+
+        if (playbackPosition < getAudioFile().getDuration()) {
+
+            log.debug("Sending NEXT event: room={}", roomId);
+            eventPublisher.publishEvent(new Next(roomId, UserAuthData.server()));
+            stop(stateDTO);
+            return;
+        }
+
+        for (String user : listeners) {
+
+            Fmp4Chunker chunker = getChunker(user, stateDTO);
+
+            if (!initializedListeners.contains(user)) {
+                sendChunk(user, chunker.initializationChunk());
+                initializedListeners.add(user);
+            }
+
+            if (chunker.hasNext()) {
+
+                AudioChunk chunk = chunker.nextAudioChunk();
+
+                if (currentState.pause()) {
+                    double target = currentState.position() + PAUSED_BUFFER_SECONDS;
+
+                    if (bufferedUntil.getOrDefault(user, 0.0) < target) {
+
+                        sendChunk(user, chunk);
+
+                        /**
+                        * that formule counts time summ of prev chunks with current chunk
+                        * and multiple it with base chunk-duration 
+                        **/
+                        bufferedUntil.put(
+                            user,
+                            (chunk.sequence() + 2) * (chunk.durationMs() / 1000.0)
+                        );
+                    }
+                } else {
+                    sendChunk(user, chunk);
+                }
+            }
+        }
+
+        if (!currentState.pause()) {
+            playbackPosition += 3;
+        }
+    }
+
+    public void stop(PlaybackStateDTO stateDTO) {
 
         if (task != null) {
 
@@ -194,6 +218,8 @@ public class AudioStreamWorker {
             task = null;
 
         }
+
+        updateState(stateDTO);
     }
 
     private void sendChunk(String user, AudioChunk chunk) {
@@ -219,39 +245,45 @@ public class AudioStreamWorker {
         );
     }
 
-    private void loadAudio(PlaybackStateDTO state) {
+    public void updateState(PlaybackStateDTO state) {
 
         if (state.entryId() == null) return;
 
+        boolean audioChanged =
+            currentState != null &&
+            !currentState.entryId().equals(state.entryId());
+
+        /**
+         * if audiofile in room is null, or if playback.entryId is changed, then:
+         *  - get audio by queue entry id and set it to RoomPlaybackContext
+         *  - updating currentState if audio is changed
+         */
         if (
-            getAudioFile() == null || 
+            getAudioFile() == null ||
             currentState == null ||
-            !currentState.entryId().equals(state.entryId())
+            audioChanged
         ) {
-            AudioFile audioFile = audioFileRepository
-                .findAudioByQueueItem(state.entryId())
-                .orElseThrow();
+            if (audioChanged) {
+                initializedListeners.clear();
+                userChunkers.clear();
+            }
 
-            roomPlaybackContextStore.get(roomId).setCurrentAudio(audioFile);
+            currentState = state;
 
-            RoomPlaybackContext context = roomPlaybackContextStore.get(this.roomId);
-
-            this.currentState = state;
-
-            log.info(
-                "NEW AUDIO: id={}, name={}, path={}",
-                getAudioFile().getId(),
-                getAudioFile().getName(),
-                getAudioFile().getPath()
-            );
-
+            roomPlaybackContextStore.updateRoomAudio(roomId, state);
             loadParser();
+
+            RoomPlaybackContext context =
+                roomPlaybackContextStore.get(roomId);
 
             try {
                 for (String user : context.getListeners()) {
-                    getChunker(user, state);
+                    getChunker(user, currentState);
 
-                    roomWebSocketService.broadcastRoomInfo(user, RoomDTO.ofRoomPlaybackContext(context));
+                    roomWebSocketService.broadcastRoomInfo(
+                        user,
+                        RoomDTO.ofRoomPlaybackContext(context)
+                    );
                 }
             } catch (Exception e) {
                 log.info("Exception {}", e);
