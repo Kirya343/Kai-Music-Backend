@@ -44,7 +44,7 @@ public class AudioStreamWorker {
 
     private PlaybackStateDTO currentState;
     private Fmp4Parser parser;
-    private double playbackPosition;
+    private long playbackPosition = 0;
     private Set<String> initializedListeners = new HashSet<>();
     private ScheduledFuture<?> task;
     private final Map<String, Fmp4Chunker> userChunkers = new HashMap<>();
@@ -160,9 +160,8 @@ public class AudioStreamWorker {
 
         //log.info("listeners: {}", String.join(",", listeners));
         //log.info("initializedListeners: {}", String.join(",", initializedListeners));
-        //log.info("audioTimeLeft: {}", audioTimeLeft);
 
-        if (playbackPosition < getAudioFile().getDuration()) {
+        if (playbackPosition > getAudioFile().getDuration()) {
 
             log.debug("Sending NEXT event: room={}", roomId);
             eventPublisher.publishEvent(new Next(roomId, UserAuthData.server()));
@@ -266,6 +265,7 @@ public class AudioStreamWorker {
             if (audioChanged) {
                 initializedListeners.clear();
                 userChunkers.clear();
+                playbackPosition = 0;
             }
 
             currentState = state;
