@@ -7,14 +7,25 @@ import org.kirya343.features.audio.datasource.model.AudioFile;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.audio.datasource.model.QueueItem;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
  
     Optional<QueueItem> findFirstByRoomOrderByPositionAsc(ListeningRoom room);
     List<QueueItem> findByRoomIdOrderByPosition(Long roomId);
     void deleteByIdAndRoomId(Long id, Long roomId);
+
+    @Modifying
+    @Transactional
+    @Query("""
+           DELETE FROM QueueItem q
+           WHERE q.room.id = :userId
+           AND q.id = :id
+        """)
+    long removeFromUserRoom(@Param("id") Long id, @Param("userId") Long userId);
 
     Optional<QueueItem> findByRoomIdAndId(Long roomId, Long entryId);
 

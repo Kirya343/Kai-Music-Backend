@@ -98,14 +98,13 @@ public class AudioStreamWorker {
                 stateDTO.entryId()
             );
 
-            stop(stateDTO);
             initializedListeners.clear();
             userChunkers.clear();
         }
 
-        log.info("START STATE: entryId={}, position={}", stateDTO.entryId(), stateDTO.position());
+        stop(stateDTO);
 
-        updateState(stateDTO);
+        log.info("START STATE: entryId={}, position={}", stateDTO.entryId(), stateDTO.position());
 
         initializedListeners.forEach(u -> getChunker(u, stateDTO).seek(stateDTO.position()));
 
@@ -143,9 +142,9 @@ public class AudioStreamWorker {
     public void streamTick(PlaybackStateDTO stateDTO) throws IOException {
         Set<String> listeners = roomPlaybackContextStore.computeIfAbsent(roomId).getListeners();
 
-        //log.info("listeners: {}", String.join(",", listeners));
-        //log.info("initializedListeners: {}", String.join(",", initializedListeners));
-
+        /**
+         * if current playback position is after than audio duration - cancel task and send Next command
+         */
         if (playbackPosition > getAudioFile().getDuration()) {
 
             log.debug("Sending NEXT event: room={}", roomId);
@@ -196,13 +195,7 @@ public class AudioStreamWorker {
 
     public void stop(PlaybackStateDTO stateDTO) {
 
-        if (task != null) {
-
-            task.cancel(false);
-            task = null;
-
-        }
-
+        cancelTask();
         updateState(stateDTO);
     }
 
@@ -311,5 +304,12 @@ public class AudioStreamWorker {
             playbackPosition,
             currentState.pause()
         ));
+    }
+
+    private void cancelTask() {
+        if (task != null && !task.isCancelled()) {
+            task.cancel(false);
+            task = null;
+        }
     }
 }

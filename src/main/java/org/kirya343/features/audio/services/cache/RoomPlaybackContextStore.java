@@ -8,6 +8,7 @@ import org.kirya343.features.audio.datasource.model.AudioFile;
 import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
 import org.kirya343.features.audio.dto.PlaybackStateDTO;
 import org.kirya343.features.audio.dto.event.RoomContextCreatedEvent;
+import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 public class RoomPlaybackContextStore {
 
+    private final RoomWebSocketService roomWebSocketService;
     private final Map<Long, RoomPlaybackContext> rooms = new ConcurrentHashMap<>();
     private final ListeningRoomRepository listeningRoomRepository;
     private final AudioFileRepository audioFileRepository;
@@ -65,6 +67,14 @@ public class RoomPlaybackContextStore {
             audioFile,
             room
         );
+    }
+
+    public void reloadAndResendContext(Long roomId) {
+        RoomPlaybackContext newContext = createRoomPlaybackState(roomId);
+
+        rooms.put(roomId, newContext);
+
+        
     }
 
     public void updateRoomAudio(Long roomId, PlaybackStateDTO state) {
