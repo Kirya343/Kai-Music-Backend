@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
 import org.kirya343.features.audio.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
+import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.audio.services.util.Fmp4Chunker;
 import org.kirya343.features.audio.services.util.Fmp4Parser;
@@ -37,6 +38,7 @@ public class AudioStreamWorker {
         Executors.newSingleThreadScheduledExecutor();
     private final ApplicationEventPublisher eventPublisher;
     private final RoomWebSocketService roomWebSocketService;
+    private final AudioStorageService audioStorageService;
 
     private final Long roomId;
 
@@ -57,7 +59,8 @@ public class AudioStreamWorker {
         RoomPlaybackContextStore roomPlaybackContextStore,
         SimpMessagingTemplate messagingTemplate,
         ApplicationEventPublisher eventPublisher,
-        RoomWebSocketService roomWebSocketService
+        RoomWebSocketService roomWebSocketService,
+        AudioStorageService audioStorageService
     ) {
 
         this.roomId = roomId;
@@ -65,6 +68,7 @@ public class AudioStreamWorker {
         this.messagingTemplate = messagingTemplate;
         this.eventPublisher = eventPublisher;
         this.roomWebSocketService = roomWebSocketService;
+        this.audioStorageService = audioStorageService;
 
         log.info(
             "Created AudioStreamWorker for room {}",
@@ -155,7 +159,7 @@ public class AudioStreamWorker {
         );
     }
 
-    public void streamTick(PlaybackStateDTO stateDTO) {
+    public void streamTick(PlaybackStateDTO stateDTO) throws IOException {
         Set<String> listeners = roomPlaybackContextStore.computeIfAbsent(roomId).getListeners();
 
         //log.info("listeners: {}", String.join(",", listeners));
@@ -322,8 +326,12 @@ public class AudioStreamWorker {
                 ignored -> {
                     Fmp4Chunker newChunker = null;
                     try {
-                        newChunker = new Fmp4Chunker(parser);
-                    } catch (IOException e) {
+                        newChunker = new Fmp4Chunker(
+                            audioStorageService,
+                            getAudioFile().getPath(),
+                            getAudioFile().getChunks()
+                        );
+                    } catch (Exception e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }

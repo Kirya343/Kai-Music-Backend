@@ -1,0 +1,5 @@
+s3:
+  endpoint: https://0fff1679785f7297aa39f62e21c91c21.r2.cloudflarestorage.com/
+  bucket: kai-music
+  access-key: f4e16472d8a1c00f916d32a21ebb2533
+  secret-key: 65e40fa290fb0d2c383d86507e8a4e769f9676c70a2375fe6a25303b0d50f121

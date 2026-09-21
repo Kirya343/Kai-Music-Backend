@@ -25,7 +25,8 @@ public class AudioFile {
             String artist, 
             String album, 
             String coverUrl,
-            Long duration
+            Long duration,
+            Integer chunks
         ) {
         this.name = name;
         this.path = path;
@@ -36,6 +37,7 @@ public class AudioFile {
         this.album = album;
         this.coverUrl = coverUrl;
         this.duration = duration;
+        this.chunks = chunks;
     }
     
     @Id
@@ -59,6 +61,8 @@ public class AudioFile {
 
     @Setter
     private String coverUrl;
+
+    private Integer chunks;
 
     @ManyToOne
     private User owner;
