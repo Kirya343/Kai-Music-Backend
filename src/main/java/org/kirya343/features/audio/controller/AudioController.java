@@ -7,10 +7,12 @@ import org.kirya343.features.audio.datasource.repository.QueueItemRepository;
 import org.kirya343.features.audio.dto.AudioDTO;
 import org.kirya343.features.audio.dto.AudioUpdateDTO;
 import org.kirya343.features.audio.services.storage.AudioFileManager;
+import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.authentication.dto.UserAuthData;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +39,7 @@ public class AudioController {
     private final QueueItemRepository queueItemRepository;
     private final AudioFileManager audioFileManager;
     private final UserAuthDataService userAuthDataService;
+    private final AudioStorageService audioStorageService;
 
     @GetMapping("/{queueItemId}")
     public ResponseEntity<InputStreamResource> getAudio(
@@ -88,6 +91,24 @@ public class AudioController {
         if (dto.artist() != null && dto.artist().length() > 0) audio.setArtist(dto.artist());
         if (dto.title() != null && dto.title().length() > 0) audio.setTitle(dto.title());
         if (dto.coverUrl() != null && dto.coverUrl().length() > 0) audio.setCoverUrl(dto.coverUrl());
+
+        audioFileRepository.save(audio);
+    }
+
+    @DeleteMapping ("/{audioId}")
+    public void deleteAudio(
+        @PathVariable Long audioId,
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+        
+        AudioFile audio = audioFileRepository.findById(audioId).orElseThrow(
+            () -> new EntityNotFoundException("Трека не существует"));
+
+        try {
+            audioStorageService.deleteAudio(audio.getPath());
+        } catch (Exception e) {
+            throw e;
+        }
 
         audioFileRepository.save(audio);
     }

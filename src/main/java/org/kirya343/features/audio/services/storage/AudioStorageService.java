@@ -2,6 +2,7 @@ package org.kirya343.features.audio.services.storage;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import org.kirya343.features.audio.dto.AudioChunk;
@@ -9,8 +10,11 @@ import org.kirya343.features.storage.S3StorageService;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Service
+@Slf4j 
 @RequiredArgsConstructor
 public class AudioStorageService {
 
@@ -100,5 +104,15 @@ public class AudioStorageService {
             5000,
             false
         );
+    }
+
+    public void deleteAudio(String audioDirectory) {
+
+        List<S3Object> objects = s3StorageService.listFiles(audioDirectory);
+
+        for (S3Object object : objects) {
+            log.debug("deleting: " + object.key());
+            s3StorageService.delete(object.key());
+        }
     }
 }

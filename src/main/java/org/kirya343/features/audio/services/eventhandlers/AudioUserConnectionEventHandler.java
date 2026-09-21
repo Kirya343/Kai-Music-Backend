@@ -1,7 +1,5 @@
 package org.kirya343.features.audio.services.eventhandlers;
 
-import org.kirya343.features.audio.datasource.model.RoomPlaybackState;
-import org.kirya343.features.audio.dto.PlaybackStateDTO;
 import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
 import org.kirya343.features.audio.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
@@ -40,11 +38,10 @@ public class AudioUserConnectionEventHandler {
 
         roomPlaybackContextStore.computeIfAbsent(room.getId()).getListeners().add(event.authData().openId());
 
-        RoomPlaybackState state = room.getPlaybackState();
         RoomPlaybackContext roomContext = roomPlaybackContextStore.computeIfAbsent(room.getId());
 
-        roomWebSocketService.broadcastPlaybackState(event.authData().openId(), PlaybackStateDTO.ofState(state));
         roomWebSocketService.broadcastRoomInfo(event.authData().openId(), RoomDTO.ofRoomPlaybackContext(roomContext));
+        audioStreamWorkerManager.getWorker(room.getId()).handleUserConnected(event.authData().openId());
     }
 
     @Async
@@ -58,6 +55,6 @@ public class AudioUserConnectionEventHandler {
         if (room == null) return;
 
         roomPlaybackContextStore.computeIfAbsent(room.getId()).getListeners().remove(event.authData().openId());
-        audioStreamWorkerManager.getWorker(room.getId()).deleteInitializedListener(event.authData().openId());
+        audioStreamWorkerManager.getWorker(room.getId()).handleUserDisconnected(event.authData().openId());
     }
 }

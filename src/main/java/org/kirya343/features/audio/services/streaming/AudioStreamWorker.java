@@ -1,7 +1,6 @@
 package org.kirya343.features.audio.services.streaming;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -17,7 +16,6 @@ import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.audio.services.util.Fmp4Chunker;
-import org.kirya343.features.audio.services.util.Fmp4Parser;
 import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.room.dto.RoomDTO;
 import org.kirya343.features.room.dto.commands.Next;
@@ -45,14 +43,14 @@ public class AudioStreamWorker {
     private static final int CHUNK_INTERVAL_SECONDS = 3;
 
     private PlaybackStateDTO currentState;
-    private Fmp4Parser parser;
     private long playbackPosition = 0;
     private Set<String> initializedListeners = new HashSet<>();
     private ScheduledFuture<?> task;
-    private final Map<String, Fmp4Chunker> userChunkers = new HashMap<>();
 
-    private final Map<String, Double> bufferedUntil = new HashMap<>();
     private static final int PAUSED_BUFFER_SECONDS = 15;
+
+    private final Map<String, Fmp4Chunker> userChunkers = new HashMap<>();
+    private final Map<String, Double> bufferedUntil = new HashMap<>();
 
     public AudioStreamWorker(
         Long roomId,
@@ -82,10 +80,6 @@ public class AudioStreamWorker {
             .getCurrentAudio();
     }
 
-    public void deleteInitializedListener(String user) {
-        this.initializedListeners.remove(user);
-    }
-
     public void start(PlaybackStateDTO stateDTO) {
 
         boolean trackChanged =
@@ -113,8 +107,6 @@ public class AudioStreamWorker {
 
         updateState(stateDTO);
 
-        if (parser == null) return;
-
         initializedListeners.forEach(u -> getChunker(u, stateDTO).seek(stateDTO.position()));
 
         long duration = AudioMp3Service.getDuration(getAudioFile());
@@ -124,21 +116,10 @@ public class AudioStreamWorker {
         playbackPosition = stateDTO.position();
 
         log.info(
-            "START: room={}, audio={}, chunker={}",
+            "START: room={}, audio={}",
             roomId,
-            getAudioFile().getName(),
-            parser
+            getAudioFile().getName()
         );
-
-        if (task != null && !task.isDone() && !task.isCancelled()) {
-
-            log.warn(
-                "Worker already running: room={}",
-                roomId
-            );
-
-            return;
-        }
 
         task = scheduler.scheduleAtFixedRate(
             () -> {
@@ -275,7 +256,6 @@ public class AudioStreamWorker {
             currentState = state;
 
             roomPlaybackContextStore.updateRoomAudio(roomId, state);
-            loadParser();
 
             RoomPlaybackContext context =
                 roomPlaybackContextStore.get(roomId);
@@ -292,31 +272,6 @@ public class AudioStreamWorker {
             } catch (Exception e) {
                 log.info("Exception {}", e);
             }
-        }
-    }
-
-    private void loadParser() {
-
-        log.info(
-            "Loading fMP4 chunker: {}",
-            getAudioFile().getPath()
-        );
-
-        Path path = Path.of(
-            getAudioFile().getPath()
-        );
-
-        try {
-
-            this.parser = new Fmp4Parser(path);
-
-        } catch (Exception e) {
-
-            throw new RuntimeException(
-                "Failed to create Fmp4Chunker for audio: "
-                    + getAudioFile().getPath(),
-                e
-            );
         }
     }
 
@@ -342,5 +297,19 @@ public class AudioStreamWorker {
                 }
             );
         return chunker;
+    }
+
+    public void handleUserDisconnected(String user) {
+        this.initializedListeners.remove(user);
+        this.bufferedUntil.remove(user);
+    }
+
+    public void handleUserConnected(String user) {
+        roomWebSocketService.broadcastPlaybackState(user, new PlaybackStateDTO(
+            currentState.user(),
+            currentState.entryId(),
+            playbackPosition,
+            currentState.pause()
+        ));
     }
 }
