@@ -1,9 +1,0 @@
-package org.kirya343.core.config;
-
-public final class Constants {
-
-    private Constants() {}
-
-    public static final char[] ALPHANUMERIC =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
-}

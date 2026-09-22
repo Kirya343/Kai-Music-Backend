@@ -3,12 +3,12 @@ logging:
 
     org.springframework.web.multipart: INFO
     org.springframework.web.servlet.resource: INFO
-    org.springframework.security: DEBUG
+    org.springframework.security: INFO
 
     org.springframework.web.socket: DEBUG
     org.springframework.messaging: INFO
 
-    org.kirya343.api: DEBUG
+    org.kirya343.features.audio: DEBUG
 
     com.zaxxer.hikari: INFO
     org.hibernate.SQL: INFO
