@@ -25,7 +25,7 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
            WHERE q.room.id = :userId
            AND q.id = :id
         """)
-    long removeFromUserRoom(@Param("id") Long id, @Param("userId") Long userId);
+    int removeFromUserRoom(@Param("id") Long id, @Param("userId") Long userId);
 
     Optional<QueueItem> findByRoomIdAndId(Long roomId, Long entryId);
 

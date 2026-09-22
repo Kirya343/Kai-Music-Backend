@@ -112,6 +112,8 @@ public class AudioStreamWorker {
 
             Fmp4Chunker chunker = getChunker(user, currentState);
 
+            log.debug("Tick to user {}", user);
+
             try {
                 if (!initializedListeners.contains(user)) {
                     sendChunk(user, chunker.initializationChunk());
@@ -139,9 +141,7 @@ public class AudioStreamWorker {
                         }
                     } else {
 
-                        AudioChunk chunk = chunker.nextAudioChunk();
-
-                        sendChunk(user, chunk);
+                        sendChunk(user, chunker.nextAudioChunk());
                     }
                 }
 

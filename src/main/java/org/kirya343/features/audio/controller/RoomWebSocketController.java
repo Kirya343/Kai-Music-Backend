@@ -4,14 +4,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.kirya343.features.audio.services.AudioQueryService;
-import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
 import org.kirya343.features.audio.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.audio.services.command.RoomCommandWorker;
 import org.kirya343.features.audio.datasource.model.AudioFile;
 import org.kirya343.features.audio.datasource.model.QueueItem;
 import org.kirya343.features.audio.datasource.repository.QueueItemRepository;
 import org.kirya343.features.audio.dto.PlaybackStateDTO;
-import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
@@ -23,6 +21,7 @@ import org.kirya343.features.room.dto.commands.UpdatePlayback;
 import org.kirya343.features.user.datasource.User;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -37,7 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RoomWebSocketController {
 
-    private final RoomWebSocketService roomWebSocketService;
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final RoomCommandWorker roomCommandWorker;
     private final AudioQueryService audioQueryService;
@@ -115,7 +113,7 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/queue.add")
     public void addToQueue(
-        Long audioId,
+        @Payload Long audioId,
         @AuthenticationPrincipal UserAuthData authData
     ) {
         ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
@@ -128,20 +126,21 @@ public class RoomWebSocketController {
         );
 
         QueueItem saved = queueItemRepository.save(qi);
+        log.info("new QueueItem {}", saved.getId());
         roomPlaybackContextStore.get(room.getId()).getRoom().getQueue().add(saved);
 
-        RoomPlaybackContext context = roomPlaybackContextStore.get(room.getId());
+        ListeningRoom updated = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
 
-        roomWebSocketService.broadcastRoomInfo(authData.openId(), RoomDTO.ofRoomPlaybackContext(context));
+        roomPlaybackContextStore.reloadAndResendContext(updated);
     }
 
     @Transactional 
     @MessageMapping("/room/queue.remove")
     public void removeFromQueue(
-        Long queueItemId,
+        @Payload Long queueItemId,
         @AuthenticationPrincipal UserAuthData authData
     ) {
-        long deleted = queueItemRepository.removeFromUserRoom(queueItemId, authData.id());
+        int deleted = queueItemRepository.removeFromUserRoom(queueItemId, authData.id());
 
         if (deleted != 0) {
             ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
