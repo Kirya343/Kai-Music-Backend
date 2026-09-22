@@ -108,12 +108,11 @@ public class AudioFileManager {
 
             // 3. Название
             String originalName = uploadedFile.getOriginalFilename();
-            String title = originalName;
 
             log.debug("Оригинальное название файла: {}", originalName);
 
             if (originalName != null && originalName.contains(".")) {
-                title = originalName.substring(0, originalName.lastIndexOf("."));
+                originalName = originalName.substring(0, originalName.lastIndexOf("."));
             }
 
             Fmp4Parser parser = new Fmp4Parser(converted.toPath());
@@ -132,6 +131,8 @@ public class AudioFileManager {
                     chunk
                 );
             }
+
+            String title = metadata.title().startsWith("upload") ? originalName : metadata.title();
 
             // 5. Сохраняем в БД
             AudioFile audio = new AudioFile(

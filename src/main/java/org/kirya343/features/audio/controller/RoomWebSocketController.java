@@ -153,11 +153,7 @@ public class RoomWebSocketController {
         if (deleted != 0) {
             ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
 
-            roomPlaybackContextStore.reloadAndResendContext(queueItemId);;
-
-            RoomPlaybackContext context = roomPlaybackContextStore.get(room.getId());
-
-            roomWebSocketService.broadcastRoomInfo(authData.openId(), RoomDTO.ofRoomPlaybackContext(context));
+            roomPlaybackContextStore.reloadAndResendContext(room);
         }
     }
 }

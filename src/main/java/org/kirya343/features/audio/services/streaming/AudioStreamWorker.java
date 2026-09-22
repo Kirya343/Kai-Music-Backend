@@ -106,7 +106,12 @@ public class AudioStreamWorker {
 
         log.info("START STATE: entryId={}, position={}", stateDTO.entryId(), stateDTO.position());
 
-        initializedListeners.forEach(u -> getChunker(u, stateDTO).seek(stateDTO.position()));
+        for (String user : initializedListeners) {
+            Fmp4Chunker chunker = getChunker(user, stateDTO);
+
+            chunker.seek(stateDTO.position());
+            bufferedUntil.remove(user);
+        }
 
         long duration = AudioMp3Service.getDuration(getAudioFile());
 
@@ -298,6 +303,7 @@ public class AudioStreamWorker {
     }
 
     public void handleUserConnected(String user) {
+        log.info("user connected and recive {}", playbackPosition);
         roomWebSocketService.broadcastPlaybackState(user, new PlaybackStateDTO(
             currentState.user(),
             currentState.entryId(),

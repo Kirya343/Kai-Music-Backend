@@ -52,6 +52,7 @@ public class RoomPlaybackContext {
     @Setter 
     private AudioFile currentAudio;
 
+    @Setter 
     private ListeningRoom room;
 
     public long getPosition(long now) {

@@ -12,6 +12,7 @@ import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
+import org.kirya343.features.room.dto.RoomDTO;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -69,12 +70,14 @@ public class RoomPlaybackContextStore {
         );
     }
 
-    public void reloadAndResendContext(Long roomId) {
-        RoomPlaybackContext newContext = createRoomPlaybackState(roomId);
+    public void reloadAndResendContext(ListeningRoom room) {
+        rooms.get(room.getId()).setRoom(room);
 
-        rooms.put(roomId, newContext);
+        RoomPlaybackContext context = rooms.get(room.getId());
 
-        
+        for (String user : rooms.get(room.getId()).getListeners()) {
+             roomWebSocketService.broadcastRoomInfo(user, RoomDTO.ofRoomPlaybackContext(context));
+        }
     }
 
     public void updateRoomAudio(Long roomId, PlaybackStateDTO state) {
