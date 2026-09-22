@@ -51,7 +51,7 @@ public record RoomDTO(
         ListeningRoom room = context.getRoom();
 
         return new RoomDTO(
-            context.getRoomId(),
+            context.getRoom().getId(),
             room.getTitle() != null ? room.getTitle() : room.getOwner().getName() + "\'s room",
             room.getOwner().getId(),
             room.getCode(),

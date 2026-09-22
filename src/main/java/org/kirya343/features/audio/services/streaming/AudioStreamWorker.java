@@ -14,10 +14,8 @@ import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
 import org.kirya343.features.audio.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
-import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.audio.services.util.Fmp4Chunker;
 import org.kirya343.features.authentication.dto.UserAuthData;
-import org.kirya343.features.room.dto.RoomDTO;
 import org.kirya343.features.room.dto.commands.Next;
 import org.kirya343.features.audio.datasource.model.AudioFile;
 import org.kirya343.features.audio.dto.AudioChunk;
@@ -43,7 +41,6 @@ public class AudioStreamWorker {
     private static final int CHUNK_INTERVAL_SECONDS = 3;
 
     private PlaybackStateDTO currentState;
-    private long playbackPosition = 0;
     private Set<String> initializedListeners = new HashSet<>();
     private ScheduledFuture<?> task;
 
@@ -58,7 +55,8 @@ public class AudioStreamWorker {
         SimpMessagingTemplate messagingTemplate,
         ApplicationEventPublisher eventPublisher,
         RoomWebSocketService roomWebSocketService,
-        AudioStorageService audioStorageService
+        AudioStorageService audioStorageService,
+        PlaybackStateDTO currentState
     ) {
 
         this.roomId = roomId;
@@ -67,6 +65,7 @@ public class AudioStreamWorker {
         this.eventPublisher = eventPublisher;
         this.roomWebSocketService = roomWebSocketService;
         this.audioStorageService = audioStorageService;
+        this.currentState = currentState;
 
         log.info(
             "Created AudioStreamWorker for room {}",
@@ -80,128 +79,87 @@ public class AudioStreamWorker {
             .getCurrentAudio();
     }
 
-    public void start(PlaybackStateDTO stateDTO) {
+    public void applyState(PlaybackStateDTO state) {
 
-        boolean trackChanged =
-            currentState != null &&
-            !currentState.entryId().equals(stateDTO.entryId());
+        updateState(state);
 
-        /**
-         * if track is changed - clear all users and user chunkers,
-         * becouse for new track audioStreamWorker have to create new parser with new track
-         * and recreate all user chunkers with new parser
-         */
-        if (trackChanged) {
-            log.info(
-                "SWITCH TRACK: {} => {}",
-                currentState.entryId(),
-                stateDTO.entryId()
+        log.info("START STATE: entryId={}, position={}", state.entryId(), state.position());
+
+        if (task == null || task.isCancelled()) {
+            task = scheduler.scheduleAtFixedRate(
+                this::streamTick,
+                0,
+                CHUNK_INTERVAL_SECONDS,
+                TimeUnit.SECONDS
             );
-
-            initializedListeners.clear();
-            userChunkers.clear();
         }
-
-        stop(stateDTO);
-
-        log.info("START STATE: entryId={}, position={}", stateDTO.entryId(), stateDTO.position());
-
-        for (String user : initializedListeners) {
-            Fmp4Chunker chunker = getChunker(user, stateDTO);
-
-            chunker.seek(stateDTO.position());
-            bufferedUntil.remove(user);
-        }
-
-        long duration = AudioMp3Service.getDuration(getAudioFile());
-
-        log.info("audioDuration: {}, pos: {}", duration, stateDTO.position());
-
-        playbackPosition = stateDTO.position();
-
-        log.info(
-            "START: room={}, audio={}",
-            roomId,
-            getAudioFile().getName()
-        );
-
-        task = scheduler.scheduleAtFixedRate(
-            () -> {
-
-                try {
-
-                    streamTick(stateDTO);
-
-                } catch (Throwable e) {
-
-                    log.error("SCHEDULED TASK CRASHED: room={}", roomId, e);
-                }
-
-            },
-            0,
-            CHUNK_INTERVAL_SECONDS,
-            TimeUnit.SECONDS
-        );
     }
 
-    public void streamTick(PlaybackStateDTO stateDTO) throws IOException {
+    public void streamTick() {
         Set<String> listeners = roomPlaybackContextStore.computeIfAbsent(roomId).getListeners();
 
         /**
          * if current playback position is after than audio duration - cancel task and send Next command
          */
-        if (playbackPosition > getAudioFile().getDuration()) {
+        if (currentState.position() > getAudioFile().getDuration()) {
 
             log.debug("Sending NEXT event: room={}", roomId);
             eventPublisher.publishEvent(new Next(roomId, UserAuthData.server()));
-            stop(stateDTO);
             return;
         }
 
         for (String user : listeners) {
 
-            Fmp4Chunker chunker = getChunker(user, stateDTO);
+            Fmp4Chunker chunker = getChunker(user, currentState);
 
-            if (!initializedListeners.contains(user)) {
-                sendChunk(user, chunker.initializationChunk());
-                initializedListeners.add(user);
-            }
+            try {
+                if (!initializedListeners.contains(user)) {
+                    sendChunk(user, chunker.initializationChunk());
+                    initializedListeners.add(user);
+                }
 
-            if (chunker.hasNext()) {
+                if (chunker.hasNext()) {
+                    if (currentState.pause()) {
+                        double target = currentState.position() + PAUSED_BUFFER_SECONDS;
 
-                AudioChunk chunk = chunker.nextAudioChunk();
+                        if (bufferedUntil.getOrDefault(user, 0.0) < target) {
 
-                if (currentState.pause()) {
-                    double target = currentState.position() + PAUSED_BUFFER_SECONDS;
+                            AudioChunk chunk = chunker.nextAudioChunk();
 
-                    if (bufferedUntil.getOrDefault(user, 0.0) < target) {
+                            sendChunk(user, chunk);
+
+                            /**
+                            * that formule counts time summ of prev chunks with current chunk
+                            * and multiple it with base chunk-duration 
+                            **/
+                            bufferedUntil.put(
+                                user,
+                                (chunk.sequence() + 2) * (chunk.durationMs() / 1000.0)
+                            );
+                        }
+                    } else {
+
+                        AudioChunk chunk = chunker.nextAudioChunk();
 
                         sendChunk(user, chunk);
-
-                        /**
-                        * that formule counts time summ of prev chunks with current chunk
-                        * and multiple it with base chunk-duration 
-                        **/
-                        bufferedUntil.put(
-                            user,
-                            (chunk.sequence() + 2) * (chunk.durationMs() / 1000.0)
-                        );
                     }
-                } else {
-                    sendChunk(user, chunk);
                 }
+
+            } catch (IOException e) {
+
+            // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
 
         if (!currentState.pause()) {
-            playbackPosition += 3;
+            currentState = new PlaybackStateDTO(
+                currentState.user(), 
+                currentState.entryId(), 
+                currentState.position() + 3, 
+                currentState.pause()
+            );
         }
-    }
-
-    public void stop(PlaybackStateDTO stateDTO) {
-
-        cancelTask();
-        updateState(stateDTO);
     }
 
     private void sendChunk(String user, AudioChunk chunk) {
@@ -229,31 +187,34 @@ public class AudioStreamWorker {
 
     public void updateState(PlaybackStateDTO state) {
 
-        if (state.entryId() == null) return;
+        PlaybackStateDTO previousState = currentState;
 
-        boolean audioChanged =
+        boolean trackChanged =
             currentState != null &&
             !currentState.entryId().equals(state.entryId());
+        
+        boolean positionChanged =
+            currentState != null &&
+            !currentState.position().equals(state.position());
+
+        currentState = state;
 
         /**
-         * if audiofile in room is null, or if playback.entryId is changed, then:
-         *  - get audio by queue entry id and set it to RoomPlaybackContext
-         *  - updating currentState if audio is changed
+         * if track is changed - clear all users and user chunkers,
+         * becouse for new track audioStreamWorker have to create new parser with new track
+         * and recreate all user chunkers with new parser
          */
-        if (
-            getAudioFile() == null ||
-            currentState == null ||
-            audioChanged
-        ) {
-            if (audioChanged) {
-                initializedListeners.clear();
-                userChunkers.clear();
-                playbackPosition = 0;
-            }
+        if (trackChanged) {
+            log.info(
+                "SWITCH TRACK: {} => {}",
+                previousState.entryId(),
+                currentState.entryId()
+            );
 
-            currentState = state;
+            initializedListeners.clear();
+            userChunkers.clear();
 
-            roomPlaybackContextStore.updateRoomAudio(roomId, state);
+            roomPlaybackContextStore.updateRoomAudio(roomId, currentState);
 
             RoomPlaybackContext context =
                 roomPlaybackContextStore.get(roomId);
@@ -261,14 +222,24 @@ public class AudioStreamWorker {
             try {
                 for (String user : context.getListeners()) {
                     getChunker(user, currentState);
-
-                    roomWebSocketService.broadcastRoomInfo(
-                        user,
-                        RoomDTO.ofRoomPlaybackContext(context)
-                    );
                 }
             } catch (Exception e) {
                 log.info("Exception {}", e);
+            }
+        }
+
+        if (positionChanged) {
+            log.info(
+                "SEEK POSITION: {} => {}",
+                previousState.entryId(),
+                currentState.entryId()
+            );
+
+            for (String user : initializedListeners) {
+                Fmp4Chunker chunker = getChunker(user, currentState);
+
+                chunker.seek(currentState.position());
+                bufferedUntil.remove(user);
             }
         }
     }
@@ -300,19 +271,15 @@ public class AudioStreamWorker {
     public void handleUserDisconnected(String user) {
         this.initializedListeners.remove(user);
         this.bufferedUntil.remove(user);
+        this.userChunkers.remove(user);
     }
 
     public void handleUserConnected(String user) {
-        log.info("user connected and recive {}", playbackPosition);
-        roomWebSocketService.broadcastPlaybackState(user, new PlaybackStateDTO(
-            currentState.user(),
-            currentState.entryId(),
-            playbackPosition,
-            currentState.pause()
-        ));
+        log.info("user connected and recive {}", currentState.position());
+        roomWebSocketService.broadcastPlaybackState(user, currentState);
     }
 
-    private void cancelTask() {
+    public void cancelTask() {
         if (task != null && !task.isCancelled()) {
             task.cancel(false);
             task = null;

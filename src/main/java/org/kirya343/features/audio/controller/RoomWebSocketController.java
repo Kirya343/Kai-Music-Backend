@@ -17,10 +17,9 @@ import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.room.dto.RoomDTO;
 import org.kirya343.features.room.dto.commands.Next;
-import org.kirya343.features.room.dto.commands.Pause;
-import org.kirya343.features.room.dto.commands.Play;
 import org.kirya343.features.room.dto.commands.Prev;
 import org.kirya343.features.room.dto.commands.RoomCommand;
+import org.kirya343.features.room.dto.commands.UpdatePlayback;
 import org.kirya343.features.user.datasource.User;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -74,14 +73,8 @@ public class RoomWebSocketController {
             return;
         }
 
-        RoomCommand cmd;
-
-        if (!state.pause()) {
-            cmd = new Play(roomId, state, authData);
-        } else {
-            cmd = new Pause(roomId, state, authData);
-        }
-
+        RoomCommand cmd = new UpdatePlayback(roomId, state, authData);
+        
         roomCommandWorker.submit(cmd);
     }
 

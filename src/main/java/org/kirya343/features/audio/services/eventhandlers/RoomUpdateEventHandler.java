@@ -29,9 +29,9 @@ public class RoomUpdateEventHandler {
                 entityManager.getReference(ListeningRoom.class, event.roomId())
             ));
 
-        state.setPosition(event.position());
-        state.setCurrentQueueEntryId(event.audioId());
-        state.setPaused(event.pause());
+        state.setPosition(event.stateDTO().position());
+        state.setCurrentQueueEntryId(event.stateDTO().entryId());
+        state.setPaused(event.stateDTO().pause());
         state.setUser(event.authData().name());
         
         roomPlaybackStateRepository.save(state);

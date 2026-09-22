@@ -14,37 +14,13 @@ public class RoomPlaybackContext {
 
     public RoomPlaybackContext(
         Long roomId,
-        Long currentQueueEntryId,
-        long duration,
-        boolean paused,
         AudioFile currentAudio,
         ListeningRoom room
     ) {
-        this.roomId = roomId;
-        this.currentQueueEntryId = currentQueueEntryId;
-        this.duration = duration;
-        this.paused = paused;
         this.listeners = new HashSet<>();
         this.currentAudio = currentAudio;
         this.room = room;
     }
-
-    private Long roomId;
-
-    @Setter
-    private Long currentQueueEntryId;
-
-    @Setter
-    private long duration;
-
-    @Setter
-    private boolean paused;
-
-    @Setter
-    private long resumedAt;
-
-    @Setter
-    private long lastPosition;
 
     @Setter
     private Set<String> listeners;
@@ -54,13 +30,4 @@ public class RoomPlaybackContext {
 
     @Setter 
     private ListeningRoom room;
-
-    public long getPosition(long now) {
-
-        long pos = now - resumedAt;
-        
-        long posInSeconds = pos / 1_000_000 / 1000;
-
-        return posInSeconds;
-    }
 }

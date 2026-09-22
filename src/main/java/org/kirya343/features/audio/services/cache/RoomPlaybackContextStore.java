@@ -9,7 +9,6 @@ import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
 import org.kirya343.features.audio.dto.PlaybackStateDTO;
 import org.kirya343.features.audio.dto.event.RoomContextCreatedEvent;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
-import org.kirya343.features.audio.services.util.AudioMp3Service;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.room.dto.RoomDTO;
@@ -62,9 +61,6 @@ public class RoomPlaybackContextStore {
 
         return new RoomPlaybackContext(
             room.getId(),
-            null,
-            AudioMp3Service.getDuration(audioFile),
-            false,
             audioFile,
             room
         );
