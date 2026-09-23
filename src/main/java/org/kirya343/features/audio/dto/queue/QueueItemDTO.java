@@ -1,4 +1,4 @@
-package org.kirya343.features.audio.dto;
+package org.kirya343.features.audio.dto.queue;
 
 import java.util.Collection;
 import java.util.List;

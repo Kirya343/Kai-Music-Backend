@@ -26,7 +26,7 @@ public class RoomContextEventHandler {
         RoomPlaybackState state = roomPlaybackStateRepository.findById(event.roomId()).orElseThrow();
 
         AudioStreamWorker worker = audioStreamWorkerManager.getWorker(event.roomId());
-
+        
         if (worker != null) {
             worker.applyState(PlaybackStateDTO.ofState(state));
         }

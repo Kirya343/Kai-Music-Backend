@@ -18,19 +18,46 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
     List<QueueItem> findByRoomIdOrderByPosition(Long roomId);
     void deleteByIdAndRoomId(Long id, Long roomId);
 
-    @Modifying
-    @Transactional
     @Query("""
-           DELETE FROM QueueItem q
-           WHERE q.room.id = :userId
-           AND q.id = :id
+        SELECT q
+        FROM QueueItem q
+        JOIN q.room r
+        JOIN User u ON u.listeningRoom.id = r.id
+        WHERE q.id = :id
+        AND u.id = :userId
         """)
-    int removeFromUserRoom(@Param("id") Long id, @Param("userId") Long userId);
+    Optional<QueueItem> findByIdAndUserRoom(
+        @Param("id") Long id,
+        @Param("userId") Long userId
+    );
+
+    @Modifying(
+        flushAutomatically = true,
+        clearAutomatically = true
+    )
+    @Query("""
+        DELETE FROM QueueItem q
+        WHERE q.id = :id
+        AND EXISTS (
+            SELECT 1
+            FROM User u
+            WHERE u.id = :userId
+                AND u.listeningRoom.id = q.room.id
+        )
+        """)
+    int deleteByIdAndUserRoom(
+        @Param("id") Long id,
+        @Param("userId") Long userId
+    );
 
     Optional<QueueItem> findByRoomIdAndId(Long roomId, Long entryId);
 
-    @Query("SELECT COALESCE(MAX(q.position), 0) FROM QueueItem q")
-    Long findMaxPosition();
+    @Query("""
+        SELECT COALESCE(MAX(q.position), -1)
+        FROM QueueItem q
+        WHERE q.room.id = :roomId
+        """)
+    int getMaxPosition(@Param("roomId") Long roomId);
 
     @Query("""
         SELECT q.audio
@@ -81,4 +108,96 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         LIMIT 1
     """, nativeQuery = true)
     Optional<QueueItem> findRandomTrack(Long roomId);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        UPDATE queue_items
+        SET position = position + 1
+        WHERE room_id = :roomId
+        AND position >= :position
+        """, nativeQuery = true)
+    int shiftQueueItems(
+        @Param("roomId") Long roomId,
+        @Param("position") Integer position
+    );
+
+    @Modifying(
+        flushAutomatically = true,
+        clearAutomatically = true
+    )
+    @Transactional
+    @Query(value = """
+        INSERT INTO queue_items (
+            room_id,
+            audio_id,
+            position,
+            added_by_id,
+            created_at
+        )
+        SELECT
+            :roomId,
+            :audioId,
+            COALESCE(MAX(position), -1) + 1,
+            :addedById,
+            CURRENT_TIMESTAMP
+        FROM queue_items
+        WHERE room_id = :roomId
+        """, nativeQuery = true)
+    int insertQueueItemAtEnd(
+        @Param("roomId") Long roomId,
+        @Param("audioId") Long audioId,
+        @Param("addedById") Long addedById
+    );
+
+    @Modifying(
+        flushAutomatically = true,
+        clearAutomatically = true
+    )
+    @Transactional
+    @Query(value = """
+        INSERT INTO queue_items (
+            room_id,
+            audio_id,
+            position,
+            added_by_id,
+            created_at
+        )
+        VALUES (
+            :roomId,
+            :audioId,
+            :position,
+            :addedById,
+            CURRENT_TIMESTAMP
+        )
+        """, nativeQuery = true)
+    int insertQueueItem(
+        @Param("roomId") Long roomId,
+        @Param("audioId") Long audioId,
+        @Param("position") Integer position,
+        @Param("addedById") Long addedById
+    );
+
+    @Modifying(
+        flushAutomatically = true,
+        clearAutomatically = true
+    )
+    @Query(value = """
+        UPDATE queue_items q
+        JOIN (
+            SELECT
+                id,
+                ROW_NUMBER() OVER (
+                    PARTITION BY room_id
+                    ORDER BY position
+                ) - 1 AS new_position
+            FROM queue_items
+            WHERE room_id = :roomId
+        ) ordered ON ordered.id = q.id
+        SET q.position = ordered.new_position
+        WHERE q.room_id = :roomId
+        """, nativeQuery = true)
+    int normalizePositions(
+        @Param("roomId") Long roomId
+    );
 }

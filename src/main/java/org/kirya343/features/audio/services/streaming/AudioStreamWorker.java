@@ -65,7 +65,8 @@ public class AudioStreamWorker {
         this.eventPublisher = eventPublisher;
         this.roomWebSocketService = roomWebSocketService;
         this.audioStorageService = audioStorageService;
-        this.currentState = currentState;
+
+        this.applyState(currentState);
 
         log.info(
             "Created AudioStreamWorker for room {}",

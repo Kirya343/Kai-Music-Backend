@@ -38,7 +38,7 @@ public class AudioUserConnectionEventHandler {
 
         roomPlaybackContextStore.computeIfAbsent(room.getId()).getListeners().add(event.authData().openId());
 
-        RoomPlaybackContext roomContext = roomPlaybackContextStore.computeIfAbsent(room.getId());
+        RoomPlaybackContext roomContext = roomPlaybackContextStore.get(room.getId());
 
         roomWebSocketService.broadcastRoomInfo(event.authData().openId(), RoomDTO.ofRoomPlaybackContext(roomContext));
         audioStreamWorkerManager.getWorker(room.getId()).handleUserConnected(event.authData().openId());

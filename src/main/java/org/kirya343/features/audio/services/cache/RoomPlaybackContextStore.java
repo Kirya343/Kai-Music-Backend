@@ -14,6 +14,7 @@ import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.room.dto.RoomDTO;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
@@ -66,13 +67,18 @@ public class RoomPlaybackContextStore {
         );
     }
 
-    public void reloadAndResendContext(ListeningRoom room) {
+    @Transactional 
+    public void reloadAndResendContext(Long roomId) {
+        ListeningRoom room = listeningRoomRepository
+            .findById(roomId)
+            .orElseThrow();
+
         rooms.get(room.getId()).setRoom(room);
 
         RoomPlaybackContext context = rooms.get(room.getId());
 
         for (String user : rooms.get(room.getId()).getListeners()) {
-             roomWebSocketService.broadcastRoomInfo(user, RoomDTO.ofRoomPlaybackContext(context));
+            roomWebSocketService.broadcastRoomInfo(user, RoomDTO.ofRoomPlaybackContext(context));
         }
     }
 

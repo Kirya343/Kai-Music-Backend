@@ -1,24 +1,20 @@
 package org.kirya343.features.audio.controller;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.kirya343.features.audio.services.AudioQueryService;
-import org.kirya343.features.audio.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.audio.services.command.RoomCommandWorker;
-import org.kirya343.features.audio.datasource.model.AudioFile;
-import org.kirya343.features.audio.datasource.model.QueueItem;
-import org.kirya343.features.audio.datasource.repository.QueueItemRepository;
+import org.kirya343.features.audio.services.queue.QueueCommandService;
 import org.kirya343.features.audio.dto.PlaybackStateDTO;
+import org.kirya343.features.audio.dto.queue.QueueItemCreateDTO;
 import org.kirya343.features.authentication.dto.UserAuthData;
-import org.kirya343.features.room.datasource.ListeningRoom;
-import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.room.dto.RoomDTO;
 import org.kirya343.features.room.dto.commands.Next;
 import org.kirya343.features.room.dto.commands.Prev;
 import org.kirya343.features.room.dto.commands.RoomCommand;
 import org.kirya343.features.room.dto.commands.UpdatePlayback;
-import org.kirya343.features.user.datasource.User;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -26,8 +22,6 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,12 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RoomWebSocketController {
 
-    private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final RoomCommandWorker roomCommandWorker;
     private final AudioQueryService audioQueryService;
-    private final QueueItemRepository queueItemRepository;
-    private final ListeningRoomRepository listeningRoomRepository;
-    private final EntityManager entityManager;
+    private final QueueCommandService queueCommandService;
     private final Map<String, Long> lastUpdate = new ConcurrentHashMap<>();
     private static final long UPDATE_DELAY_MS = 300;
 
@@ -113,39 +104,17 @@ public class RoomWebSocketController {
 
     @MessageMapping("/room/queue.add")
     public void addToQueue(
-        @Payload Long audioId,
+        List<QueueItemCreateDTO> list,
         @AuthenticationPrincipal UserAuthData authData
     ) {
-        ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
-
-        QueueItem qi = new QueueItem(
-            room, 
-            entityManager.getReference(AudioFile.class, audioId),
-            queueItemRepository.findMaxPosition() + 50,
-            entityManager.getReference(User.class, authData.id())
-        );
-
-        QueueItem saved = queueItemRepository.save(qi);
-        log.info("new QueueItem {}", saved.getId());
-        roomPlaybackContextStore.get(room.getId()).getRoom().getQueue().add(saved);
-
-        ListeningRoom updated = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
-
-        roomPlaybackContextStore.reloadAndResendContext(updated);
+        queueCommandService.addQueueList(list, authData);
     }
 
-    @Transactional 
     @MessageMapping("/room/queue.remove")
     public void removeFromQueue(
-        @Payload Long queueItemId,
+        @Payload List<Long> list,
         @AuthenticationPrincipal UserAuthData authData
     ) {
-        int deleted = queueItemRepository.removeFromUserRoom(queueItemId, authData.id());
-
-        if (deleted != 0) {
-            ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
-
-            roomPlaybackContextStore.reloadAndResendContext(room);
-        }
+        queueCommandService.removeQueueList(list, authData);
     }
 }
