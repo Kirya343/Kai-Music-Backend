@@ -176,6 +176,7 @@ public class AudioStreamWorker {
         headers.put("content-type", "audio/mp4");
         headers.put("sequence", chunk.sequence());
         headers.put("duration", chunk.durationMs());
+        headers.put("entry-id", currentState.entryId());
         headers.put("initialization", chunk.initialization());
 
         messagingTemplate.convertAndSendToUser(
