@@ -6,10 +6,12 @@ import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
 import org.kirya343.features.audio.datasource.repository.QueueItemRepository;
 import org.kirya343.features.audio.dto.AudioDTO;
 import org.kirya343.features.audio.dto.AudioUpdateDTO;
+import org.kirya343.features.audio.services.AudioCommandService;
 import org.kirya343.features.audio.services.storage.AudioFileManager;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.authentication.dto.UserAuthData;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +43,7 @@ public class AudioController {
     private final AudioFileManager audioFileManager;
     private final UserAuthDataService userAuthDataService;
     private final AudioStorageService audioStorageService;
+    private final AudioCommandService audioCommandService;
 
     @GetMapping("/{queueItemId}")
     public ResponseEntity<InputStreamResource> getAudio(
@@ -61,6 +65,18 @@ public class AudioController {
     public List<AudioDTO> getUserLibrary(@AuthenticationPrincipal UserAuthData authData) {
         List<AudioFile> audios = audioFileRepository.findByOwnerId(authData.id());
         return AudioDTO.ofList(audios);
+    }
+
+    @PostMapping("/recognize/{audioId}")
+    public AudioDTO recognize(
+        @PathVariable Long audioId, 
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+        try {
+            return audioCommandService.recognize(audioId, authData);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/upload")

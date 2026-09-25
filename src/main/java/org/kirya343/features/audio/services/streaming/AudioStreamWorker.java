@@ -16,6 +16,7 @@ import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.audio.services.util.Fmp4Chunker;
 import org.kirya343.features.authentication.dto.UserAuthData;
+import org.kirya343.features.room.dto.RoomDTO;
 import org.kirya343.features.room.dto.commands.Next;
 import org.kirya343.features.audio.datasource.model.AudioFile;
 import org.kirya343.features.audio.dto.AudioChunk;
@@ -224,6 +225,7 @@ public class AudioStreamWorker {
             try {
                 for (String user : context.getListeners()) {
                     getChunker(user, currentState);
+                    roomWebSocketService.broadcastRoomInfo(user, RoomDTO.ofRoomPlaybackContext(context));
                 }
             } catch (Exception e) {
                 log.info("Exception {}", e);

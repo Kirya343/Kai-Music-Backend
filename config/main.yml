@@ -55,3 +55,9 @@ app:
     sameSite: "Lax"
 
 isTest: false
+
+acrcloud:
+  host: identify-eu-west-1.acrcloud.com
+  access-key: 1b78fd463a3ccc72c542c53e6322c270
+  access-secret: zoAc360yQG8VLCqI2USxSOyUQEO2i7pxOSzBEzEY
+  timeout: 10s
