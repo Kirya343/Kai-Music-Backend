@@ -3,7 +3,10 @@ package org.kirya343.features.audio.controller;
 import java.util.List;
 
 import org.kirya343.features.audio.services.AudioQueryService;
+import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
+import org.kirya343.features.audio.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.audio.services.playback.RoomSessionService;
+import org.kirya343.features.audio.services.streaming.AudioStreamWorkerManager;
 import org.kirya343.features.presence.services.PresenceService;
 import org.kirya343.features.room.services.RoomCommandService;
 import org.kirya343.features.room.datasource.ListeningRoom;
@@ -47,6 +50,8 @@ public class RoomController {
     private final UserRepository userRepository;
     private final RoomCommandService roomCommandService;
     private final RoomSessionService roomSessionService;
+    private final AudioStreamWorkerManager audioStreamWorkerManager;
+    private final RoomPlaybackContextStore roomPlaybackContextStore;
 
     @GetMapping
     public RoomDTO getCurrentRoom(@AuthenticationPrincipal UserAuthData authData) {
@@ -63,12 +68,22 @@ public class RoomController {
         @RequestParam String code,
         @AuthenticationPrincipal UserAuthData authData
     ) {
-        ListeningRoom room = listeningRoomRepository.findByCode(code).orElseThrow();
 
-        log.info("Пользователь {} присоединяется к комнате {}", authData.name(), room.getId());
-        userRepository.updateListeningRoom(authData.id(), room.getId());
+        ListeningRoom prevRoom = listeningRoomRepository.findRoomByUserId(authData.id()).orElse(null);
+        if (prevRoom != null) {
+            RoomPlaybackContext context = roomPlaybackContextStore.get(prevRoom.getId());
+            if (context != null) {
+                context.getListeners().remove(authData.openId());
+            }
+            audioStreamWorkerManager.getWorker(prevRoom.getId()).handleUserDisconnected(authData.openId());
+        }
 
-        roomSessionService.initializeRoom(room.getId(), authData);
+        ListeningRoom newRoom = listeningRoomRepository.findByCode(code).orElseThrow();
+
+        log.info("Пользователь {} присоединяется к комнате {}", authData.name(), newRoom.getId());
+        userRepository.updateListeningRoom(authData.id(), newRoom.getId());
+
+        roomSessionService.initializeRoom(newRoom.getId(), authData);
     }
 
     @GetMapping("/list/page")
