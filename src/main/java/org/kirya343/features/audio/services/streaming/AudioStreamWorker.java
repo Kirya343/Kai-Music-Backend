@@ -110,6 +110,8 @@ public class AudioStreamWorker {
             return;
         }
 
+        log.debug("Tick to room {}", roomId);
+
         for (String user : listeners) {
 
             Fmp4Chunker chunker = getChunker(user, currentState);

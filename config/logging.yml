@@ -8,7 +8,7 @@ logging:
     org.springframework.web.socket: DEBUG
     org.springframework.messaging: INFO
 
-    org.kirya343.features.audio.AudioCommandService: DEBUG
+    org.kirya343.features.audio: DEBUG
     org.kirya343.features.audio.recognition: DEBUG
 
     com.zaxxer.hikari: INFO

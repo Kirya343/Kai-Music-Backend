@@ -73,8 +73,10 @@ public class RoomPlaybackContextStore {
 
         AudioFile audioFile = audioFileRepository
             .findAudioByQueueItem(state.entryId())
-            .orElseThrow();
+            .orElse(null);
 
-        this.computeIfAbsent(roomId).setCurrentAudio(audioFile);
+        if (audioFile != null) {
+            this.computeIfAbsent(roomId).setCurrentAudio(audioFile);
+        }   
     }
 }
