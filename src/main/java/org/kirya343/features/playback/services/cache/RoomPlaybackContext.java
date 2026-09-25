@@ -33,6 +33,6 @@ public class RoomPlaybackContext {
     private RoomDTO room;
 
     public RoomDTO getFullRoom() {
-        return RoomDTO.addAudioFile(room, currentAudio);
+        return RoomDTO.byContext(room, currentAudio, listeners.size());
     }
 }

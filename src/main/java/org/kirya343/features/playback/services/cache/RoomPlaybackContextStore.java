@@ -79,4 +79,13 @@ public class RoomPlaybackContextStore {
             this.computeIfAbsent(roomId).setCurrentAudio(audioFile);
         }   
     }
+
+    public void listenersUpdated(Long roomId) {
+
+        RoomPlaybackContext roomContext = rooms.get(roomId);
+
+        for (String user : roomContext.getListeners()) {
+            roomWebSocketService.broadcastRoomInfo(user, roomContext.getFullRoom());
+        }  
+    }
 }

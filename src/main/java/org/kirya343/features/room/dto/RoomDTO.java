@@ -13,7 +13,7 @@ public record RoomDTO(
     String title,
     Long ownerId,
     String code,
-    Integer membersCount,
+    Integer listeners,
     PlaybackMode mode,
     List<QueueItemDTO> queue,
     AudioDTO audio
@@ -31,13 +31,13 @@ public record RoomDTO(
         );
     }
 
-    public static RoomDTO addAudioFile(RoomDTO r, AudioFile audio) {
+    public static RoomDTO byContext(RoomDTO r, AudioFile audio, Integer listeners) {
         return new RoomDTO(
             r.id(),
             r.title(),
             r.ownerId(),
             r.code(),
-            r.membersCount(),
+            listeners,
             r.mode(),
             r.queue(),
             AudioDTO.ofAudioFile(audio)

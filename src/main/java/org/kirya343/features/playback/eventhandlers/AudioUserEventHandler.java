@@ -47,7 +47,9 @@ public class AudioUserEventHandler {
 
         if (room == null) return;
 
-        roomPlaybackContextStore.computeIfAbsent(room.getId()).getListeners().remove(event.authData().openId());
+        roomPlaybackContextStore.get(room.getId()).getListeners().remove(event.authData().openId());
         audioStreamWorkerManager.getWorker(room.getId()).handleUserDisconnected(event.authData().openId());
+
+        roomPlaybackContextStore.listenersUpdated(room.getId());
     }
 }
