@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import org.kirya343.features.audio.datasource.model.AudioFile;
-import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
+import org.kirya343.features.audio.datasource.AudioFile;
+import org.kirya343.features.audio.datasource.AudioFileRepository;
 import org.kirya343.features.audio.dto.AudioChunk;
 import org.kirya343.features.audio.dto.AudioDTO;
 import org.kirya343.features.audio.services.recognition.AcrCloudRecognitionService;

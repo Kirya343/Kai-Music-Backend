@@ -9,9 +9,9 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.kirya343.infrastructure.common.config.datasource.Constants;
 import org.kirya343.features.user.datasource.User;
-import org.kirya343.features.audio.datasource.model.QueueItem;
-import org.kirya343.features.audio.datasource.model.RoomPlaybackState;
-import org.kirya343.features.audio.enums.PlaybackMode;
+import org.kirya343.features.playback.datasource.model.QueueItem;
+import org.kirya343.features.playback.datasource.model.RoomPlaybackState;
+import org.kirya343.features.playback.enums.PlaybackMode;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 

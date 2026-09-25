@@ -3,8 +3,8 @@ package org.kirya343.features.room.datasource;
 import java.util.List;
 import java.util.Optional;
 
+import org.kirya343.features.playback.enums.PlaybackMode;
 import org.kirya343.features.room.dto.ShortListeningRoomDTO;
-import org.kirya343.features.audio.enums.PlaybackMode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

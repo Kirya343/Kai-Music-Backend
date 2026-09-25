@@ -3,7 +3,7 @@ package org.kirya343.features.audio.dto;
 import java.util.Collection;
 import java.util.List;
 
-import org.kirya343.features.audio.datasource.model.AudioFile;
+import org.kirya343.features.audio.datasource.AudioFile;
 
 public record AudioDTO(
     Long id,

@@ -1,15 +1,15 @@
 package org.kirya343.features.audio.controller;
 
 import org.kirya343.infrastructure.security.services.UserAuthDataService;
-import org.kirya343.features.audio.datasource.model.AudioFile;
-import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
-import org.kirya343.features.audio.datasource.repository.QueueItemRepository;
+import org.kirya343.features.audio.datasource.AudioFile;
+import org.kirya343.features.audio.datasource.AudioFileRepository;
 import org.kirya343.features.audio.dto.AudioDTO;
 import org.kirya343.features.audio.dto.AudioUpdateDTO;
 import org.kirya343.features.audio.services.AudioCommandService;
 import org.kirya343.features.audio.services.storage.AudioFileManager;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.authentication.dto.UserAuthData;
+import org.kirya343.features.playback.datasource.repository.QueueItemRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;

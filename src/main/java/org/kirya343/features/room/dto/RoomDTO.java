@@ -3,10 +3,10 @@ package org.kirya343.features.room.dto;
 import java.util.List;
 
 import org.kirya343.features.room.datasource.ListeningRoom;
-import org.kirya343.features.audio.datasource.model.AudioFile;
+import org.kirya343.features.audio.datasource.AudioFile;
 import org.kirya343.features.audio.dto.AudioDTO;
-import org.kirya343.features.audio.dto.queue.QueueItemDTO;
-import org.kirya343.features.audio.enums.PlaybackMode;
+import org.kirya343.features.playback.dto.queue.QueueItemDTO;
+import org.kirya343.features.playback.enums.PlaybackMode;
 
 public record RoomDTO(
     Long id,

@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.kirya343.features.audio.services.util.AudioConverter;
 import org.kirya343.features.audio.services.util.Fmp4Parser;
-import org.kirya343.features.audio.datasource.model.AudioFile;
+import org.kirya343.features.audio.datasource.AudioFile;
+import org.kirya343.features.audio.datasource.AudioFileRepository;
 import org.kirya343.features.user.datasource.User;
-import org.kirya343.features.audio.datasource.repository.AudioFileRepository;
 import org.kirya343.features.audio.dto.AudioChunk;
 import org.kirya343.features.audio.dto.AudioMetadataDTO;
 import org.kirya343.features.authentication.dto.UserAuthData;
