@@ -1,12 +1,10 @@
 package org.kirya343.features.audio.services.eventhandlers;
 
-import org.kirya343.features.audio.services.cache.RoomPlaybackContext;
 import org.kirya343.features.audio.services.cache.RoomPlaybackContextStore;
-import org.kirya343.features.audio.services.playback.RoomWebSocketService;
+import org.kirya343.features.audio.services.playback.RoomSessionService;
 import org.kirya343.features.audio.services.streaming.AudioStreamWorkerManager;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
-import org.kirya343.features.room.dto.RoomDTO;
 import org.kirya343.features.user.dto.event.UserConnectedEvent;
 import org.kirya343.features.user.dto.event.UserDisconnectedEvent;
 import org.springframework.context.event.EventListener;
@@ -18,12 +16,12 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class AudioUserConnectionEventHandler {
+public class AudioUserEventHandler {
 
     private final ListeningRoomRepository listeningRoomRepository;
     private final RoomPlaybackContextStore roomPlaybackContextStore;
-    private final RoomWebSocketService roomWebSocketService;
     private final AudioStreamWorkerManager audioStreamWorkerManager;
+    private final RoomSessionService roomSessionService;
 
     @Async 
     @EventListener
@@ -36,12 +34,7 @@ public class AudioUserConnectionEventHandler {
         
         if (room == null) return;
 
-        roomPlaybackContextStore.computeIfAbsent(room.getId()).getListeners().add(event.authData().openId());
-
-        RoomPlaybackContext roomContext = roomPlaybackContextStore.get(room.getId());
-
-        roomWebSocketService.broadcastRoomInfo(event.authData().openId(), RoomDTO.ofRoomPlaybackContext(roomContext));
-        audioStreamWorkerManager.getWorker(room.getId()).handleUserConnected(event.authData().openId());
+        roomSessionService.initializeRoom(room.getId(), event.authData());
     }
 
     @Async

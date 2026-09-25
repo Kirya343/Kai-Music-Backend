@@ -3,6 +3,7 @@ package org.kirya343.features.room.services;
 import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.user.datasource.User;
+import org.kirya343.features.user.datasource.UserRepository;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.room.dto.RoomDTO;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class RoomCommandService {
 
     private final ListeningRoomRepository listeningRoomRepository;
+    private final UserRepository userRepository;
     private final RoomWebSocketService roomWebSocketService;
     private final EntityManager entityManager;
     
@@ -30,6 +32,7 @@ public class RoomCommandService {
         );
 
         ListeningRoom saved = listeningRoomRepository.save(room);
+        userRepository.updateListeningRoom(authData.id(), saved.getId());
 
         roomWebSocketService.broadcastRoomInfo(authData.openId(), RoomDTO.ofRoom(saved));
 

@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.kirya343.features.audio.datasource.model.AudioFile;
 import org.kirya343.features.room.datasource.ListeningRoom;
+import org.kirya343.features.room.dto.RoomDTO;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +20,7 @@ public class RoomPlaybackContext {
     ) {
         this.listeners = new HashSet<>();
         this.currentAudio = currentAudio;
-        this.room = room;
+        this.room = RoomDTO.ofRoom(room);
     }
 
     @Setter
@@ -28,6 +29,10 @@ public class RoomPlaybackContext {
     @Setter 
     private AudioFile currentAudio;
 
-    @Setter 
-    private ListeningRoom room;
+    @Setter
+    private RoomDTO room;
+
+    public RoomDTO getFullRoom() {
+        return RoomDTO.addAudioFile(room, currentAudio);
+    }
 }

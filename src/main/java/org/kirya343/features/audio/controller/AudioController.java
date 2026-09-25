@@ -10,9 +10,7 @@ import org.kirya343.features.audio.services.AudioCommandService;
 import org.kirya343.features.audio.services.storage.AudioFileManager;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.authentication.dto.UserAuthData;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +27,6 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -44,15 +40,6 @@ public class AudioController {
     private final UserAuthDataService userAuthDataService;
     private final AudioStorageService audioStorageService;
     private final AudioCommandService audioCommandService;
-
-    @GetMapping("/{queueItemId}")
-    public ResponseEntity<InputStreamResource> getAudio(
-            @AuthenticationPrincipal UserAuthData authData,
-            @PathVariable Long queueItemId,
-            @RequestHeader(value = "Range", required = false) String rangeHeader
-    ) throws IOException {
-        return audioFileManager.getAudio(queueItemId, rangeHeader, authData);
-    }
 
     @GetMapping("/{queueItemId}/info")
     public AudioDTO getAudioInfo(@PathVariable Long queueItemId) {

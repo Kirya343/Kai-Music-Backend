@@ -1,6 +1,5 @@
 package org.kirya343.features.audio.services.streaming;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -16,7 +15,6 @@ import org.kirya343.features.audio.services.playback.RoomWebSocketService;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.audio.services.util.Fmp4Chunker;
 import org.kirya343.features.authentication.dto.UserAuthData;
-import org.kirya343.features.room.dto.RoomDTO;
 import org.kirya343.features.room.dto.commands.Next;
 import org.kirya343.features.audio.datasource.model.AudioFile;
 import org.kirya343.features.audio.dto.AudioChunk;
@@ -83,6 +81,8 @@ public class AudioStreamWorker {
 
     public void applyState(PlaybackStateDTO state) {
 
+        if (state == null) return;
+
         updateState(state);
 
         log.info("START STATE: entryId={}, position={}", state.entryId(), state.position());
@@ -147,7 +147,7 @@ public class AudioStreamWorker {
                     }
                 }
 
-            } catch (IOException e) {
+            } catch (Exception e) {
 
             // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -193,12 +193,16 @@ public class AudioStreamWorker {
         PlaybackStateDTO previousState = currentState;
 
         boolean trackChanged =
-            currentState != null &&
-            !currentState.entryId().equals(state.entryId());
+            currentState == null || (
+                currentState != null &&
+                !currentState.entryId().equals(state.entryId())
+            );
         
         boolean positionChanged =
-            currentState != null &&
-            !currentState.position().equals(state.position());
+            currentState == null || (
+                currentState != null &&
+                !currentState.position().equals(state.position())
+            );
 
         currentState = state;
 
@@ -210,7 +214,7 @@ public class AudioStreamWorker {
         if (trackChanged) {
             log.info(
                 "SWITCH TRACK: {} => {}",
-                previousState.entryId(),
+                previousState != null ? previousState.entryId() : "null",
                 currentState.entryId()
             );
 
@@ -225,7 +229,7 @@ public class AudioStreamWorker {
             try {
                 for (String user : context.getListeners()) {
                     getChunker(user, currentState);
-                    roomWebSocketService.broadcastRoomInfo(user, RoomDTO.ofRoomPlaybackContext(context));
+                    roomWebSocketService.broadcastRoomInfo(user, context.getFullRoom());
                 }
             } catch (Exception e) {
                 log.info("Exception {}", e);
@@ -235,8 +239,8 @@ public class AudioStreamWorker {
         if (positionChanged) {
             log.info(
                 "SEEK POSITION: {} => {}",
-                previousState.entryId(),
-                currentState.entryId()
+                previousState != null ? previousState.position() : "null",
+                currentState.position()
             );
 
             for (String user : initializedListeners) {
@@ -279,6 +283,9 @@ public class AudioStreamWorker {
     }
 
     public void handleUserConnected(String user) {
+
+        if (currentState == null) return;
+
         log.info("user connected and recive {}", currentState.position());
         roomWebSocketService.broadcastPlaybackState(user, currentState);
     }

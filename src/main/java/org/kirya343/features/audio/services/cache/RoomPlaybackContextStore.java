@@ -60,12 +60,12 @@ public class RoomPlaybackContextStore {
             .findById(roomId)
             .orElseThrow();
 
-        rooms.get(room.getId()).setRoom(room);
+        rooms.get(room.getId()).setRoom(RoomDTO.ofRoom(room));
 
         RoomPlaybackContext context = rooms.get(room.getId());
 
         for (String user : rooms.get(room.getId()).getListeners()) {
-            roomWebSocketService.broadcastRoomInfo(user, RoomDTO.ofRoomPlaybackContext(context));
+            roomWebSocketService.broadcastRoomInfo(user, context.getFullRoom());
         }
     }
 

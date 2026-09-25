@@ -10,6 +10,9 @@ public record PlaybackStateDTO(
 ) {
 
     public static PlaybackStateDTO ofState(RoomPlaybackState state) {
+
+        if (state == null) return null;
+        
         return new PlaybackStateDTO(
             state.getUser(), 
             state.getCurrentQueueEntryId(), 

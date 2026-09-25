@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class RoomUpdateEventHandler {
+public class RoomEventHandler {
 
     private final RoomPlaybackStateRepository roomPlaybackStateRepository;
     private final EntityManager entityManager;

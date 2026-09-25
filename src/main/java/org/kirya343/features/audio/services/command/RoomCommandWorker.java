@@ -47,9 +47,9 @@ public class RoomCommandWorker {
         RoomPlaybackContext roomContext = rooms.computeIfAbsent(cmd.roomId());
 
         UserAuthData authData = cmd.user();
-        Long roomId = roomContext.getRoom().getId();
+        Long roomId = roomContext.getRoom().id();
 
-        AudioStreamWorker streamWorker = audioStreamWorkerManager.getWorker(roomContext.getRoom().getId());
+        AudioStreamWorker streamWorker = audioStreamWorkerManager.getWorker(roomContext.getRoom().id());
 
         PlaybackStateDTO state = null;
 
@@ -86,7 +86,7 @@ public class RoomCommandWorker {
 
         publisher.publishEvent(
             new RoomPlaybackEvent(
-                roomContext.getRoom().getId(), 
+                roomContext.getRoom().id(), 
                 state, 
                 authData
             ));
