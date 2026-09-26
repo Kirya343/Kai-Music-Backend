@@ -3,7 +3,6 @@ package org.kirya343.features.playback.services.command;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.kirya343.features.authentication.dto.UserAuthData;
-import org.kirya343.features.playback.datasource.model.QueueItem;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.features.playback.dto.commands.Next;
 import org.kirya343.features.playback.dto.commands.Prev;
@@ -16,6 +15,7 @@ import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.playback.services.streaming.AudioStreamWorker;
 import org.kirya343.features.playback.services.streaming.AudioStreamWorkerManager;
+import org.kirya343.features.playlist.datasource.model.QueueItem;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -25,13 +25,13 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j 
 @RequiredArgsConstructor
-public class RoomCommandWorker {
+public class PlaybackCommandWorker {
 
     private final ApplicationEventPublisher publisher;
     private final RoomPlaybackContextStore rooms;
     private final QueueService queueService;
     private final RoomWebSocketService webSocketService;
-    private final RoomExecutorRegistry executorRegistry;
+    private final PlaybackExecutorRegistry executorRegistry;
     private final AudioStreamWorkerManager audioStreamWorkerManager;
 
     public void submit(RoomCommand cmd) {

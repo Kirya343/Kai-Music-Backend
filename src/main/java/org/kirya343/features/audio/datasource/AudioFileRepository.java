@@ -13,11 +13,12 @@ public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
         SELECT a
         FROM QueueItem q
         JOIN q.audio a
-        JOIN q.room r
+        JOIN q.playlist p
+        JOIN ListeningRoom r ON r.playlist.id = p.id
         LEFT JOIN r.members m
         WHERE q.id = :queueItemId
         AND (r.owner.id = :userId OR m.id = :userId)
-    """)
+        """)
     Optional<AudioFile> findAudioInUserRoom(
         Long userId,
         Long queueItemId
@@ -37,10 +38,11 @@ public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
         SELECT a
         FROM QueueItem q
         JOIN q.audio a
-        JOIN q.room r
+        JOIN ListeningRoom r ON r.playlist.id = q.playlist.id
         JOIN r.playbackState ps
-        WHERE r.id = :roomId AND ps.currentQueueEntryId = q.id
-    """)
+        WHERE r.id = :roomId
+            AND ps.currentQueueEntryId = q.id
+        """)
     Optional<AudioFile> findCurrentAudioByRoom(
         @Param("roomId") Long roomId
     );

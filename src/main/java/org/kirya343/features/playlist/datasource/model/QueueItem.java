@@ -1,10 +1,9 @@
-package org.kirya343.features.playback.datasource.model;
+package org.kirya343.features.playlist.datasource.model;
 
 import java.time.Instant;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.kirya343.features.audio.datasource.AudioFile;
-import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.user.datasource.User;
 
 import jakarta.persistence.Column;
@@ -24,14 +23,14 @@ import lombok.Setter;
 @Table(
     name = "queue_items",
     indexes = {
-        @Index(name = "idx_room_position", columnList = "room_id, position")
+        @Index(name = "idx_playlist_position", columnList = "playlist_id, position")
     }
 )
 @NoArgsConstructor
 public class QueueItem {
 
-    public QueueItem(ListeningRoom room, AudioFile audio, Long position, User addedBy) {
-        this.room = room;
+    public QueueItem(Playlist playlist, AudioFile audio, Long position, User addedBy) {
+        this.playlist = playlist;
         this.audio = audio;
         this.position = position;
         this.addedBy = addedBy;
@@ -42,7 +41,7 @@ public class QueueItem {
     private Long id;
 
     @ManyToOne(optional = false)
-    private ListeningRoom room;
+    private Playlist playlist;
 
     @ManyToOne(optional = false)
     private AudioFile audio;

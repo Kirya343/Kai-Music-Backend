@@ -9,7 +9,6 @@ import org.kirya343.features.audio.services.AudioCommandService;
 import org.kirya343.features.audio.services.storage.AudioFileManager;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.authentication.dto.UserAuthData;
-import org.kirya343.features.playback.datasource.repository.QueueItemRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,18 +34,10 @@ import java.util.List;
 public class AudioController {
 
     private final AudioFileRepository audioFileRepository;
-    private final QueueItemRepository queueItemRepository;
     private final AudioFileManager audioFileManager;
     private final UserAuthDataService userAuthDataService;
     private final AudioStorageService audioStorageService;
     private final AudioCommandService audioCommandService;
-
-    @GetMapping("/{queueItemId}/info")
-    public AudioDTO getAudioInfo(@PathVariable Long queueItemId) {
-        AudioFile audio = queueItemRepository.findAudioById(queueItemId).orElseThrow();
-
-        return AudioDTO.ofAudioFile(audio);
-    }
 
     @GetMapping("/library")
     public List<AudioDTO> getUserLibrary(@AuthenticationPrincipal UserAuthData authData) {
@@ -98,7 +89,7 @@ public class AudioController {
         audioFileRepository.save(audio);
     }
 
-    @DeleteMapping ("/{audioId}")
+    @DeleteMapping("/{audioId}")
     public void deleteAudio(
         @PathVariable Long audioId,
         @AuthenticationPrincipal UserAuthData authData

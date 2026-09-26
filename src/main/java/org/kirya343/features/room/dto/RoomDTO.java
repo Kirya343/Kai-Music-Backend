@@ -1,12 +1,9 @@
 package org.kirya343.features.room.dto;
 
-import java.util.List;
-
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.audio.datasource.AudioFile;
 import org.kirya343.features.audio.dto.AudioDTO;
-import org.kirya343.features.playback.dto.queue.QueueItemDTO;
-import org.kirya343.features.playback.enums.PlaybackMode;
+import org.kirya343.features.playlist.dto.PlaylistDTO;
 
 public record RoomDTO(
     Long id,
@@ -14,8 +11,7 @@ public record RoomDTO(
     Long ownerId,
     String code,
     Integer listeners,
-    PlaybackMode mode,
-    List<QueueItemDTO> queue,
+    PlaylistDTO playlist,
     AudioDTO audio
 ) {
     public static RoomDTO ofRoom(ListeningRoom room, AudioFile audio) {
@@ -25,8 +21,7 @@ public record RoomDTO(
             room.getOwner().getId(),
             room.getCode(),
             room.getMembers().size(),
-            room.getPlaybackMode(),
-            QueueItemDTO.ofList(room.getQueue()),
+            PlaylistDTO.ofPlaylist(room.getPlaylist()),
             AudioDTO.ofAudioFile(audio)
         );
     }
@@ -38,8 +33,7 @@ public record RoomDTO(
             r.ownerId(),
             r.code(),
             listeners,
-            r.mode(),
-            r.queue(),
+            r.playlist(),
             AudioDTO.ofAudioFile(audio)
         );
     }
@@ -52,8 +46,7 @@ public record RoomDTO(
             room.getOwner().getId(),
             room.getCode(),
             room.getMembers().size(),
-            room.getPlaybackMode(),
-            QueueItemDTO.ofList(room.getQueue()),
+            PlaylistDTO.ofPlaylist(room.getPlaylist()),
             null
         );
     }

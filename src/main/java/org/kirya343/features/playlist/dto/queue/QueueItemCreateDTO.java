@@ -1,4 +1,4 @@
-package org.kirya343.features.playback.dto.queue;
+package org.kirya343.features.playlist.dto.queue;
 
 public record QueueItemCreateDTO(
     Long audioId,

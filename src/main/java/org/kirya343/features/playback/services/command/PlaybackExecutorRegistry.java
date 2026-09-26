@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RoomExecutorRegistry {
+public class PlaybackExecutorRegistry {
 
     private final Map<Long, ThreadPoolExecutor> executors = new ConcurrentHashMap<>();
 

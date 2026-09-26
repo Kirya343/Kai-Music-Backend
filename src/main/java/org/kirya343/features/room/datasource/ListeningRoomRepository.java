@@ -3,24 +3,23 @@ package org.kirya343.features.room.datasource;
 import java.util.List;
 import java.util.Optional;
 
-import org.kirya343.features.playback.enums.PlaybackMode;
 import org.kirya343.features.room.dto.ShortListeningRoomDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Long> {
     
     @Query("""
-        SELECT r FROM ListeningRoom r
+        SELECT DISTINCT r
+        FROM ListeningRoom r
         LEFT JOIN FETCH r.owner
         LEFT JOIN FETCH r.members m
-        LEFT JOIN FETCH r.queue q
+        LEFT JOIN FETCH r.playlist p
+        LEFT JOIN FETCH p.queue q
         LEFT JOIN FETCH q.audio
         WHERE m.id = :userId
-    """)
+        """)
     Optional<ListeningRoom> findRoomByUserId(@Param("userId") Long userId);
 
     @Query("""
@@ -35,11 +34,6 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
 
     List<ListeningRoom> findAllByOwnerId(Long ownerId);
     Optional<ListeningRoom> findByCode(String code);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE ListeningRoom r SET r.playbackMode = :mode WHERE r.id = :roomId")
-    int updatePlaybackMode(@Param("roomId") Long roomId, @Param("mode") PlaybackMode mode);
 
     @Query("""
         SELECT new org.kirya343.features.room.dto.ShortListeningRoomDTO(

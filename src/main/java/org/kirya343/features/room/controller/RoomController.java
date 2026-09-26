@@ -1,4 +1,4 @@
-package org.kirya343.features.audio.controller;
+package org.kirya343.features.room.controller;
 
 import java.util.List;
 
@@ -9,10 +9,6 @@ import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.user.datasource.UserRepository;
 import org.kirya343.features.authentication.dto.UserAuthData;
-import org.kirya343.features.playback.datasource.model.RoomPlaybackState;
-import org.kirya343.features.playback.datasource.repository.RoomPlaybackStateRepository;
-import org.kirya343.features.playback.dto.PlaybackStateDTO;
-import org.kirya343.features.playback.enums.PlaybackMode;
 import org.kirya343.features.playback.services.RoomSessionService;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
@@ -21,7 +17,6 @@ import org.kirya343.features.room.dto.MainPageRequest;
 import org.kirya343.features.room.dto.RoomDTO;
 import org.kirya343.features.room.dto.RoomUpdateDTO;
 import org.kirya343.features.room.dto.ShortListeningRoomDTO;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -31,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/room")
 public class RoomController {
 
-    private final RoomPlaybackStateRepository roomPlaybackStateRepository;
     private final ListeningRoomRepository listeningRoomRepository;
     private final AudioQueryService audioQueryService;
     private final PresenceService presenceService;
@@ -97,23 +90,6 @@ public class RoomController {
             presenceService.countAll(),
             roomsCount
         );
-    }
-
-    @PatchMapping("/{roomId}/mode")
-    public void updatePlaybackMode(@PathVariable Long roomId, @RequestParam PlaybackMode mode) {
-        listeningRoomRepository.updatePlaybackMode(roomId, mode);
-    }
-    
-    @GetMapping("/{roomId}/playback-state")
-    public PlaybackStateDTO getPlaybackState(
-        @PathVariable Long roomId,
-        @AuthenticationPrincipal UserAuthData authData
-    ) {
-
-        RoomPlaybackState state = roomPlaybackStateRepository.findById(roomId).orElseThrow(
-            () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        return PlaybackStateDTO.ofState(state);
     }
 
     @PatchMapping("/{roomId}")

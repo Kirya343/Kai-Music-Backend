@@ -20,7 +20,7 @@ public class RoomPlaybackContext {
     ) {
         this.listeners = new HashSet<>();
         this.currentAudio = currentAudio;
-        this.room = RoomDTO.ofRoom(room);
+        this.room = RoomDTO.ofRoom(room, currentAudio);
     }
 
     @Setter

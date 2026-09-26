@@ -9,7 +9,7 @@ import org.kirya343.features.playback.dto.commands.RoomCommand;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RoomCommandQueue {
+public class PlaybackCommandQueue {
 
     private final Map<Long, BlockingQueue<RoomCommand>> queues = new ConcurrentHashMap<>();
 

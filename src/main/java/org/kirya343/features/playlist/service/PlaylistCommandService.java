@@ -1,11 +1,11 @@
-package org.kirya343.features.playback.services.queue;
+package org.kirya343.features.playlist.service;
 
 import java.util.List;
 
 import org.kirya343.features.authentication.dto.UserAuthData;
-import org.kirya343.features.playback.datasource.repository.QueueItemRepository;
 import org.kirya343.features.playback.dto.event.QueueChangedEvent;
-import org.kirya343.features.playback.dto.queue.QueueItemCreateDTO;
+import org.kirya343.features.playlist.datasource.repository.QueueItemRepository;
+import org.kirya343.features.playlist.dto.queue.QueueItemCreateDTO;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.springframework.context.ApplicationEventPublisher;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service 
 @Slf4j 
 @RequiredArgsConstructor 
-public class QueueCommandService {
+public class PlaylistCommandService {
 
     private final QueueItemRepository queueItemRepository;
     private final ListeningRoomRepository listeningRoomRepository;
@@ -30,7 +30,7 @@ public class QueueCommandService {
 
         for (QueueItemCreateDTO dto : list) {
 
-            addToQueue(room.getId(), authData.id(), dto);
+            addToQueue(room.getPlaylist().getId(), authData.id(), dto);
         }
 
         eventPublisher.publishEvent(
@@ -40,13 +40,13 @@ public class QueueCommandService {
     
     @Transactional
     public void addToQueue(
-        Long roomId,
+        Long playlistId,
         Long addedById,
         QueueItemCreateDTO dto
     ) {
         if (dto.position() == null) {
             queueItemRepository.insertQueueItemAtEnd(
-                roomId,
+                playlistId,
                 dto.audioId(),
                 addedById
             );
@@ -54,7 +54,7 @@ public class QueueCommandService {
             return;
         }
 
-        int maxPosition = queueItemRepository.getMaxPosition(roomId);
+        int maxPosition = queueItemRepository.getMaxPosition(playlistId);
 
         if (dto.position() < 0 || dto.position() > maxPosition + 1) {
             throw new IllegalArgumentException(
@@ -63,12 +63,12 @@ public class QueueCommandService {
         }
 
         queueItemRepository.shiftQueueItems(
-            roomId,
+            playlistId,
             dto.position()
         );
 
         queueItemRepository.insertQueueItem(
-            roomId,
+            playlistId,
             dto.audioId(),
             dto.position(),
             addedById
@@ -81,7 +81,7 @@ public class QueueCommandService {
 
         for (Long queueItemId : list) {
 
-            removeFromQueue(room.getId(), queueItemId, authData);
+            removeFromQueue(room.getPlaylist().getId(), queueItemId, authData);
         }
 
         eventPublisher.publishEvent(
@@ -90,12 +90,12 @@ public class QueueCommandService {
     }
 
     @Transactional 
-    public void removeFromQueue(Long roomId, Long queueItemId, UserAuthData authData) {
+    public void removeFromQueue(Long playlistId, Long queueItemId, UserAuthData authData) {
         queueItemRepository.deleteByIdAndUserRoom(queueItemId, authData.id());
 
         log.debug("deleted");
 
-        queueItemRepository.normalizePositions(roomId);
+        queueItemRepository.normalizePositions(playlistId);
 
         log.debug("shifted");
     }

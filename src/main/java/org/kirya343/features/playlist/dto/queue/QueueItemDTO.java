@@ -1,10 +1,10 @@
-package org.kirya343.features.playback.dto.queue;
+package org.kirya343.features.playlist.dto.queue;
 
 import java.util.Collection;
 import java.util.List;
 
 import org.kirya343.features.audio.dto.AudioDTO;
-import org.kirya343.features.playback.datasource.model.QueueItem;
+import org.kirya343.features.playlist.datasource.model.QueueItem;
 
 public record QueueItemDTO(
     Long id,
