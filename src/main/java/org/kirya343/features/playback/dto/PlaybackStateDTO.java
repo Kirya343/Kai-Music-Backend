@@ -11,7 +11,7 @@ public record PlaybackStateDTO(
 
     public static PlaybackStateDTO ofState(RoomPlaybackState state) {
 
-        if (state == null) return null;
+        if (state == null || state.getCurrentQueueEntryId() == null) return null;
         
         return new PlaybackStateDTO(
             state.getUser(), 
