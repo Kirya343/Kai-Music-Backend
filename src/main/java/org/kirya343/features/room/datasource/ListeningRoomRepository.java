@@ -3,7 +3,7 @@ package org.kirya343.features.room.datasource;
 import java.util.List;
 import java.util.Optional;
 
-import org.kirya343.features.room.dto.ShortListeningRoomDTO;
+import org.kirya343.features.room.dto.ShortRoomDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,6 +21,8 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
         WHERE m.id = :userId
         """)
     Optional<ListeningRoom> findRoomByUserId(@Param("userId") Long userId);
+    
+    Optional<ListeningRoom> findByPlaylistId(Long playlistId);
 
     @Query("""
         SELECT r FROM ListeningRoom r
@@ -36,7 +38,7 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
     Optional<ListeningRoom> findByCode(String code);
 
     @Query("""
-        SELECT new org.kirya343.features.room.dto.ShortListeningRoomDTO(
+        SELECT new org.kirya343.features.room.dto.ShortRoomDTO(
             r.id,
             COALESCE(r.title, CONCAT(r.owner.name, '''s room')),
             r.owner.id,
@@ -45,5 +47,5 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
         )
         FROM ListeningRoom r
     """)
-    List<ShortListeningRoomDTO> findAllShortDTOs();
+    List<ShortRoomDTO> findAllShortDTOs();
 }

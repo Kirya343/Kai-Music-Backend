@@ -10,9 +10,7 @@ import org.kirya343.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.features.playback.services.RoomWebSocketService;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
-import org.kirya343.features.room.dto.RoomDTO;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
@@ -54,21 +52,6 @@ public class RoomPlaybackContextStore {
         );
     }
 
-    @Transactional 
-    public void reloadAndResendContext(Long roomId) {
-        ListeningRoom room = listeningRoomRepository
-            .findById(roomId)
-            .orElseThrow();
-
-        rooms.get(room.getId()).setRoom(RoomDTO.ofRoom(room));
-
-        RoomPlaybackContext context = rooms.get(room.getId());
-
-        for (String user : rooms.get(room.getId()).getListeners()) {
-            roomWebSocketService.broadcastRoomInfo(user, context.getFullRoom());
-        }
-    }
-
     public void updateRoomAudio(Long roomId, PlaybackStateDTO state) {
 
         AudioFile audioFile = audioFileRepository
@@ -85,7 +68,7 @@ public class RoomPlaybackContextStore {
         RoomPlaybackContext roomContext = rooms.get(roomId);
 
         for (String user : roomContext.getListeners()) {
-            roomWebSocketService.broadcastRoomInfo(user, roomContext.getFullRoom());
-        }  
+            roomWebSocketService.broadcastRoomInfo(user, roomContext.getRoom());
+        }
     }
 }

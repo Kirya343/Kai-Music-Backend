@@ -4,13 +4,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.kirya343.features.audio.services.storage.AudioStorageService;
+import org.kirya343.features.playback.PlaybackWebsocketService;
 import org.kirya343.features.playback.datasource.model.RoomPlaybackState;
 import org.kirya343.features.playback.datasource.repository.RoomPlaybackStateRepository;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.features.playback.services.RoomWebSocketService;
+import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AudioStreamWorkerManager {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final PlaybackWebsocketService playbackWebsocketService;
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final ApplicationEventPublisher eventPublisher;
     private final RoomWebSocketService roomWebSocketService;
@@ -39,17 +40,23 @@ public class AudioStreamWorkerManager {
 
         if (worker == null) {
 
+            log.info("Создаём новый воркер для комнаты {}", roomId);
+
             RoomPlaybackState state = roomPlaybackStateRepository.findById(roomId).orElse(null);
 
+            RoomPlaybackContext context = roomPlaybackContextStore.computeIfAbsent(roomId);
+
             worker = new AudioStreamWorker(
-                roomId, 
-                roomPlaybackContextStore, 
-                messagingTemplate, 
+                roomId,
+                playbackWebsocketService, 
                 eventPublisher, 
                 roomWebSocketService, 
                 audioStorageService, 
-                PlaybackStateDTO.ofState(state)
+                PlaybackStateDTO.ofState(state),
+                context
             );
+
+            log.info("Кладём к остальным воркер для комнаты {}", roomId);
 
             workers.putIfAbsent(roomId, worker);
         }

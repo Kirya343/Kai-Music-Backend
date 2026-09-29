@@ -2,9 +2,9 @@ package org.kirya343.features.room.controller;
 
 import java.util.List;
 
-import org.kirya343.features.audio.services.AudioQueryService;
 import org.kirya343.features.presence.services.PresenceService;
 import org.kirya343.features.room.services.RoomCommandService;
+import org.kirya343.features.room.services.RoomQueryService;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.user.datasource.UserRepository;
@@ -16,7 +16,7 @@ import org.kirya343.features.playback.services.streaming.AudioStreamWorkerManage
 import org.kirya343.features.room.dto.MainPageRequest;
 import org.kirya343.features.room.dto.RoomDTO;
 import org.kirya343.features.room.dto.RoomUpdateDTO;
-import org.kirya343.features.room.dto.ShortListeningRoomDTO;
+import org.kirya343.features.room.dto.ShortRoomDTO;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RoomController {
 
     private final ListeningRoomRepository listeningRoomRepository;
-    private final AudioQueryService audioQueryService;
+    private final RoomQueryService roomQueryService;
     private final PresenceService presenceService;
     private final UserRepository userRepository;
     private final RoomCommandService roomCommandService;
@@ -48,7 +48,7 @@ public class RoomController {
 
     @GetMapping
     public RoomDTO getCurrentRoom(@AuthenticationPrincipal UserAuthData authData) {
-        return audioQueryService.getCurrentRoom(authData);
+        return roomQueryService.getCurrentRoom(authData);
     }
 
     @PostMapping
@@ -82,7 +82,7 @@ public class RoomController {
     @GetMapping("/list/page")
     public MainPageRequest getMainPage() {
 
-        List<ShortListeningRoomDTO> rooms = listeningRoomRepository.findAllShortDTOs();
+        List<ShortRoomDTO> rooms = listeningRoomRepository.findAllShortDTOs();
         long roomsCount = listeningRoomRepository.count();
 
         return new MainPageRequest(

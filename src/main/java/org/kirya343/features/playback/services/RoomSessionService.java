@@ -19,6 +19,7 @@ public class RoomSessionService {
         roomPlaybackContextStore.computeIfAbsent(roomId).getListeners().add(authData.openId());
 
         roomPlaybackContextStore.listenersUpdated(roomId);
+        
         audioStreamWorkerManager.getWorker(roomId).handleUserConnected(authData.openId());
     }
 }

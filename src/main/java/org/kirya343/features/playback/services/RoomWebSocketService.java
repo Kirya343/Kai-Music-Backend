@@ -1,9 +1,9 @@
 package org.kirya343.features.playback.services;
 
-import java.util.Objects;
-
+import org.kirya343.features.audio.dto.AudioDTO;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
-import org.kirya343.features.room.dto.RoomDTO;
+import org.kirya343.features.playlist.dto.PlaylistDTO;
+import org.kirya343.features.room.dto.ShortRoomDTO;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,18 +24,37 @@ public class RoomWebSocketService {
         messagingTemplate.convertAndSendToUser(
             userOpenId,
             "/queue/playback",
-            Objects.requireNonNull(state)
+            state
         );
     }
 
-    public void broadcastRoomInfo(String userOpenId, RoomDTO dto) {
+    public void broadcastRoomInfo(String userOpenId, ShortRoomDTO dto) {
 
         log.debug("Sending room({}) info to user {}", dto.id(), userOpenId);
 
         messagingTemplate.convertAndSendToUser(
             userOpenId,
             "/queue/room",
-            Objects.requireNonNull(dto)
+            dto
+        );
+    }
+
+    public void broadcastAudioInfo(String userOpenId, AudioDTO dto) {
+
+        log.debug("Sending audio({}) info to user {}", dto.id(), userOpenId);
+
+        messagingTemplate.convertAndSendToUser(
+            userOpenId,
+            "/queue/audio-info",
+            dto
+        );
+    }
+
+    public void broadcastPlaylist(String userOpenId, PlaylistDTO playlist) {
+        messagingTemplate.convertAndSendToUser(
+            userOpenId, 
+            "/queue/playlist", 
+            playlist
         );
     }
 }

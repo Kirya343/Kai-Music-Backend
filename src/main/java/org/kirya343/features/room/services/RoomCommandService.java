@@ -6,7 +6,7 @@ import org.kirya343.features.user.datasource.UserRepository;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.playback.services.RoomWebSocketService;
-import org.kirya343.features.room.dto.RoomDTO;
+import org.kirya343.features.room.dto.ShortRoomDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +34,7 @@ public class RoomCommandService {
         ListeningRoom saved = listeningRoomRepository.save(room);
         userRepository.updateListeningRoom(authData.id(), saved.getId());
 
-        roomWebSocketService.broadcastRoomInfo(authData.openId(), RoomDTO.ofRoom(saved));
+        roomWebSocketService.broadcastRoomInfo(authData.openId(), ShortRoomDTO.ofRoom(saved));
 
         return saved;
     }

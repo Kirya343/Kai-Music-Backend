@@ -15,30 +15,6 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 public class AudioFile {
-
-    public AudioFile(
-            String name, 
-            String path, 
-            String format, 
-            User owner,
-            String title, 
-            String artist, 
-            String album, 
-            String coverUrl,
-            Long duration,
-            Integer chunks
-        ) {
-        this.name = name;
-        this.path = path;
-        this.format = format;
-        this.owner = owner;
-        this.title = title;
-        this.artist = artist;
-        this.album = album;
-        this.coverUrl = coverUrl;
-        this.duration = duration;
-        this.chunks = chunks;
-    }
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,4 +42,28 @@ public class AudioFile {
 
     @ManyToOne
     private User owner;
+
+    public AudioFile(
+            String name, 
+            String path, 
+            String format, 
+            User owner,
+            String title, 
+            String artist, 
+            String album, 
+            String coverUrl,
+            Long duration,
+            Integer chunks
+        ) {
+        this.name = name;
+        this.path = path;
+        this.format = format;
+        this.owner = owner;
+        this.title = title;
+        this.artist = artist;
+        this.album = album;
+        this.coverUrl = coverUrl;
+        this.duration = duration;
+        this.chunks = chunks;
+    }
 }

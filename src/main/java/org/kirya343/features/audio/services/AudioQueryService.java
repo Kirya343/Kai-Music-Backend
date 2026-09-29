@@ -1,9 +1,7 @@
 package org.kirya343.features.audio.services;
 
-import org.kirya343.features.room.datasource.ListeningRoom;
-import org.kirya343.features.room.datasource.ListeningRoomRepository;
-import org.kirya343.features.authentication.dto.UserAuthData;
-import org.kirya343.features.room.dto.RoomDTO;
+import org.kirya343.features.audio.datasource.AudioFile;
+import org.kirya343.features.audio.datasource.AudioFileRepository;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -12,11 +10,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AudioQueryService {
 
-    private final ListeningRoomRepository listeningRoomRepository;
-    
-    public RoomDTO getCurrentRoom(UserAuthData authData) {
-        ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
+    private final AudioFileRepository audioFileRepository;
 
-        return RoomDTO.ofRoom(room);
+    public AudioFile getAudioByQueueItem(Long entryId) {
+        AudioFile audioFile = audioFileRepository
+            .findAudioByQueueItem(entryId)
+            .orElseThrow();
+
+        return audioFile;
     }
 }

@@ -1,5 +1,7 @@
 package org.kirya343.features.playlist.datasource.repository;
 
+import java.util.Optional;
+
 import org.kirya343.features.playback.enums.PlaybackMode;
 import org.kirya343.features.playlist.datasource.model.Playlist;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +16,11 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
     @Transactional 
     @Query("UPDATE Playlist p SET p.playbackMode = :mode WHERE p.id = :playlistId")
     int updatePlaybackMode(@Param("playlistId") Long playlistId, @Param("mode") PlaybackMode mode);
+
+    @Query("""
+        SELECT r.playlist
+        FROM ListeningRoom r
+        WHERE r.id = :roomId
+    """)
+    Optional<Playlist> findByRoomId(@Param("roomId") Long roomId);
 }

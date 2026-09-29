@@ -2,10 +2,10 @@ package org.kirya343.features.playback.services.command;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.kirya343.features.audio.services.AudioQueryService;
 import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
-import org.kirya343.features.playback.dto.commands.Next;
-import org.kirya343.features.playback.dto.commands.Prev;
+import org.kirya343.features.playback.dto.commands.ChangeTrack;
 import org.kirya343.features.playback.dto.commands.RoomCommand;
 import org.kirya343.features.playback.dto.commands.UpdatePlayback;
 import org.kirya343.features.playback.dto.event.RoomPlaybackEvent;
@@ -16,6 +16,7 @@ import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.playback.services.streaming.AudioStreamWorker;
 import org.kirya343.features.playback.services.streaming.AudioStreamWorkerManager;
 import org.kirya343.features.playlist.datasource.model.QueueItem;
+import org.kirya343.features.playlist.datasource.repository.QueueItemRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +34,8 @@ public class PlaybackCommandWorker {
     private final RoomWebSocketService webSocketService;
     private final PlaybackExecutorRegistry executorRegistry;
     private final AudioStreamWorkerManager audioStreamWorkerManager;
+    private final AudioQueryService audioQueryService;
+    private final QueueItemRepository queueItemRepository;
 
     public void submit(RoomCommand cmd) {
 
@@ -53,46 +56,73 @@ public class PlaybackCommandWorker {
 
         PlaybackStateDTO state = null;
 
-        switch (cmd) {
-            case UpdatePlayback c -> { 
-                
-                state = c.state();
-            }
-            case Next c -> {
-                QueueItem entry = queueService.nextTrack(roomId);
+        try {
+            switch (cmd) {
+                case UpdatePlayback c -> { 
+                    
+                    state = c.state();
+                }
+                case ChangeTrack c -> {
 
-                state = new PlaybackStateDTO(
-                    cmd.user().name(), 
-                    entry.getId(), 
-                    Long.valueOf(0), 
-                    false
-                );
-            }
-            case Prev c -> {
+                    QueueItem entry = null;
+                    
+                    switch (c.changing()) {
+                        case "prev":
 
-                QueueItem entry = queueService.nextTrack(roomId);
+                            entry = queueService.prevTrack(roomId);
 
-                state = new PlaybackStateDTO(
-                    cmd.user().name(), 
-                    entry.getId(), 
-                    Long.valueOf(0), 
-                    false
-                );
-            }
-            default -> throw new RuntimeException("Введена неверная команда");
-        };
+                            break;
 
-        streamWorker.applyState(state);
+                        case "next":
 
-        publisher.publishEvent(
-            new RoomPlaybackEvent(
-                roomContext.getRoom().id(), 
-                state, 
-                authData
-            ));
+                            entry = queueService.nextTrack(roomId);
+                            
+                            break;
+                    
+                        default:
 
-        for (String user : roomContext.getListeners()) {
-            webSocketService.broadcastPlaybackState(user, state);
+                            try {
+
+                                Long entryId = Long.parseLong(c.changing());
+
+                                entry = queueItemRepository.findById(entryId).orElseThrow();
+
+                            } catch (NumberFormatException e) {
+                                throw e;
+                            }
+                            
+                            break;
+                    }
+
+                    state = new PlaybackStateDTO(
+                        cmd.user().name(), 
+                        entry.getId(), 
+                        Long.valueOf(0), 
+                        false
+                    );
+
+                    roomContext.setCurrentAudio(
+                        audioQueryService.getAudioByQueueItem(entry.getId())
+                    );
+
+                }
+                default -> throw new RuntimeException("Введена неверная команда");
+            };
+
+            streamWorker.applyState(state);
+
+            publisher.publishEvent(
+                new RoomPlaybackEvent(
+                    roomContext.getRoom().id(), 
+                    state, 
+                    authData
+                ));
+
+            for (String user : roomContext.getListeners()) {
+                webSocketService.broadcastPlaybackState(user, state);
+            }   
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

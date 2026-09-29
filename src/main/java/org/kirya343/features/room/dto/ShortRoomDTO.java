@@ -2,7 +2,7 @@ package org.kirya343.features.room.dto;
 
 import org.kirya343.features.room.datasource.ListeningRoom;
 
-public record ShortListeningRoomDTO(
+public record ShortRoomDTO(
     Long id,
     String title,
     Long ownerId,
@@ -10,8 +10,8 @@ public record ShortListeningRoomDTO(
     Integer membersCount
 ) {
 
-    public static ShortListeningRoomDTO ofRoom(ListeningRoom room) {
-        return new ShortListeningRoomDTO(
+    public static ShortRoomDTO ofRoom(ListeningRoom room) {
+        return new ShortRoomDTO(
             room.getId(), 
             room.getTitle() != null ? room.getTitle() : room.getOwner().getName() + "\'s room", 
             room.getOwner().getId(),
