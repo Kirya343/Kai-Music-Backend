@@ -5,7 +5,7 @@ import org.kirya343.features.playback.datasource.model.RoomPlaybackState;
 public record PlaybackStateDTO(
     String user,
     Long entryId,
-    Long position,
+    Double position,
     boolean pause
 ) {
 
