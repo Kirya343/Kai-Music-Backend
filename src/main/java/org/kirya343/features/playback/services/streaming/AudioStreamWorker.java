@@ -39,7 +39,7 @@ public class AudioStreamWorker {
 
     private final Long roomId;
 
-    private static final int CHUNK_INTERVAL_SECONDS = 3;
+    private static final int CHUNK_INTERVAL_SECONDS = 2;
 
     private PlaybackStateDTO currentState;
     private Set<String> initializedListeners = new HashSet<>();
@@ -121,7 +121,7 @@ public class AudioStreamWorker {
             currentState = new PlaybackStateDTO(
                 currentState.user(), 
                 currentState.entryId(), 
-                currentState.position() + 3, 
+                currentState.position() + CHUNK_INTERVAL_SECONDS, 
                 currentState.pause()
             );
         }
