@@ -87,7 +87,9 @@ public class AudioStreamWorker {
 
         if (task == null || task.isCancelled()) {
             task = scheduler.scheduleAtFixedRate(
-                this::streamTick,
+                () -> {
+                    streamTick();
+                },
                 0,
                 CHUNK_INTERVAL_SECONDS,
                 TimeUnit.SECONDS
@@ -169,6 +171,8 @@ public class AudioStreamWorker {
             chunker.initializationChunk(), 
             currentState.entryId());
 
+        bufferedUntil.put(user, currentState.position());
+
         initializedListeners.add(user);
     }
 
@@ -204,6 +208,7 @@ public class AudioStreamWorker {
 
             initializedListeners.clear();
             userChunkers.clear();
+            bufferedUntil.clear();
 
             try {
                 for (String user : roomContext.getListeners()) {
@@ -226,7 +231,7 @@ public class AudioStreamWorker {
                 Fmp4Chunker chunker = getChunker(user, currentState);
 
                 chunker.seek(currentState.position());
-                bufferedUntil.remove(user);
+                bufferedUntil.put(user, currentState.position());
             }
         }
     }

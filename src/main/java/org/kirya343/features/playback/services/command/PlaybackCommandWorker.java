@@ -97,7 +97,7 @@ public class PlaybackCommandWorker {
                     state = new PlaybackStateDTO(
                         cmd.user().name(), 
                         entry.getId(), 
-                        Long.valueOf(0), 
+                        0.0, 
                         false
                     );
 

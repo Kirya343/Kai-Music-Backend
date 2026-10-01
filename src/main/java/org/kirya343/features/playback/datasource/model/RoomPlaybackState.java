@@ -30,7 +30,7 @@ public class RoomPlaybackState {
     private ListeningRoom room;
 
     @Column(nullable = false)
-    private Long position = 0L;
+    private Double position = 0.0;
 
     @JoinColumn(name = "audio_id")
     private Long currentQueueEntryId;
@@ -43,7 +43,7 @@ public class RoomPlaybackState {
 
     private String user;
 
-    public RoomPlaybackState(ListeningRoom room, Long currentQueueEntryId, Long position, boolean paused, String user) {
+    public RoomPlaybackState(ListeningRoom room, Long currentQueueEntryId, Double position, boolean paused, String user) {
         this.room = room;
         this.currentQueueEntryId = currentQueueEntryId;
         this.position = position;
@@ -55,11 +55,11 @@ public class RoomPlaybackState {
         this.room = room;
     }
 
-    public long getCurrentPosition() {
+    public double getCurrentPosition() {
         if (paused) {
             return position;
         }
-        long elapsed = Duration.between(lastUpdate, Instant.now()).toSeconds();
+        double elapsed = Duration.between(lastUpdate, Instant.now()).toSeconds();
         return position + elapsed;
     }
 }
