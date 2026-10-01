@@ -1,16 +1,28 @@
 package org.kirya343.features.playlist.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.kirya343.features.authentication.dto.UserAuthData;
+import org.kirya343.features.authentication.service.UserAuthDataService;
 import org.kirya343.features.playback.dto.event.QueueChangedEvent;
+import org.kirya343.features.playback.enums.PlaybackMode;
+import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
+import org.kirya343.features.playlist.datasource.model.Playlist;
+import org.kirya343.features.playlist.datasource.repository.PlaylistRepository;
 import org.kirya343.features.playlist.datasource.repository.QueueItemRepository;
+import org.kirya343.features.playlist.dto.PlaylistCreateDTO;
 import org.kirya343.features.playlist.dto.queue.QueueItemCreateDTO;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
+import org.kirya343.features.room.services.RoomQueryService;
+import org.kirya343.features.user.datasource.User;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,19 +35,61 @@ public class PlaylistCommandService {
     private final QueueItemRepository queueItemRepository;
     private final ListeningRoomRepository listeningRoomRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserAuthDataService userAuthDataService;
+    private final PlaylistRepository playlistRepository;
+    private final PlaylistCommandService playlistCommandService;
+    private final RoomQueryService roomQueryService;
+    private final RoomPlaybackContextStore roomPlaybackContextStore;
+    private final SimpMessagingTemplate messagingTemplate;
+
+    public Playlist createPlaylist(PlaylistCreateDTO dto, UserAuthData authData) {
+        User user = userAuthDataService.getByAuthData(authData);
+
+        if (user == null) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        Playlist playlist = new Playlist(dto.title(), user);
+
+        Playlist saved = playlistRepository.save(playlist);
+
+        playlistCommandService.addQueueList(dto.audios(), saved.getId(), authData);
+
+        return saved;
+    }
+
+    public void updatePlaybackMode(Long playlistId, PlaybackMode mode) {
+        playlistRepository.updatePlaybackMode(playlistId, mode);
+
+        ListeningRoom room = roomQueryService.findByPlaylistId(playlistId);
+
+        if (room != null) {
+            Set<String> listners = roomPlaybackContextStore.get(room.getId()).getListeners();
+
+            for (String user : listners) {
+                messagingTemplate.convertAndSendToUser(
+                    user, 
+                    "/queue/playback-mode", 
+                    mode
+                );
+            }
+        }
+    }
 
     @Transactional
-    public void addQueueList(List<QueueItemCreateDTO> list, UserAuthData authData) {
+    public void addQueueListToRoom(List<QueueItemCreateDTO> list, UserAuthData authData) {
         ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
 
-        for (QueueItemCreateDTO dto : list) {
-
-            addToQueue(room.getPlaylist().getId(), authData.id(), dto);
-        }
+        addQueueList(list, room.getPlaylist().getId(), authData);
 
         eventPublisher.publishEvent(
             new QueueChangedEvent(room.getId())
         );
+    }
+
+    @Transactional
+    public void addQueueList(List<QueueItemCreateDTO> list, Long playlistId, UserAuthData authData) {
+        for (QueueItemCreateDTO dto : list) {
+            addToQueue(playlistId, authData.id(), dto);
+        }
     }
     
     @Transactional
@@ -76,17 +130,23 @@ public class PlaylistCommandService {
     }
 
     @Transactional
-    public void removeQueueList(List<Long> list, UserAuthData authData) {
+    public void removeQueueListFromRoom(List<Long> list, UserAuthData authData) {
         ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
 
-        for (Long queueItemId : list) {
-
-            removeFromQueue(room.getPlaylist().getId(), queueItemId, authData);
-        }
+        removeQueueList(list, room.getPlaylist().getId(), authData);
 
         eventPublisher.publishEvent(
             new QueueChangedEvent(room.getId())
         );
+    }
+
+    @Transactional
+    public void removeQueueList(List<Long> list, Long playlistId, UserAuthData authData) {
+
+        for (Long queueItemId : list) {
+
+            removeFromQueue(playlistId, queueItemId, authData);
+        }
     }
 
     @Transactional 
