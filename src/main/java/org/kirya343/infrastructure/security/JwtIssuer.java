@@ -35,7 +35,7 @@ public class JwtIssuer {
         JWTClaimsSet set = new JWTClaimsSet.Builder()
                 .subject(auth.id().toString())
                 .issueTime(Date.from(now))
-                .expirationTime(Date.from(now.plus(Duration.ofMinutes(15))))
+                .expirationTime(Date.from(now.plus(Duration.ofDays(1))))
                 .claim("openId", auth.openId())
                 .claim("name", auth.name())
                 .claim("status", auth.status())

@@ -1,5 +1,6 @@
 package org.kirya343.features.playlist.datasource.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.kirya343.features.playback.enums.PlaybackMode;
@@ -23,4 +24,16 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
         WHERE r.id = :roomId
     """)
     Optional<Playlist> findByRoomId(@Param("roomId") Long roomId);
+
+    @Query("""
+        SELECT p
+        FROM Playlist p
+        WHERE p.owner.id = :userId
+        AND NOT EXISTS (
+            SELECT r
+            FROM ListeningRoom r
+            WHERE r.playlist = p
+        )
+    """)
+    List<Playlist> findUserPlaylists(@Param("userId") Long userId);
 }

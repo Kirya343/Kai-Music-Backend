@@ -43,12 +43,37 @@ public class PlaylistController {
         return PlaylistDTO.ofPlaylist(playlist);
     }
 
+    @GetMapping("/my")
+    public List<PlaylistDTO> getMyPlaylist(
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+        List<Playlist> playlists = playlistRepository.findUserPlaylists(authData.id());
+
+        return PlaylistDTO.ofListShort(playlists);
+    }
+
     @PostMapping
-    public Long createPlaylist(
+    public PlaylistDTO createPlaylist(
         @RequestBody PlaylistCreateDTO dto,
         @AuthenticationPrincipal UserAuthData authData
     ) {
-        return playlistCommandService.createPlaylist(dto, authData).getId();
+        return playlistCommandService.createPlaylist(dto, authData);
+    }
+
+    @PostMapping("/{playlistId}/import")
+    public void importPlaylist(
+        @PathVariable Long playlistId, 
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+        playlistCommandService.importPlaylist(playlistId, authData);
+    }
+
+    @DeleteMapping("/{playlistId}")
+    public void deletePlaylist(
+        @PathVariable Long playlistId,
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+        playlistRepository.deleteById(playlistId);
     }
 
     @PatchMapping("/{playlistId}/mode")

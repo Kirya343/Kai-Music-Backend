@@ -45,4 +45,8 @@ public class UserAuthDataService {
             Objects.requireNonNull(user.getStatus())
         );
     }
+
+    public User parse(UserAuthData authData) {
+        return userRepository.findById(authData.id()).orElse(null);
+    }
 }

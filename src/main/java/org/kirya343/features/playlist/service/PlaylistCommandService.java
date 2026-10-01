@@ -1,22 +1,25 @@
 package org.kirya343.features.playlist.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.kirya343.features.authentication.dto.UserAuthData;
-import org.kirya343.features.authentication.service.UserAuthDataService;
 import org.kirya343.features.playback.dto.event.QueueChangedEvent;
 import org.kirya343.features.playback.enums.PlaybackMode;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.playlist.datasource.model.Playlist;
+import org.kirya343.features.playlist.datasource.model.QueueItem;
 import org.kirya343.features.playlist.datasource.repository.PlaylistRepository;
 import org.kirya343.features.playlist.datasource.repository.QueueItemRepository;
 import org.kirya343.features.playlist.dto.PlaylistCreateDTO;
+import org.kirya343.features.playlist.dto.PlaylistDTO;
 import org.kirya343.features.playlist.dto.queue.QueueItemCreateDTO;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.room.services.RoomQueryService;
 import org.kirya343.features.user.datasource.User;
+import org.kirya343.infrastructure.security.services.UserAuthDataService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -37,13 +40,12 @@ public class PlaylistCommandService {
     private final ApplicationEventPublisher eventPublisher;
     private final UserAuthDataService userAuthDataService;
     private final PlaylistRepository playlistRepository;
-    private final PlaylistCommandService playlistCommandService;
     private final RoomQueryService roomQueryService;
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public Playlist createPlaylist(PlaylistCreateDTO dto, UserAuthData authData) {
-        User user = userAuthDataService.getByAuthData(authData);
+    public PlaylistDTO createPlaylist(PlaylistCreateDTO dto, UserAuthData authData) {
+        User user = userAuthDataService.parse(authData);
 
         if (user == null) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
@@ -51,9 +53,11 @@ public class PlaylistCommandService {
 
         Playlist saved = playlistRepository.save(playlist);
 
-        playlistCommandService.addQueueList(dto.audios(), saved.getId(), authData);
+        if (dto.audios() != null && dto.audios().size() > 0) {
+            addQueueList(dto.audios(), saved.getId(), authData);
+        }
 
-        return saved;
+        return PlaylistDTO.ofPlaylistShort(saved);
     }
 
     public void updatePlaybackMode(Long playlistId, PlaybackMode mode) {
@@ -71,6 +75,21 @@ public class PlaylistCommandService {
                     mode
                 );
             }
+        }
+    }
+
+    @Transactional
+    public void importPlaylist(Long playlistId, UserAuthData authData) {
+        Playlist playlist = playlistRepository.findById(playlistId).orElseThrow();
+
+        List<QueueItemCreateDTO> list = new ArrayList<>();
+
+        for (QueueItem qi : playlist.getQueue()) {
+            list.add(new QueueItemCreateDTO(qi.getAudio().getId(), qi.getPosition()));
+        }
+
+        if (list.size() > 0) {
+            addQueueListToRoom(list, authData);
         }
     }
 

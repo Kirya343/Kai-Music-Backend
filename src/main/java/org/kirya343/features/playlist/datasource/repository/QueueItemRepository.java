@@ -100,7 +100,7 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         """, nativeQuery = true)
     int shiftQueueItems(
         @Param("playlistId") Long playlistId,
-        @Param("position") Integer position
+        @Param("position") Long position
     );
 
     @Modifying(
@@ -155,7 +155,7 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
     int insertQueueItem(
         @Param("playlistId") Long playlistId,
         @Param("audioId") Long audioId,
-        @Param("position") Integer position,
+        @Param("position") Long position,
         @Param("addedById") Long addedById
     );
 

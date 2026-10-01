@@ -23,4 +23,19 @@ public record PlaylistDTO(
             QueueItemDTO.ofList(playlist.getQueue())
         );
     }
+
+    public static PlaylistDTO ofPlaylistShort(Playlist playlist) {
+
+        return new PlaylistDTO(
+            playlist.getId(),
+            playlist.getOwner().getId(),
+            playlist.getTitle(),
+            playlist.getPlaybackMode(),
+            null
+        );
+    }
+
+    public static List<PlaylistDTO> ofListShort(List<Playlist> playlists) {
+        return playlists.stream().map(p -> PlaylistDTO.ofPlaylistShort(p)).toList();
+    }
 }
