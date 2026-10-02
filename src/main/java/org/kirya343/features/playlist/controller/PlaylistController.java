@@ -84,16 +84,18 @@ public class PlaylistController {
         playlistCommandService.updatePlaybackMode(playlistId, mode);
     }
 
-    @PostMapping("/queue")
+    @PostMapping("/{playlistId}/queue")
     public void addToQueue(
+        @PathVariable Long playlistId,
         @RequestBody List<QueueItemCreateDTO> list,
         @AuthenticationPrincipal UserAuthData authData
     ) {
         playlistCommandService.addQueueListToRoom(list, authData);
     }
 
-    @DeleteMapping("/queue")
+    @DeleteMapping("/{playlistId}/queue")
     public void removeFromQueue(
+        @PathVariable Long playlistId,
         @RequestBody List<Long> list,
         @AuthenticationPrincipal UserAuthData authData
     ) {
