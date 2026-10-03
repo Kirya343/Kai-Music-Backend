@@ -79,7 +79,7 @@ public class PlaylistCommandService {
     }
 
     @Transactional
-    public void importPlaylist(Long playlistId, UserAuthData authData) {
+    public void importPlaylist(Long targetPlaylistId, Long playlistId, UserAuthData authData) {
         Playlist playlist = playlistRepository.findById(playlistId).orElseThrow();
 
         List<QueueItemCreateDTO> list = new ArrayList<>();
@@ -89,25 +89,21 @@ public class PlaylistCommandService {
         }
 
         if (list.size() > 0) {
-            addQueueListToRoom(list, authData);
+            addQueueList(list, targetPlaylistId, authData);
         }
-    }
-
-    @Transactional
-    public void addQueueListToRoom(List<QueueItemCreateDTO> list, UserAuthData authData) {
-        ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
-
-        addQueueList(list, room.getPlaylist().getId(), authData);
-
-        eventPublisher.publishEvent(
-            new QueueChangedEvent(room.getId())
-        );
     }
 
     @Transactional
     public void addQueueList(List<QueueItemCreateDTO> list, Long playlistId, UserAuthData authData) {
         for (QueueItemCreateDTO dto : list) {
             addToQueue(playlistId, authData.id(), dto);
+        }
+
+        ListeningRoom room = listeningRoomRepository.findByPlaylistId(playlistId).orElse(null);
+        if (room != null) {
+            eventPublisher.publishEvent(
+                new QueueChangedEvent(room.getId())
+            );
         }
     }
     
@@ -149,22 +145,18 @@ public class PlaylistCommandService {
     }
 
     @Transactional
-    public void removeQueueListFromRoom(List<Long> list, UserAuthData authData) {
-        ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
-
-        removeQueueList(list, room.getPlaylist().getId(), authData);
-
-        eventPublisher.publishEvent(
-            new QueueChangedEvent(room.getId())
-        );
-    }
-
-    @Transactional
     public void removeQueueList(List<Long> list, Long playlistId, UserAuthData authData) {
 
         for (Long queueItemId : list) {
 
             removeFromQueue(playlistId, queueItemId, authData);
+        }
+
+        ListeningRoom room = listeningRoomRepository.findByPlaylistId(playlistId).orElse(null);
+        if (room != null) {
+            eventPublisher.publishEvent(
+                new QueueChangedEvent(room.getId())
+            );
         }
     }
 

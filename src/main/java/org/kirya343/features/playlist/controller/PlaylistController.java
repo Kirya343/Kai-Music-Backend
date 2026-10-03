@@ -60,12 +60,13 @@ public class PlaylistController {
         return playlistCommandService.createPlaylist(dto, authData);
     }
 
-    @PostMapping("/{playlistId}/import")
+    @PostMapping("/{targetPlaylistId}/import")
     public void importPlaylist(
-        @PathVariable Long playlistId, 
+        @PathVariable Long targetPlaylistId, 
+        @RequestParam Long playlistId,
         @AuthenticationPrincipal UserAuthData authData
     ) {
-        playlistCommandService.importPlaylist(playlistId, authData);
+        playlistCommandService.importPlaylist(targetPlaylistId, playlistId, authData);
     }
 
     @DeleteMapping("/{playlistId}")
@@ -90,7 +91,7 @@ public class PlaylistController {
         @RequestBody List<QueueItemCreateDTO> list,
         @AuthenticationPrincipal UserAuthData authData
     ) {
-        playlistCommandService.addQueueListToRoom(list, authData);
+        playlistCommandService.addQueueList(list, playlistId, authData);
     }
 
     @DeleteMapping("/{playlistId}/queue")
@@ -99,6 +100,6 @@ public class PlaylistController {
         @RequestBody List<Long> list,
         @AuthenticationPrincipal UserAuthData authData
     ) {
-        playlistCommandService.removeQueueListFromRoom(list, authData);
+        playlistCommandService.removeQueueList(list, playlistId, authData);
     }
 }
