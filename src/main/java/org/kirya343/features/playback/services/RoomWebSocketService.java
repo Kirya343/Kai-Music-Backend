@@ -2,7 +2,6 @@ package org.kirya343.features.playback.services;
 
 import org.kirya343.features.audio.dto.AudioDTO;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
-import org.kirya343.features.playlist.dto.PlaylistDTO;
 import org.kirya343.features.room.dto.ShortRoomDTO;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -47,14 +46,6 @@ public class RoomWebSocketService {
             userOpenId,
             "/queue/audio-info",
             dto
-        );
-    }
-
-    public void broadcastPlaylist(String userOpenId, PlaylistDTO playlist) {
-        messagingTemplate.convertAndSendToUser(
-            userOpenId, 
-            "/queue/playlist", 
-            playlist
         );
     }
 }

@@ -16,7 +16,6 @@ import org.kirya343.features.playlist.dto.PlaylistCreateDTO;
 import org.kirya343.features.playlist.dto.PlaylistDTO;
 import org.kirya343.features.playlist.dto.queue.QueueItemCreateDTO;
 import org.kirya343.features.room.datasource.ListeningRoom;
-import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.room.services.RoomQueryService;
 import org.kirya343.features.user.datasource.User;
 import org.kirya343.infrastructure.security.services.UserAuthDataService;
@@ -36,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 public class PlaylistCommandService {
 
     private final QueueItemRepository queueItemRepository;
-    private final ListeningRoomRepository listeningRoomRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final UserAuthDataService userAuthDataService;
     private final PlaylistRepository playlistRepository;
@@ -99,12 +97,9 @@ public class PlaylistCommandService {
             addToQueue(playlistId, authData.id(), dto);
         }
 
-        ListeningRoom room = listeningRoomRepository.findByPlaylistId(playlistId).orElse(null);
-        if (room != null) {
-            eventPublisher.publishEvent(
-                new QueueChangedEvent(room.getId())
-            );
-        }
+        eventPublisher.publishEvent(
+            new QueueChangedEvent(playlistId)
+        );
     }
     
     @Transactional
@@ -152,12 +147,9 @@ public class PlaylistCommandService {
             removeFromQueue(playlistId, queueItemId, authData);
         }
 
-        ListeningRoom room = listeningRoomRepository.findByPlaylistId(playlistId).orElse(null);
-        if (room != null) {
-            eventPublisher.publishEvent(
-                new QueueChangedEvent(room.getId())
-            );
-        }
+        eventPublisher.publishEvent(
+            new QueueChangedEvent(playlistId)
+        );
     }
 
     @Transactional 

@@ -7,9 +7,10 @@ import org.kirya343.features.playback.dto.event.RoomContextChangedEvent;
 import org.kirya343.features.playback.services.RoomWebSocketService;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
-import org.kirya343.features.playlist.datasource.model.Playlist;
-import org.kirya343.features.playlist.datasource.repository.PlaylistRepository;
 import org.kirya343.features.playlist.dto.PlaylistDTO;
+import org.kirya343.features.playlist.service.PlaylistWebSocketService;
+import org.kirya343.features.room.datasource.ListeningRoom;
+import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -24,20 +25,21 @@ import lombok.extern.slf4j.Slf4j;
 public class RoomContextEventHandler {
 
     private final RoomPlaybackContextStore roomPlaybackContextStore;
+    private final PlaylistWebSocketService playlistWebSocketService;
     private final RoomWebSocketService roomWebSocketService;
-    private final PlaylistRepository playlistRepository;
+    private final ListeningRoomRepository listeningRoomRepository;
     
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleQueueChanged(QueueChangedEvent event) {      
+    public void handleQueueChanged(QueueChangedEvent event) {  
+        
+        ListeningRoom room = listeningRoomRepository.findByPlaylistId(event.playlistId()).orElse(null);
 
-        Set<String> listners = roomPlaybackContextStore.get(event.roomId()).getListeners();
+        if (room == null) return;
 
-        Playlist playlist = playlistRepository.findByRoomId(event.roomId()).orElse(null);
+        Set<String> listners = roomPlaybackContextStore.get(room.getId()).getListeners();
 
-        if (playlist != null) {
-            for (String user : listners) {
-                roomWebSocketService.broadcastPlaylist(user, PlaylistDTO.ofPlaylist(playlist));
-            }
+        for (String user : listners) {
+            playlistWebSocketService.broadcastPlaylist(user, PlaylistDTO.ofPlaylist(room.getPlaylist()));
         }
     }
 
