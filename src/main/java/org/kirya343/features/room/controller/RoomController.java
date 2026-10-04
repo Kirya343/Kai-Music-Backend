@@ -87,6 +87,24 @@ public class RoomController {
         roomSessionService.initializeRoom(newRoom.getId(), authData);
     }
 
+    @PostMapping("/leave")
+    public void leaveRoom(
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+
+        ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElse(null);
+        if (room != null) {
+            RoomPlaybackContext context = roomPlaybackContextStore.get(room.getId());
+            if (context != null) {
+                context.getListeners().remove(authData.openId());
+            }
+            audioStreamWorkerManager.getWorker(room.getId()).handleUserDisconnected(authData.openId());
+        }
+
+        log.info("Пользователь {} покинул комнату {}", authData.name(), room.getId());
+        userRepository.updateListeningRoom(authData.id(), null);
+    }
+
     @GetMapping("/list/page")
     public MainPageRequest getMainPage() {
 
