@@ -13,7 +13,7 @@ import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.playback.services.RoomSessionService;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
-import org.kirya343.features.playback.services.streaming.AudioStreamWorkerManager;
+import org.kirya343.features.playback.services.streaming.UserAudioStreamWorkerManager;
 import org.kirya343.features.playlist.dto.PlaylistDTO;
 import org.kirya343.features.playlist.service.PlaylistWebSocketService;
 import org.kirya343.features.room.dto.MainPageRequest;
@@ -46,7 +46,7 @@ public class RoomController {
     private final UserRepository userRepository;
     private final RoomCommandService roomCommandService;
     private final RoomSessionService roomSessionService;
-    private final AudioStreamWorkerManager audioStreamWorkerManager;
+    private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final RoomWebSocketService roomWebSocketService;
     private final PlaylistWebSocketService playlistWebSocketService;
@@ -73,7 +73,7 @@ public class RoomController {
             if (context != null) {
                 context.getListeners().remove(authData.openId());
             }
-            audioStreamWorkerManager.getWorker(prevRoom.getId()).handleUserDisconnected(authData.openId());
+            userAudioStreamWorkerManager.removeWorker(authData.openId());
         }
 
         ListeningRoom newRoom = listeningRoomRepository.findByCode(code).orElseThrow();
@@ -98,7 +98,7 @@ public class RoomController {
             if (context != null) {
                 context.getListeners().remove(authData.openId());
             }
-            audioStreamWorkerManager.getWorker(room.getId()).handleUserDisconnected(authData.openId());
+            userAudioStreamWorkerManager.removeWorker(authData.openId());
         }
 
         log.info("Пользователь {} покинул комнату {}", authData.name(), room.getId());

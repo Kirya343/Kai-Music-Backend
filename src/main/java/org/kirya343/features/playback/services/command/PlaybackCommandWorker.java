@@ -13,8 +13,8 @@ import org.kirya343.features.playback.dto.event.RoomPlaybackEvent;
 import org.kirya343.features.playback.services.QueueService;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
-import org.kirya343.features.playback.services.streaming.AudioStreamWorker;
-import org.kirya343.features.playback.services.streaming.AudioStreamWorkerManager;
+import org.kirya343.features.playback.services.streaming.RoomStreamWorker;
+import org.kirya343.features.playback.services.streaming.RoomStreamWorkerManager;
 import org.kirya343.features.playlist.datasource.model.QueueItem;
 import org.kirya343.features.playlist.datasource.repository.QueueItemRepository;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,7 +33,7 @@ public class PlaybackCommandWorker {
     private final QueueService queueService;
     private final PlaybackWebsocketService webSocketService;
     private final PlaybackExecutorRegistry executorRegistry;
-    private final AudioStreamWorkerManager audioStreamWorkerManager;
+    private final RoomStreamWorkerManager audioStreamWorkerManager;
     private final AudioQueryService audioQueryService;
     private final QueueItemRepository queueItemRepository;
 
@@ -52,7 +52,7 @@ public class PlaybackCommandWorker {
         UserAuthData authData = cmd.user();
         Long roomId = roomContext.getRoom().id();
 
-        AudioStreamWorker streamWorker = audioStreamWorkerManager.getWorker(roomContext.getRoom().id());
+        RoomStreamWorker streamWorker = audioStreamWorkerManager.getWorker(roomContext.getRoom().id());
 
         PlaybackStateDTO state = null;
 

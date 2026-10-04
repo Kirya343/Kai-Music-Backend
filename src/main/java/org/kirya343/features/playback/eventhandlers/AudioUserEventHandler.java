@@ -1,7 +1,7 @@
 package org.kirya343.features.playback.eventhandlers;
 
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
-import org.kirya343.features.playback.services.streaming.AudioStreamWorkerManager;
+import org.kirya343.features.playback.services.streaming.UserAudioStreamWorkerManager;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.user.dto.event.UserDisconnectedEvent;
@@ -17,7 +17,7 @@ public class AudioUserEventHandler {
 
     private final ListeningRoomRepository listeningRoomRepository;
     private final RoomPlaybackContextStore roomPlaybackContextStore;
-    private final AudioStreamWorkerManager audioStreamWorkerManager;
+    private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
 
     @Async
     @EventListener
@@ -30,7 +30,8 @@ public class AudioUserEventHandler {
         if (room == null) return;
 
         roomPlaybackContextStore.get(room.getId()).getListeners().remove(event.authData().openId());
-        audioStreamWorkerManager.getWorker(room.getId()).handleUserDisconnected(event.authData().openId());
+
+        userAudioStreamWorkerManager.removeWorker(event.authData().openId());
 
         roomPlaybackContextStore.listenersUpdated(room.getId());
     }

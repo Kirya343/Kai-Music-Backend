@@ -3,8 +3,6 @@ package org.kirya343.features.playback.services.streaming;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kirya343.features.audio.services.storage.AudioStorageService;
-import org.kirya343.features.playback.PlaybackWebsocketService;
 import org.kirya343.features.playback.datasource.model.RoomPlaybackState;
 import org.kirya343.features.playback.datasource.repository.RoomPlaybackStateRepository;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
@@ -19,22 +17,21 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j 
 @RequiredArgsConstructor
-public class AudioStreamWorkerManager {
+public class RoomStreamWorkerManager {
 
-    private final PlaybackWebsocketService playbackWebsocketService;
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final ApplicationEventPublisher eventPublisher;
-    private final AudioStorageService audioStorageService;
     private final RoomPlaybackStateRepository roomPlaybackStateRepository;
+    private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
 
-    private final Map<Long, AudioStreamWorker> workers =
+    private final Map<Long, RoomStreamWorker> workers =
             new ConcurrentHashMap<>();
 
-    public AudioStreamWorker getWorker(Long roomId) {
+    public RoomStreamWorker getWorker(Long roomId) {
 
         log.info("Пытаемся получить воркер для комнаты {}", roomId);
 
-        AudioStreamWorker worker = workers.get(roomId);
+        RoomStreamWorker worker = workers.get(roomId);
 
         if (worker == null) {
 
@@ -44,11 +41,10 @@ public class AudioStreamWorkerManager {
 
             RoomPlaybackContext context = roomPlaybackContextStore.computeIfAbsent(roomId);
 
-            worker = new AudioStreamWorker(
+            worker = new RoomStreamWorker(
                 roomId,
-                playbackWebsocketService, 
                 eventPublisher, 
-                audioStorageService, 
+                userAudioStreamWorkerManager,
                 PlaybackStateDTO.ofState(state),
                 context
             );
@@ -63,7 +59,7 @@ public class AudioStreamWorkerManager {
 
     public void removeWorker(Long roomId) {
 
-        AudioStreamWorker worker = workers.remove(roomId);
+        RoomStreamWorker worker = workers.remove(roomId);
 
         if (worker != null) {
             worker.cancelTask();
