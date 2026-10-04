@@ -43,7 +43,8 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
             COALESCE(r.title, CONCAT(r.owner.name, '''s room')),
             r.owner.id,
             r.code,
-            SIZE(r.members)
+            SIZE(r.members),
+            r.playlist.id
         )
         FROM ListeningRoom r
     """)

@@ -83,7 +83,11 @@ public class AudioStreamWorker {
         if (task == null || task.isCancelled()) {
             task = scheduler.scheduleAtFixedRate(
                 () -> {
-                    streamTick();
+                    try {
+                        streamTick();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 },
                 0,
                 CHUNK_INTERVAL_SECONDS,
