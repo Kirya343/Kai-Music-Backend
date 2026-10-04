@@ -6,6 +6,7 @@ import org.kirya343.features.audio.datasource.AudioFileRepository;
 import org.kirya343.features.audio.dto.AudioDTO;
 import org.kirya343.features.audio.dto.AudioUpdateDTO;
 import org.kirya343.features.audio.services.AudioCommandService;
+import org.kirya343.features.audio.services.AudioWebsocketService;
 import org.kirya343.features.audio.services.storage.AudioFileManager;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.authentication.dto.UserAuthData;
@@ -31,6 +32,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/audio")
 @RequiredArgsConstructor
+// TODO раскидать по сервисам
 public class AudioController {
 
     private final AudioFileRepository audioFileRepository;
@@ -38,6 +40,7 @@ public class AudioController {
     private final UserAuthDataService userAuthDataService;
     private final AudioStorageService audioStorageService;
     private final AudioCommandService audioCommandService;
+    private final AudioWebsocketService audioWebsocketService;
 
     @GetMapping("/library")
     public List<AudioDTO> getUserLibrary(@AuthenticationPrincipal UserAuthData authData) {
@@ -46,12 +49,12 @@ public class AudioController {
     }
 
     @PostMapping("/recognize/{audioId}")
-    public AudioDTO recognize(
+    public void recognize(
         @PathVariable Long audioId, 
         @AuthenticationPrincipal UserAuthData authData
     ) {
         try {
-            return audioCommandService.recognize(audioId, authData);
+            audioCommandService.recognize(audioId, authData);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -87,6 +90,8 @@ public class AudioController {
         if (dto.coverUrl() != null && dto.coverUrl().length() > 0) audio.setCoverUrl(dto.coverUrl());
 
         audioFileRepository.save(audio);
+
+        audioWebsocketService.broadcastAudio(authData.openId(), AudioDTO.ofAudioFile(audio));
     }
 
     @DeleteMapping("/{audioId}")

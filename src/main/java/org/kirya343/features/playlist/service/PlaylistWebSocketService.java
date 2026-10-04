@@ -21,4 +21,12 @@ public class PlaylistWebSocketService {
             playlist
         );
     }
+
+    public void broadcastRoomPlaylist(String userOpenId, PlaylistDTO playlist) {
+        messagingTemplate.convertAndSendToUser(
+            userOpenId, 
+            "/queue/playlist.room", 
+            playlist
+        );
+    }
 }

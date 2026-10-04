@@ -3,6 +3,7 @@ package org.kirya343.infrastructure.security.websocket;
 import java.security.Principal;
 import java.util.Map;
 
+import org.kirya343.features.user.dto.event.UserConnectedEvent;
 import org.kirya343.features.user.dto.event.UserDisconnectedEvent;
 import org.kirya343.infrastructure.security.JwtService;
 import org.kirya343.infrastructure.security.services.CachedPermissionsJwtTokenConverter;
@@ -76,7 +77,7 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
 
                 UserAuthData authData = (UserAuthData) auth.getPrincipal();
 
-                //eventPublisher.publishEvent(new UserConnectedEvent(authData));
+                eventPublisher.publishEvent(new UserConnectedEvent(authData));
 
                 logger.debug("Пользователь подключался от WS: {}", authData.name());
 

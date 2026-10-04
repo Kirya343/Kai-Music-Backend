@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+// TODO переписать методы маппинга в дтохи
 public class UserMappingServiceImpl implements UserMappingService {
 
     private final PermissionMappingService permissionMappingService;

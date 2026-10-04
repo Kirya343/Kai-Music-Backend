@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+// TODO переписать методы маппинга в дтохи
 public class PermissionMappingServiceImpl implements PermissionMappingService{
     
     public PermissionDTO toDTO(Permission perm) {

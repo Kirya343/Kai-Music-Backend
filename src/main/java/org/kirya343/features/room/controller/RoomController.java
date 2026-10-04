@@ -5,6 +5,7 @@ import java.util.List;
 import org.kirya343.features.presence.services.PresenceService;
 import org.kirya343.features.room.services.RoomCommandService;
 import org.kirya343.features.room.services.RoomQueryService;
+import org.kirya343.features.room.services.RoomWebSocketService;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.user.datasource.UserRepository;
@@ -13,6 +14,8 @@ import org.kirya343.features.playback.services.RoomSessionService;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.playback.services.streaming.AudioStreamWorkerManager;
+import org.kirya343.features.playlist.dto.PlaylistDTO;
+import org.kirya343.features.playlist.service.PlaylistWebSocketService;
 import org.kirya343.features.room.dto.MainPageRequest;
 import org.kirya343.features.room.dto.RoomDTO;
 import org.kirya343.features.room.dto.RoomUpdateDTO;
@@ -45,6 +48,8 @@ public class RoomController {
     private final RoomSessionService roomSessionService;
     private final AudioStreamWorkerManager audioStreamWorkerManager;
     private final RoomPlaybackContextStore roomPlaybackContextStore;
+    private final RoomWebSocketService roomWebSocketService;
+    private final PlaylistWebSocketService playlistWebSocketService;
 
     @GetMapping
     public RoomDTO getCurrentRoom(@AuthenticationPrincipal UserAuthData authData) {
@@ -75,6 +80,9 @@ public class RoomController {
 
         log.info("Пользователь {} присоединяется к комнате {}", authData.name(), newRoom.getId());
         userRepository.updateListeningRoom(authData.id(), newRoom.getId());
+
+        roomWebSocketService.broadcastRoomInfo(authData.openId(), ShortRoomDTO.ofRoom(newRoom));
+        playlistWebSocketService.broadcastRoomPlaylist(authData.openId(), PlaylistDTO.ofPlaylist(newRoom.getPlaylist()));
 
         roomSessionService.initializeRoom(newRoom.getId(), authData);
     }

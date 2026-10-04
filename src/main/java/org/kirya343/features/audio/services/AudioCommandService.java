@@ -33,9 +33,10 @@ public class AudioCommandService {
     private final AudioStorageService audioStorageService;
     private final AudioFileRepository audioFileRepository;
     private final AcrCloudRecognitionService recognitionService;
+    private final AudioWebsocketService audioWebsocketService;
     private final ObjectMapper objectMapper;
     
-    public AudioDTO recognize(
+    public void recognize(
             Long audioId,
             UserAuthData authData
     ) throws IOException {
@@ -176,7 +177,7 @@ public class AudioCommandService {
                 System.currentTimeMillis() - startedAt
         );
 
-        return AudioDTO.ofAudioFile(audioFile);
+        audioWebsocketService.broadcastAudio(audioFile.getOwner().getOpenId(), AudioDTO.ofAudioFile(audioFile));
     }
 
     private byte[] buildM4a(

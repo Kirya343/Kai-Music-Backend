@@ -38,4 +38,8 @@ public record PlaylistDTO(
     public static List<PlaylistDTO> ofListShort(List<Playlist> playlists) {
         return playlists.stream().map(p -> PlaylistDTO.ofPlaylistShort(p)).toList();
     }
+
+    public static List<PlaylistDTO> ofList(List<Playlist> playlists) {
+        return playlists.stream().map(p -> PlaylistDTO.ofPlaylist(p)).toList();
+    }
 }

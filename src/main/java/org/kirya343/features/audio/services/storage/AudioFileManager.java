@@ -3,12 +3,14 @@ package org.kirya343.features.audio.services.storage;
 import java.io.File;
 import java.util.List;
 
+import org.kirya343.features.audio.services.AudioWebsocketService;
 import org.kirya343.features.audio.services.util.AudioConverter;
 import org.kirya343.features.audio.services.util.Fmp4Parser;
 import org.kirya343.features.audio.datasource.AudioFile;
 import org.kirya343.features.audio.datasource.AudioFileRepository;
 import org.kirya343.features.user.datasource.User;
 import org.kirya343.features.audio.dto.AudioChunk;
+import org.kirya343.features.audio.dto.AudioDTO;
 import org.kirya343.features.audio.dto.AudioMetadataDTO;
 import org.kirya343.features.authentication.dto.UserAuthData;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class AudioFileManager {
 
     private final AudioFileRepository audioFileRepository;
     private final AudioStorageService audioStorageService;
+    private final AudioWebsocketService audioWebsocketService;
     private final EntityManager entityManager;
 
     public void uploadAudio(MultipartFile uploadedFile, UserAuthData authData) {
@@ -91,7 +94,9 @@ public class AudioFileManager {
             
             log.debug("Сохранили файл в бд");
 
-            audioFileRepository.save(audio);
+            AudioFile saved = audioFileRepository.save(audio);
+
+            audioWebsocketService.broadcastAudio(authData.openId(), AudioDTO.ofAudioFile(saved));
 
         } catch (Exception e) {
             throw new RuntimeException("Ошибка загрузки аудио", e);

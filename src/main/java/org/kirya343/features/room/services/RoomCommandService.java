@@ -5,7 +5,6 @@ import org.kirya343.features.user.datasource.User;
 import org.kirya343.features.user.datasource.UserRepository;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.features.authentication.dto.UserAuthData;
-import org.kirya343.features.playback.services.RoomWebSocketService;
 import org.kirya343.features.room.dto.ShortRoomDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

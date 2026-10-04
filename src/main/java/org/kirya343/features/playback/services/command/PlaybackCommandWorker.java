@@ -4,13 +4,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.kirya343.features.audio.services.AudioQueryService;
 import org.kirya343.features.authentication.dto.UserAuthData;
+import org.kirya343.features.playback.PlaybackWebsocketService;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.features.playback.dto.commands.ChangeTrack;
 import org.kirya343.features.playback.dto.commands.RoomCommand;
 import org.kirya343.features.playback.dto.commands.UpdatePlayback;
 import org.kirya343.features.playback.dto.event.RoomPlaybackEvent;
 import org.kirya343.features.playback.services.QueueService;
-import org.kirya343.features.playback.services.RoomWebSocketService;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.playback.services.streaming.AudioStreamWorker;
@@ -31,7 +31,7 @@ public class PlaybackCommandWorker {
     private final ApplicationEventPublisher publisher;
     private final RoomPlaybackContextStore rooms;
     private final QueueService queueService;
-    private final RoomWebSocketService webSocketService;
+    private final PlaybackWebsocketService webSocketService;
     private final PlaybackExecutorRegistry executorRegistry;
     private final AudioStreamWorkerManager audioStreamWorkerManager;
     private final AudioQueryService audioQueryService;

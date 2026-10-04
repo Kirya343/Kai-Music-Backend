@@ -8,7 +8,6 @@ import org.kirya343.features.playback.PlaybackWebsocketService;
 import org.kirya343.features.playback.datasource.model.RoomPlaybackState;
 import org.kirya343.features.playback.datasource.repository.RoomPlaybackStateRepository;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
-import org.kirya343.features.playback.services.RoomWebSocketService;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
 import org.springframework.context.ApplicationEventPublisher;
@@ -25,7 +24,6 @@ public class AudioStreamWorkerManager {
     private final PlaybackWebsocketService playbackWebsocketService;
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final ApplicationEventPublisher eventPublisher;
-    private final RoomWebSocketService roomWebSocketService;
     private final AudioStorageService audioStorageService;
     private final RoomPlaybackStateRepository roomPlaybackStateRepository;
 
@@ -50,7 +48,6 @@ public class AudioStreamWorkerManager {
                 roomId,
                 playbackWebsocketService, 
                 eventPublisher, 
-                roomWebSocketService, 
                 audioStorageService, 
                 PlaybackStateDTO.ofState(state),
                 context

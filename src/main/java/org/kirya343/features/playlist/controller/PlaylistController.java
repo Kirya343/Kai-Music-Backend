@@ -49,7 +49,7 @@ public class PlaylistController {
     ) {
         List<Playlist> playlists = playlistRepository.findUserPlaylists(authData.id());
 
-        return PlaylistDTO.ofListShort(playlists);
+        return PlaylistDTO.ofList(playlists);
     }
 
     @PostMapping

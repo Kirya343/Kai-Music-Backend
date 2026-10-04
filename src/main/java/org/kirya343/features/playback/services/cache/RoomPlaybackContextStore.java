@@ -7,9 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.kirya343.features.audio.datasource.AudioFile;
 import org.kirya343.features.audio.datasource.AudioFileRepository;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
-import org.kirya343.features.playback.services.RoomWebSocketService;
 import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
+import org.kirya343.features.room.services.RoomWebSocketService;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;

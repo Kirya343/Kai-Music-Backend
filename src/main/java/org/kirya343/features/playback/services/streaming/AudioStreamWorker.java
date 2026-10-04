@@ -16,11 +16,9 @@ import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.playback.PlaybackWebsocketService;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.features.playback.dto.commands.ChangeTrack;
-import org.kirya343.features.playback.services.RoomWebSocketService;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.audio.datasource.AudioFile;
 import org.kirya343.features.audio.dto.AudioChunk;
-import org.kirya343.features.audio.dto.AudioDTO;
 import org.springframework.context.ApplicationEventPublisher;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +30,6 @@ public class AudioStreamWorker {
     private final ScheduledExecutorService scheduler =
         Executors.newSingleThreadScheduledExecutor();
     private final ApplicationEventPublisher eventPublisher;
-    private final RoomWebSocketService roomWebSocketService;
     private final AudioStorageService audioStorageService;
 
     private final RoomPlaybackContext roomContext;
@@ -54,7 +51,6 @@ public class AudioStreamWorker {
         Long roomId,
         PlaybackWebsocketService playbackWebsocketService,
         ApplicationEventPublisher eventPublisher,
-        RoomWebSocketService roomWebSocketService,
         AudioStorageService audioStorageService,
         PlaybackStateDTO currentState,
         RoomPlaybackContext roomContext
@@ -63,7 +59,6 @@ public class AudioStreamWorker {
         this.roomId = roomId;
         this.playbackWebsocketService = playbackWebsocketService;
         this.eventPublisher = eventPublisher;
-        this.roomWebSocketService = roomWebSocketService;
         this.audioStorageService = audioStorageService;
         this.roomContext = roomContext;
 
@@ -213,7 +208,6 @@ public class AudioStreamWorker {
             try {
                 for (String user : roomContext.getListeners()) {
                     getChunker(user, currentState);
-                    roomWebSocketService.broadcastAudioInfo(user, AudioDTO.ofAudioFile(roomContext.getCurrentAudio()));
                 }
             } catch (Exception e) {
                 log.info("Exception {}", e);
@@ -268,8 +262,7 @@ public class AudioStreamWorker {
         if (currentState == null) return;
 
         log.info("user connected and recive {}", currentState.position());
-        roomWebSocketService.broadcastPlaybackState(user, currentState);
-        roomWebSocketService.broadcastAudioInfo(user, AudioDTO.ofAudioFile(roomContext.getCurrentAudio()));
+        playbackWebsocketService.broadcastPlaybackState(user, currentState);
     }
 
     public void cancelTask() {
