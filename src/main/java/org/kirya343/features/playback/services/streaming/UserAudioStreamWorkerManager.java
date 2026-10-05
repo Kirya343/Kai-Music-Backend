@@ -26,13 +26,13 @@ public class UserAudioStreamWorkerManager {
 
     public UserAudioStreamWorker getWorker(String userSub, PlaybackStateDTO currentState) {
 
-        log.info("Пытаемся получить воркер для пользователя {}", userSub);
+        log.debug("Пытаемся получить воркер для пользователя {}", userSub);
 
         UserAudioStreamWorker worker = workers.get(userSub);
 
         if (worker == null) {
 
-            log.info("Создаём новый воркер для пользователя {}", userSub);
+            log.debug("Создаём новый воркер для пользователя {}", userSub);
 
             worker = new UserAudioStreamWorker(
                 userSub,
@@ -42,7 +42,7 @@ public class UserAudioStreamWorkerManager {
                 currentState
             );
 
-            log.info("Кладём к остальным воркер для пользователя {}", userSub);
+            log.debug("Кладём к остальным воркер для пользователя {}", userSub);
 
             workers.putIfAbsent(userSub, worker);
         }
@@ -53,6 +53,10 @@ public class UserAudioStreamWorkerManager {
     public void removeWorker(String userSub) {
 
         UserAudioStreamWorker worker = workers.remove(userSub);
+
+        log.debug("Удаляем воркер {}", userSub);
+
+        log.debug("Воркеры стриминга пользователей {}", workers.keySet());
 
         if (worker != null) {
             worker.cancelTask();

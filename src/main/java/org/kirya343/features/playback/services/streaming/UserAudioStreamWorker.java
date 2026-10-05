@@ -42,9 +42,12 @@ public class UserAudioStreamWorker {
         this.audioQueryService = audioQueryService;
         this.audioStorageService = audioStorageService;
         this.playbackWebsocketService = playbackWebsocketService;
-        this.currentState = currentState;
+
+        log.debug("Created UserAudioStreamWorker for {}, with state: {}, {}, {}", 
+            user, currentState.entryId(), currentState.position(), currentState.pause());
 
         playbackWebsocketService.broadcastPlaybackState(user, currentState);
+        applyState(currentState);
     }
 
     public void applyState(PlaybackStateDTO state) {
@@ -56,6 +59,13 @@ public class UserAudioStreamWorker {
         updateState(state);
 
         log.info("START STATE: entryId={}, position={}", state.entryId(), state.position());
+
+        try {
+            tick();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
     }
 

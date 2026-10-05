@@ -44,12 +44,10 @@ public class RoomStreamWorker {
         this.roomContext = roomContext;
         this.userAudioStreamWorkerManager = userAudioStreamWorkerManager;
 
-        this.applyState(currentState);
+        log.debug("Created RoomStreamWorker for {}, with state: {}, {}, {}", 
+            roomId, currentState.entryId(), currentState.position(), currentState.pause());
 
-        log.info(
-            "Created AudioStreamWorker for room {}",
-            roomId
-        );
+        this.applyState(currentState);
     }
 
     public void applyState(PlaybackStateDTO state) {
