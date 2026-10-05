@@ -14,6 +14,7 @@ import org.kirya343.features.audio.datasource.AudioFile;
 import org.kirya343.features.audio.datasource.AudioFileRepository;
 import org.kirya343.features.audio.dto.AudioChunk;
 import org.kirya343.features.audio.dto.AudioDTO;
+import org.kirya343.features.audio.dto.AudioUpdateDTO;
 import org.kirya343.features.audio.services.recognition.AcrCloudRecognitionService;
 import org.kirya343.features.audio.services.recognition.AcrCloudResponse;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,8 +42,6 @@ public class AudioCommandService {
             Long audioId,
             UserAuthData authData
     ) throws IOException {
-
-        long startedAt = System.currentTimeMillis();
 
         log.info("Starting audio recognition: audioId={}", audioId);
 
@@ -165,19 +165,14 @@ public class AudioCommandService {
             throw e;
         }
 
-        audioFile.setTitle(music.title());
-        audioFile.setAlbum(music.album().name());
-        audioFile.setArtist(String.join(", ", music.artists().stream().map(a -> a.name()).toList()));
+        AudioUpdateDTO update = new AudioUpdateDTO(
+            music.title(), 
+            String.join(", ", music.artists().stream().map(a -> a.name()).toList()), 
+            music.title(), 
+            null);
 
-        audioFileRepository.save(audioFile);
+        updateAudio(audioId, update, authData);
 
-        log.info(
-                "Audio updated successfully: audioId={}, totalTime={}ms",
-                audioId,
-                System.currentTimeMillis() - startedAt
-        );
-
-        audioWebsocketService.broadcastAudio(audioFile.getOwner().getOpenId(), AudioDTO.ofAudioFile(audioFile));
     }
 
     private byte[] buildM4a(
@@ -274,5 +269,38 @@ public class AudioCommandService {
             Files.deleteIfExists(inputFile);
             Files.deleteIfExists(outputFile);
         }
+    }
+
+    public void updateAudio(
+        Long audioId,
+        AudioUpdateDTO dto,
+        UserAuthData authData
+    ) {
+        
+        AudioFile audio = audioFileRepository.findById(audioId).orElseThrow(
+            () -> new EntityNotFoundException("Трека не существует"));
+
+        if (dto.album() != null && dto.album().length() > 0) audio.setAlbum(dto.album());
+        if (dto.artist() != null && dto.artist().length() > 0) audio.setArtist(dto.artist());
+        if (dto.title() != null && dto.title().length() > 0) audio.setTitle(dto.title());
+        if (dto.coverUrl() != null && dto.coverUrl().length() > 0) audio.setCoverUrl(dto.coverUrl());
+
+        audioFileRepository.save(audio);
+
+        audioWebsocketService.broadcastAudio(authData.openId(), AudioDTO.ofAudioFile(audio));
+    }
+
+    public void deleteAudio(Long audioId) {
+        AudioFile audio = audioFileRepository.findById(audioId).orElseThrow(
+            () -> new EntityNotFoundException("Трека не существует"));
+
+        try {
+            audioStorageService.deleteAudio(audio.getPath());
+        } catch (Exception e) {
+            log.debug("Error while deleting audio-chunks");
+            throw e;
+        }
+
+        audioFileRepository.save(audio);
     }
 }

@@ -1,14 +1,11 @@
 package org.kirya343.features.audio.controller;
 
 import org.kirya343.infrastructure.security.services.UserAuthDataService;
-import org.kirya343.features.audio.datasource.AudioFile;
-import org.kirya343.features.audio.datasource.AudioFileRepository;
 import org.kirya343.features.audio.dto.AudioDTO;
 import org.kirya343.features.audio.dto.AudioUpdateDTO;
 import org.kirya343.features.audio.services.AudioCommandService;
-import org.kirya343.features.audio.services.AudioWebsocketService;
+import org.kirya343.features.audio.services.AudioQueryService;
 import org.kirya343.features.audio.services.storage.AudioFileManager;
-import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.authentication.dto.UserAuthData;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -32,20 +28,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/audio")
 @RequiredArgsConstructor
-// TODO раскидать по сервисам
 public class AudioController {
 
-    private final AudioFileRepository audioFileRepository;
     private final AudioFileManager audioFileManager;
     private final UserAuthDataService userAuthDataService;
-    private final AudioStorageService audioStorageService;
     private final AudioCommandService audioCommandService;
-    private final AudioWebsocketService audioWebsocketService;
+    private final AudioQueryService audioQueryService;
 
     @GetMapping("/library")
     public List<AudioDTO> getUserLibrary(@AuthenticationPrincipal UserAuthData authData) {
-        List<AudioFile> audios = audioFileRepository.findByOwnerId(authData.id());
-        return AudioDTO.ofList(audios);
+        return audioQueryService.getUserLibrary(authData.id());
     }
 
     @PostMapping("/recognize/{audioId}")
@@ -66,7 +58,6 @@ public class AudioController {
         @RequestParam(required = false) String apiKey,
         @AuthenticationPrincipal UserAuthData authData
     ) {
-
         if (apiKey != null) {
             authData = userAuthDataService.load(apiKey);
         }
@@ -80,18 +71,7 @@ public class AudioController {
         @RequestBody AudioUpdateDTO dto,
         @AuthenticationPrincipal UserAuthData authData
     ) {
-        
-        AudioFile audio = audioFileRepository.findById(audioId).orElseThrow(
-            () -> new EntityNotFoundException("Трека не существует"));
-
-        if (dto.album() != null && dto.album().length() > 0) audio.setAlbum(dto.album());
-        if (dto.artist() != null && dto.artist().length() > 0) audio.setArtist(dto.artist());
-        if (dto.title() != null && dto.title().length() > 0) audio.setTitle(dto.title());
-        if (dto.coverUrl() != null && dto.coverUrl().length() > 0) audio.setCoverUrl(dto.coverUrl());
-
-        audioFileRepository.save(audio);
-
-        audioWebsocketService.broadcastAudio(authData.openId(), AudioDTO.ofAudioFile(audio));
+        audioCommandService.updateAudio(audioId, dto, authData);
     }
 
     @DeleteMapping("/{audioId}")
@@ -99,16 +79,6 @@ public class AudioController {
         @PathVariable Long audioId,
         @AuthenticationPrincipal UserAuthData authData
     ) {
-        
-        AudioFile audio = audioFileRepository.findById(audioId).orElseThrow(
-            () -> new EntityNotFoundException("Трека не существует"));
-
-        try {
-            audioStorageService.deleteAudio(audio.getPath());
-        } catch (Exception e) {
-            throw e;
-        }
-
-        audioFileRepository.save(audio);
+        audioCommandService.deleteAudio(audioId);
     }
 }
