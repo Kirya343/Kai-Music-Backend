@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.kirya343.features.audio.services.AudioQueryService;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.playback.PlaybackWebsocketService;
+import org.kirya343.features.playback.dto.PlaybackStateDTO;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class UserAudioStreamWorkerManager {
     private final Map<String, UserAudioStreamWorker> workers =
             new ConcurrentHashMap<>();
 
-    public UserAudioStreamWorker getWorker(String userSub) {
+    public UserAudioStreamWorker getWorker(String userSub, PlaybackStateDTO currentState) {
 
         log.info("Пытаемся получить воркер для пользователя {}", userSub);
 
@@ -37,7 +38,8 @@ public class UserAudioStreamWorkerManager {
                 userSub,
                 audioQueryService,
                 audioStorageService,
-                playbackWebsocketService
+                playbackWebsocketService,
+                currentState
             );
 
             log.info("Кладём к остальным воркер для пользователя {}", userSub);

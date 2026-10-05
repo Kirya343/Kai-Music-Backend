@@ -17,9 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 public class UserAudioStreamWorker {
 
     private final String user;
-    private boolean isInitialized;
     private Double bufferedUntil = 0.0;
     private PlaybackStateDTO currentState;
+    private long playbackStartedAt;
 
     private static final int BUFFER_SECONDS = 20;
 
@@ -35,12 +35,16 @@ public class UserAudioStreamWorker {
         String user,
         AudioQueryService audioQueryService,
         AudioStorageService audioStorageService,
-        PlaybackWebsocketService playbackWebsocketService
+        PlaybackWebsocketService playbackWebsocketService,
+        PlaybackStateDTO currentState
     ) {
         this.user = user;
         this.audioQueryService = audioQueryService;
         this.audioStorageService = audioStorageService;
         this.playbackWebsocketService = playbackWebsocketService;
+        this.currentState = currentState;
+
+        playbackWebsocketService.broadcastPlaybackState(user, currentState);
     }
 
     public void applyState(PlaybackStateDTO state) {
@@ -59,32 +63,36 @@ public class UserAudioStreamWorker {
 
         log.debug("Tick to user {}", user);
 
-        if (!isInitialized) {
-            initializeUser();
-        }
-
         if (chunker.hasNext()) {
-            double target = currentState.position() + BUFFER_SECONDS;
-
-            if (bufferedUntil < target) {
-
-                AudioChunk chunk = chunker.nextAudioChunk();
-
-                playbackWebsocketService.sendChunk(
-                    user, 
-                    chunk, 
-                    currentState.entryId());
-
-                /**
-                * that formule counts time summ of prev chunks with current chunk
-                * and multiple it with base chunk-duration 
-                **/
-                double chunkDurationS = chunk.durationMs() / 1000.0;
-                double chunkDurationUntil = (chunk.sequence() + 1) * chunkDurationS; 
-
-                bufferedUntil = chunkDurationUntil;
-            }
+            fillBuffer();
         }
+    }
+
+    private void fillBuffer() throws IOException {
+
+        log.debug("fillBuffer to user {}", user);
+
+        double buffered = bufferedUntil;
+        double target = getCurrentPosition() + BUFFER_SECONDS;
+
+        while (
+            buffered < target &&
+            chunker.hasNext()
+        ) {
+            log.debug("buffered {}, target {}", buffered, target);
+
+            AudioChunk chunk = chunker.nextAudioChunk();
+
+            playbackWebsocketService.sendChunk(
+                user,
+                chunk,
+                currentState.entryId()
+            );
+
+            buffered += chunk.durationMs() / 1000.0;
+        }
+
+        bufferedUntil = buffered;
     }
 
     public void updateState(PlaybackStateDTO state) {
@@ -105,6 +113,10 @@ public class UserAudioStreamWorker {
 
         currentState = state;
 
+        if (!currentState.pause()) {
+            playbackStartedAt = System.currentTimeMillis();
+        }
+
         /**
          * if track is changed - clear all users and user chunkers,
          * becouse for new track audioStreamWorker have to create new parser with new track
@@ -117,9 +129,14 @@ public class UserAudioStreamWorker {
                 currentState.entryId()
             );
 
-            isInitialized = false;
             bufferedUntil = 0.0;
             reloadChunker(currentState);
+            try {
+                initializeUser();
+                fillBuffer();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         if (positionChanged && !trackChanged) {
@@ -142,8 +159,6 @@ public class UserAudioStreamWorker {
             currentState.entryId());
 
         bufferedUntil = currentState.position();
-
-        isInitialized = true;
     }
 
     private void reloadChunker(PlaybackStateDTO stateDTO) {
@@ -158,6 +173,17 @@ public class UserAudioStreamWorker {
         log.debug("Перематываем чанкер для пользователя {} на позицию: {}", user, stateDTO.position());
 
         chunker.seek(stateDTO.position());
+    }
+
+    private double getCurrentPosition() {
+        if (currentState.pause()) {
+            return currentState.position();
+        }
+
+        double elapsed =
+            (System.currentTimeMillis() - playbackStartedAt) / 1000.0;
+
+        return currentState.position() + elapsed;
     }
 
     public void cancelTask() {

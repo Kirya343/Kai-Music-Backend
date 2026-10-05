@@ -59,7 +59,7 @@ public class RoomStreamWorker {
         if (state == null) return;
 
         roomContext.getListeners().forEach(user -> {
-            userAudioStreamWorkerManager.getWorker(user).applyState(state);
+            userAudioStreamWorkerManager.getWorker(user, state).applyState(state);
         });
 
         log.info("START STATE: entryId={}, position={}", state.entryId(), state.position());
@@ -93,7 +93,7 @@ public class RoomStreamWorker {
         try {
             listeners.forEach(user -> {
                 try {
-                    userAudioStreamWorkerManager.getWorker(user).tick();
+                    userAudioStreamWorkerManager.getWorker(user, currentState).tick();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
