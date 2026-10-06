@@ -52,9 +52,11 @@ public class RoomStreamWorker {
 
     public void applyState(PlaybackStateDTO state) {
 
-        log.info("applyState state={}", state == null);
-
         if (state == null) return;
+
+        log.info("applyState {}", state.position());
+
+        currentState = state;
 
         roomContext.getListeners().forEach(user -> {
             userAudioStreamWorkerManager.getWorker(user, state).applyState(state);
@@ -65,7 +67,11 @@ public class RoomStreamWorker {
         if (task == null || task.isCancelled()) {
             task = scheduler.scheduleAtFixedRate(
                 () -> {
-                    streamTick();
+                    try {
+                        streamTick();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 },
                 0,
                 CHUNK_INTERVAL_SECONDS,
@@ -77,6 +83,8 @@ public class RoomStreamWorker {
     public void streamTick() {
 
         Set<String> listeners = roomContext.getListeners();
+
+        log.debug("Room tick {}, {}", roomId, listeners);
 
         /**
          * if current playback position is after than audio duration - cancel task and send Next command
