@@ -33,7 +33,7 @@ public class PlaybackCommandWorker {
     private final QueueService queueService;
     private final PlaybackWebsocketService webSocketService;
     private final PlaybackExecutorRegistry executorRegistry;
-    private final RoomStreamWorkerManager audioStreamWorkerManager;
+    private final RoomStreamWorkerManager roomStreamWorkerManager;
     private final AudioQueryService audioQueryService;
     private final QueueItemRepository queueItemRepository;
 
@@ -52,7 +52,7 @@ public class PlaybackCommandWorker {
         UserAuthData authData = cmd.user();
         Long roomId = roomContext.getRoom().id();
 
-        RoomStreamWorker streamWorker = audioStreamWorkerManager.getWorker(roomContext.getRoom().id());
+        RoomStreamWorker streamWorker = roomStreamWorkerManager.getWorker(roomContext.getRoom().id());
 
         PlaybackStateDTO state = null;
 

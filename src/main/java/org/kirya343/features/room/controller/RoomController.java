@@ -13,6 +13,7 @@ import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.playback.services.RoomSessionService;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
+import org.kirya343.features.playback.services.streaming.RoomStreamWorkerManager;
 import org.kirya343.features.playback.services.streaming.UserAudioStreamWorkerManager;
 import org.kirya343.features.playlist.dto.PlaylistDTO;
 import org.kirya343.features.playlist.service.PlaylistWebSocketService;
@@ -50,6 +51,7 @@ public class RoomController {
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final RoomWebSocketService roomWebSocketService;
     private final PlaylistWebSocketService playlistWebSocketService;
+    private final RoomStreamWorkerManager roomStreamWorkerManager;
 
     @GetMapping
     public RoomDTO getCurrentRoom(@AuthenticationPrincipal UserAuthData authData) {
@@ -73,7 +75,6 @@ public class RoomController {
             if (context != null) {
                 context.getListeners().remove(authData.openId());
             }
-            userAudioStreamWorkerManager.removeWorker(authData.openId());
         }
 
         ListeningRoom newRoom = listeningRoomRepository.findByCode(code).orElseThrow();
@@ -85,6 +86,9 @@ public class RoomController {
         playlistWebSocketService.broadcastRoomPlaylist(authData.openId(), PlaylistDTO.ofPlaylist(newRoom.getPlaylist()));
 
         roomSessionService.initializeRoom(newRoom.getId(), authData);
+
+        // Reloads worker
+        roomStreamWorkerManager.getWorker(newRoom.getId());
     }
 
     @PostMapping("/leave")

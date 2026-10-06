@@ -1,5 +1,6 @@
 package org.kirya343.features.playback.eventhandlers;
 
+import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.playback.services.streaming.UserAudioStreamWorkerManager;
 import org.kirya343.features.room.datasource.ListeningRoom;
@@ -29,10 +30,13 @@ public class AudioUserEventHandler {
 
         if (room == null) return;
 
-        roomPlaybackContextStore.get(room.getId()).getListeners().remove(event.authData().openId());
+        RoomPlaybackContext context = roomPlaybackContextStore.get(room.getId());
+
+        if (context != null) {
+            context.getListeners().remove(event.authData().openId());
+            roomPlaybackContextStore.listenersUpdated(room.getId());
+        }
 
         userAudioStreamWorkerManager.removeWorker(event.authData().openId());
-
-        roomPlaybackContextStore.listenersUpdated(room.getId());
     }
 }

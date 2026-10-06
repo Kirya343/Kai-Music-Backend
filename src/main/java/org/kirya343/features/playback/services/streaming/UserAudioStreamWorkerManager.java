@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.kirya343.features.audio.services.AudioQueryService;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.playback.PlaybackWebsocketService;
+import org.kirya343.features.playback.dto.PlaybackStateDTO;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -23,24 +24,25 @@ public class UserAudioStreamWorkerManager {
     private final Map<String, UserAudioStreamWorker> workers =
             new ConcurrentHashMap<>();
 
-    public UserAudioStreamWorker getWorker(String userSub) {
+    public UserAudioStreamWorker getWorker(String userSub, PlaybackStateDTO currentState) {
 
-        log.info("Пытаемся получить воркер для пользователя {}", userSub);
+        log.debug("Пытаемся получить воркер для пользователя {}", userSub);
 
         UserAudioStreamWorker worker = workers.get(userSub);
 
         if (worker == null) {
 
-            log.info("Создаём новый воркер для пользователя {}", userSub);
+            log.debug("Создаём новый воркер для пользователя {}", userSub);
 
             worker = new UserAudioStreamWorker(
                 userSub,
                 audioQueryService,
                 audioStorageService,
-                playbackWebsocketService
+                playbackWebsocketService,
+                currentState
             );
 
-            log.info("Кладём к остальным воркер для пользователя {}", userSub);
+            log.debug("Кладём к остальным воркер для пользователя {}", userSub);
 
             workers.putIfAbsent(userSub, worker);
         }
@@ -51,6 +53,10 @@ public class UserAudioStreamWorkerManager {
     public void removeWorker(String userSub) {
 
         UserAudioStreamWorker worker = workers.remove(userSub);
+
+        log.debug("Удаляем воркер {}", userSub);
+
+        log.debug("Воркеры стриминга пользователей {}", workers.keySet());
 
         if (worker != null) {
             worker.cancelTask();
