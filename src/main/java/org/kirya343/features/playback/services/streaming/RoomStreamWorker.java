@@ -10,6 +10,8 @@ import org.kirya343.features.authentication.dto.UserAuthData;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.features.playback.dto.commands.ChangeTrack;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
+import org.kirya343.features.presence.UserPresence;
+import org.kirya343.features.presence.services.PresenceService;
 import org.springframework.context.ApplicationEventPublisher;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,7 @@ public class RoomStreamWorker {
         Executors.newSingleThreadScheduledExecutor();
     private final ApplicationEventPublisher eventPublisher;
     private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
+    private final PresenceService presenceService;
 
     private final RoomPlaybackContext roomContext;
 
@@ -36,12 +39,14 @@ public class RoomStreamWorker {
         ApplicationEventPublisher eventPublisher,
         UserAudioStreamWorkerManager userAudioStreamWorkerManager,
         PlaybackStateDTO currentState,
-        RoomPlaybackContext roomContext
+        RoomPlaybackContext roomContext,
+        PresenceService presenceService
     ) {
 
         this.roomId = roomId;
         this.eventPublisher = eventPublisher;
         this.roomContext = roomContext;
+        this.presenceService = presenceService;
         this.userAudioStreamWorkerManager = userAudioStreamWorkerManager;
 
         log.debug("Created RoomStreamWorker for {}, with state: {}, {}, {}", 
@@ -59,7 +64,9 @@ public class RoomStreamWorker {
         currentState = state;
 
         roomContext.getListeners().forEach(user -> {
-            userAudioStreamWorkerManager.getWorker(user, state).applyState(state);
+            if (presenceService.getPresence(user) == UserPresence.ONLINE) {
+                userAudioStreamWorkerManager.getWorker(user, state).applyState(state);
+            }
         });
 
         log.info("START STATE: entryId={}, position={}", state.entryId(), state.position());
@@ -99,7 +106,9 @@ public class RoomStreamWorker {
         try {
             listeners.forEach(user -> {
                 try {
-                    userAudioStreamWorkerManager.getWorker(user, currentState).tick();
+                    if (presenceService.getPresence(user) == UserPresence.ONLINE) {
+                        userAudioStreamWorkerManager.getWorker(user, currentState).tick();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

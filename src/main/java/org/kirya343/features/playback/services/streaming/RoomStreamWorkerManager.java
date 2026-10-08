@@ -8,6 +8,7 @@ import org.kirya343.features.playback.datasource.repository.RoomPlaybackStateRep
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
+import org.kirya343.features.presence.services.PresenceService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,7 @@ public class RoomStreamWorkerManager {
     private final ApplicationEventPublisher eventPublisher;
     private final RoomPlaybackStateRepository roomPlaybackStateRepository;
     private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
+    private final PresenceService presenceService;
 
     private final Map<Long, RoomStreamWorker> workers =
             new ConcurrentHashMap<>();
@@ -46,7 +48,8 @@ public class RoomStreamWorkerManager {
                 eventPublisher, 
                 userAudioStreamWorkerManager,
                 PlaybackStateDTO.ofState(state),
-                context
+                context,
+                presenceService
             );
 
             log.info("Кладём к остальным воркер для комнаты {}", roomId);
