@@ -7,8 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.kirya343.features.audio.datasource.AudioFile;
 import org.kirya343.features.audio.datasource.AudioFileRepository;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
-import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.datasource.ListeningRoomRepository;
+import org.kirya343.features.room.dto.ShortRoomDTO;
 import org.kirya343.features.room.services.RoomWebSocketService;
 import org.springframework.stereotype.Component;
 
@@ -41,12 +41,12 @@ public class RoomPlaybackContextStore {
 
     private RoomPlaybackContext createRoomPlaybackState(Long roomId) {
 
-        ListeningRoom room = listeningRoomRepository.findFullRoomById(roomId).orElseThrow();
+        ShortRoomDTO room = listeningRoomRepository.findShortRoomById(roomId).orElseThrow();
 
         AudioFile audioFile = audioFileRepository.findCurrentAudioByRoom(roomId).orElse(null);
 
         return new RoomPlaybackContext(
-            room.getId(),
+            room.id(),
             audioFile,
             room
         );

@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.kirya343.features.audio.datasource.AudioFile;
-import org.kirya343.features.room.datasource.ListeningRoom;
 import org.kirya343.features.room.dto.ShortRoomDTO;
 
 import lombok.Getter;
@@ -16,11 +15,11 @@ public class RoomPlaybackContext {
     public RoomPlaybackContext(
         Long roomId,
         AudioFile currentAudio,
-        ListeningRoom room
+        ShortRoomDTO room
     ) {
         this.listeners = new HashSet<>();
         this.currentAudio = currentAudio;
-        this.room = ShortRoomDTO.ofRoom(room);
+        this.room = room;
     }
 
     @Setter

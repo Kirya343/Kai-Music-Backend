@@ -27,6 +27,7 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
     @Query("""
         SELECT r FROM ListeningRoom r
         LEFT JOIN FETCH r.owner
+        LEFT JOIN r.members
         WHERE r.id = :roomId
     """)
     Optional<ListeningRoom> findFullRoomById(@Param("roomId") Long roomId);
@@ -49,4 +50,18 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
         FROM ListeningRoom r
     """)
     List<ShortRoomDTO> findAllShortDTOs();
+
+    @Query("""
+        SELECT new org.kirya343.features.room.dto.ShortRoomDTO(
+            r.id,
+            COALESCE(r.title, CONCAT(r.owner.name, '''s room')),
+            r.owner.id,
+            r.code,
+            SIZE(r.members),
+            r.playlist.id
+        )
+        FROM ListeningRoom r 
+        WHERE r.id = :roomId
+    """)
+    Optional<ShortRoomDTO> findShortRoomById(@Param("roomId") Long roomId);
 }
