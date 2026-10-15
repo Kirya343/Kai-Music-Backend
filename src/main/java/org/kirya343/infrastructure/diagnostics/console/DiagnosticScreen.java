@@ -128,6 +128,12 @@ public class DiagnosticScreen {
         render();
     }
 
+    public void addLines(List<String> newLines) {
+        List<String> updatedContent = new ArrayList<>(content);
+        updatedContent.addAll(newLines);
+        setContent(updatedContent);
+    }
+
     /**
      * Отрисовывает интерфейс целиком.
      */

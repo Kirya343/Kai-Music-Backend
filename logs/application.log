@@ -1,54 +1,17 @@
-22:12:29 2026-10-15 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
-22:12:30 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
-22:12:30 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@5c471bab]]
-22:12:30 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
-22:12:30 2026-10-15 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8083"]
-22:12:30 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
-22:12:30 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@5c471bab]]
-22:12:30 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
-22:12:30 2026-10-15 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
-22:12:30 2026-10-15 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'central'
-22:12:30 2026-10-15 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-22:12:30 2026-10-15 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-22:12:30 2026-10-15 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
-
-Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-22:12:30 2026-10-15 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
-
-***************************
-APPLICATION FAILED TO START
-***************************
-
-Description:
-
-Web server failed to start. Port 8083 was already in use.
-
-Action:
-
-Identify and stop the process that's listening on port 8083 or configure this application to listen on another port.
-
-22:12:51 2026-10-15 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
-22:12:51 2026-10-15 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
-22:12:51 2026-10-15 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
-22:12:51 2026-10-15 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@64a0a8af]]
-22:12:51 2026-10-15 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
-22:12:51 2026-10-15 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'central'
-22:12:51 2026-10-15 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
-22:12:51 2026-10-15 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
-22:14:08 2026-10-15 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
-22:14:08 2026-10-15 [main] INFO  org.kirya343.ApiApplication - Starting ApiApplication using Java 21.0.12 with PID 2515702 (/home/kirya343/projects/codespaces/Kai/Kai RestAPI/target/classes started by kirya343 in /home/kirya343/projects/codespaces/Kai/Kai RestAPI)
-22:14:08 2026-10-15 [main] INFO  org.kirya343.ApiApplication - The following 1 profile is active: "production"
-22:14:09 2026-10-15 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-22:14:09 2026-10-15 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 118 ms. Found 8 JPA repository interfaces.
-22:14:10 2026-10-15 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: central]
-22:14:10 2026-10-15 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.29.Final
-22:14:10 2026-10-15 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-22:14:10 2026-10-15 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-22:14:10 2026-10-15 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-22:14:11 2026-10-15 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.mariadb.jdbc.Connection@2ace1cd3
-22:14:11 2026-10-15 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-22:14:11 2026-10-15 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MariaDBDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-22:14:11 2026-10-15 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+02:34:37 2026-10-16 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
+02:34:37 2026-10-16 [main] INFO  org.kirya343.ApiApplication - Starting ApiApplication using Java 21.0.12 with PID 2764737 (/home/kirya343/projects/codespaces/Kai/Kai RestAPI/target/classes started by kirya343 in /home/kirya343/projects/codespaces/Kai/Kai RestAPI)
+02:34:37 2026-10-16 [main] INFO  org.kirya343.ApiApplication - The following 1 profile is active: "production"
+02:34:37 2026-10-16 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+02:34:37 2026-10-16 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 105 ms. Found 8 JPA repository interfaces.
+02:34:38 2026-10-16 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: central]
+02:34:38 2026-10-16 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.29.Final
+02:34:38 2026-10-16 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+02:34:38 2026-10-16 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+02:34:38 2026-10-16 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+02:34:39 2026-10-16 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.mariadb.jdbc.Connection@2ace1cd3
+02:34:39 2026-10-16 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+02:34:40 2026-10-16 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MariaDBDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+02:34:40 2026-10-16 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
 	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
 	Database driver: undefined/unknown
 	Database version: 10.11.14
@@ -56,185 +19,553 @@ Identify and stop the process that's listening on port 8083 or configure this ap
 	Isolation level: undefined/unknown
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-22:14:11 2026-10-15 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-22:14:17 2026-10-15 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'central'
-22:14:18 2026-10-15 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-22:14:18 2026-10-15 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8083 (http)
-22:14:18 2026-10-15 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8083"]
-22:14:18 2026-10-15 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-22:14:18 2026-10-15 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
-22:14:18 2026-10-15 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-22:14:18 2026-10-15 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 9646 ms
-22:14:21 2026-10-15 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
-22:14:21 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
-22:14:21 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@5137f7a6]]
-22:14:21 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
-22:14:21 2026-10-15 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8083"]
-22:14:21 2026-10-15 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8083 (http) with context path '/'
-22:14:21 2026-10-15 [main] INFO  org.kirya343.ApiApplication - Started ApiApplication in 13.084 seconds (process running for 13.31)
-22:14:56 2026-10-15 [http-nio-8083-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-22:14:56 2026-10-15 [http-nio-8083-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-22:14:56 2026-10-15 [http-nio-8083-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
-22:15:00 2026-10-15 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
-22:15:00 2026-10-15 [main] INFO  org.kirya343.ApiApplication - Starting ApiApplication using Java 21.0.12 with PID 2516640 (/home/kirya343/projects/codespaces/Kai/Kai RestAPI/target/classes started by kirya343 in /home/kirya343/projects/codespaces/Kai/Kai RestAPI)
-22:15:00 2026-10-15 [main] INFO  org.kirya343.ApiApplication - The following 1 profile is active: "production"
-22:15:00 2026-10-15 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-22:15:01 2026-10-15 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 122 ms. Found 8 JPA repository interfaces.
-22:15:02 2026-10-15 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: central]
-22:15:02 2026-10-15 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.29.Final
-22:15:02 2026-10-15 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-22:15:02 2026-10-15 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-22:15:02 2026-10-15 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-22:15:03 2026-10-15 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.mariadb.jdbc.Connection@6aadb092
-22:15:03 2026-10-15 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-22:15:03 2026-10-15 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MariaDBDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-22:15:03 2026-10-15 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 10.11.14
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-22:15:04 2026-10-15 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-22:15:09 2026-10-15 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'central'
-22:15:09 2026-10-15 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-22:15:09 2026-10-15 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8083 (http)
-22:15:09 2026-10-15 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8083"]
-22:15:09 2026-10-15 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-22:15:09 2026-10-15 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
-22:15:09 2026-10-15 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-22:15:09 2026-10-15 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 9671 ms
-22:15:12 2026-10-15 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
-22:15:12 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
-22:15:12 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@4d5d5a46]]
-22:15:12 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
-22:15:12 2026-10-15 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8083"]
-22:15:12 2026-10-15 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8083 (http) with context path '/'
-22:15:13 2026-10-15 [main] INFO  org.kirya343.ApiApplication - Started ApiApplication in 13.236 seconds (process running for 13.474)
-22:15:56 2026-10-15 [http-nio-8083-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-22:15:56 2026-10-15 [http-nio-8083-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-22:15:56 2026-10-15 [http-nio-8083-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
-22:16:12 2026-10-15 [MessageBroker-1] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
-22:16:38 2026-10-15 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
-22:16:38 2026-10-15 [main] INFO  org.kirya343.ApiApplication - Starting ApiApplication using Java 21.0.12 with PID 2518292 (/home/kirya343/projects/codespaces/Kai/Kai RestAPI/target/classes started by kirya343 in /home/kirya343/projects/codespaces/Kai/Kai RestAPI)
-22:16:38 2026-10-15 [main] INFO  org.kirya343.ApiApplication - The following 1 profile is active: "production"
-22:16:39 2026-10-15 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-22:16:39 2026-10-15 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 117 ms. Found 8 JPA repository interfaces.
-22:16:40 2026-10-15 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: central]
-22:16:40 2026-10-15 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.29.Final
-22:16:40 2026-10-15 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-22:16:40 2026-10-15 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-22:16:40 2026-10-15 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-22:16:41 2026-10-15 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.mariadb.jdbc.Connection@5831989d
-22:16:41 2026-10-15 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-22:16:41 2026-10-15 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MariaDBDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-22:16:41 2026-10-15 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 10.11.14
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-22:16:41 2026-10-15 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-22:16:46 2026-10-15 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'central'
-22:16:47 2026-10-15 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-22:16:47 2026-10-15 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8083 (http)
-22:16:47 2026-10-15 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8083"]
-22:16:47 2026-10-15 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-22:16:47 2026-10-15 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
-22:16:47 2026-10-15 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-22:16:47 2026-10-15 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 8719 ms
-22:16:50 2026-10-15 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
-22:16:50 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
-22:16:50 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@3e028c37]]
-22:16:50 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
-22:16:50 2026-10-15 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8083"]
-22:16:50 2026-10-15 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8083 (http) with context path '/'
-22:16:50 2026-10-15 [main] INFO  org.kirya343.ApiApplication - Started ApiApplication in 12.39 seconds (process running for 12.679)
-22:16:57 2026-10-15 [http-nio-8083-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-22:16:57 2026-10-15 [http-nio-8083-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-22:16:57 2026-10-15 [http-nio-8083-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
-22:17:01 2026-10-15 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
-22:17:02 2026-10-15 [main] INFO  org.kirya343.ApiApplication - Starting ApiApplication using Java 21.0.12 with PID 2518830 (/home/kirya343/projects/codespaces/Kai/Kai RestAPI/target/classes started by kirya343 in /home/kirya343/projects/codespaces/Kai/Kai RestAPI)
-22:17:02 2026-10-15 [main] INFO  org.kirya343.ApiApplication - The following 1 profile is active: "production"
-22:17:02 2026-10-15 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-22:17:02 2026-10-15 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 109 ms. Found 8 JPA repository interfaces.
-22:17:03 2026-10-15 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: central]
-22:17:03 2026-10-15 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.29.Final
-22:17:03 2026-10-15 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-22:17:03 2026-10-15 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-22:17:03 2026-10-15 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-22:17:04 2026-10-15 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.mariadb.jdbc.Connection@608f310a
-22:17:04 2026-10-15 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-22:17:04 2026-10-15 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MariaDBDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-22:17:04 2026-10-15 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 10.11.14
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-22:17:05 2026-10-15 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-22:17:10 2026-10-15 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'central'
-22:17:10 2026-10-15 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-22:17:10 2026-10-15 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8083 (http)
-22:17:10 2026-10-15 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8083"]
-22:17:10 2026-10-15 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-22:17:10 2026-10-15 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
-22:17:10 2026-10-15 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-22:17:10 2026-10-15 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 8762 ms
-22:17:13 2026-10-15 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
-22:17:13 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
-22:17:13 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@260a839d]]
-22:17:13 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
-22:17:13 2026-10-15 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8083"]
-22:17:13 2026-10-15 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8083 (http) with context path '/'
-22:17:13 2026-10-15 [main] INFO  org.kirya343.ApiApplication - Started ApiApplication in 12.25 seconds (process running for 12.485)
-22:17:57 2026-10-15 [http-nio-8083-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-22:17:57 2026-10-15 [http-nio-8083-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-22:17:57 2026-10-15 [http-nio-8083-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
-22:18:13 2026-10-15 [MessageBroker-1] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
-22:22:13 2026-10-15 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
-22:22:13 2026-10-15 [main] INFO  org.kirya343.ApiApplication - Starting ApiApplication using Java 21.0.12 with PID 2523598 (/home/kirya343/projects/codespaces/Kai/Kai RestAPI/target/classes started by kirya343 in /home/kirya343/projects/codespaces/Kai/Kai RestAPI)
-22:22:13 2026-10-15 [main] INFO  org.kirya343.ApiApplication - The following 1 profile is active: "production"
-22:22:13 2026-10-15 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-22:22:13 2026-10-15 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 107 ms. Found 8 JPA repository interfaces.
-22:22:14 2026-10-15 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: central]
-22:22:14 2026-10-15 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.29.Final
-22:22:14 2026-10-15 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
-22:22:14 2026-10-15 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
-22:22:14 2026-10-15 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-22:22:15 2026-10-15 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.mariadb.jdbc.Connection@608f310a
-22:22:15 2026-10-15 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-22:22:15 2026-10-15 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MariaDBDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-22:22:15 2026-10-15 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
-	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
-	Database driver: undefined/unknown
-	Database version: 10.11.14
-	Autocommit mode: undefined/unknown
-	Isolation level: undefined/unknown
-	Minimum pool size: undefined/unknown
-	Maximum pool size: undefined/unknown
-22:22:16 2026-10-15 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-22:22:21 2026-10-15 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'central'
-22:22:21 2026-10-15 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
-22:22:21 2026-10-15 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8083 (http)
-22:22:21 2026-10-15 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8083"]
-22:22:21 2026-10-15 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-22:22:21 2026-10-15 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
-22:22:21 2026-10-15 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-22:22:21 2026-10-15 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 8647 ms
-22:22:24 2026-10-15 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
-22:22:25 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
-22:22:25 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@622f5b1d]]
-22:22:25 2026-10-15 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
-22:22:25 2026-10-15 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8083"]
-22:22:25 2026-10-15 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8083 (http) with context path '/'
-22:22:25 2026-10-15 [main] INFO  org.kirya343.ApiApplication - Started ApiApplication in 12.205 seconds (process running for 12.454)
-22:22:57 2026-10-15 [http-nio-8083-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-22:22:57 2026-10-15 [http-nio-8083-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-22:22:57 2026-10-15 [http-nio-8083-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
-22:23:25 2026-10-15 [MessageBroker-1] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
+02:34:40 2026-10-16 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+02:34:47 2026-10-16 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'central'
+02:34:47 2026-10-16 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+02:34:47 2026-10-16 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8083 (http)
+02:34:47 2026-10-16 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8083"]
+02:34:47 2026-10-16 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+02:34:47 2026-10-16 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.46]
+02:34:47 2026-10-16 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+02:34:47 2026-10-16 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 10616 ms
+02:34:50 2026-10-16 [main] DEBUG o.s.w.s.s.s.WebSocketHandlerMapping - Patterns [/ws] in 'stompWebSocketHandlerMapping'
+02:34:50 2026-10-16 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+02:34:50 2026-10-16 [main] DEBUG o.s.s.c.a.a.c.AuthenticationConfiguration$DefaultPasswordEncoderAuthenticationManagerBuilder - No authenticationProviders and no parentAuthenticationManager defined. Returning null.
+02:34:50 2026-10-16 [main] DEBUG o.s.s.web.DefaultSecurityFilterChain - Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, BearerTokenAuthenticationFilter, AuthenticationFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
+02:34:50 2026-10-16 [main] DEBUG o.s.w.s.m.WebSocketAnnotationMethodMessageHandler - 
+	o.k.f.a.c.AudioController:
+	
+02:34:50 2026-10-16 [main] DEBUG o.s.w.s.m.WebSocketAnnotationMethodMessageHandler - 
+	o.k.f.a.c.AuthController:
+	
+02:34:50 2026-10-16 [main] DEBUG o.s.w.s.m.WebSocketAnnotationMethodMessageHandler - 
+	o.k.f.p.c.PermissionController:
+	
+02:34:50 2026-10-16 [main] DEBUG o.s.w.s.m.WebSocketAnnotationMethodMessageHandler - 
+	o.k.f.p.c.PlaybackController:
+	
+02:34:50 2026-10-16 [main] DEBUG o.s.w.s.m.WebSocketAnnotationMethodMessageHandler - 
+	o.k.f.p.c.PlaylistController:
+	
+02:34:50 2026-10-16 [main] DEBUG o.s.w.s.m.WebSocketAnnotationMethodMessageHandler - 
+	o.k.f.r.c.RoomController:
+	
+02:34:50 2026-10-16 [main] DEBUG o.s.w.s.m.WebSocketAnnotationMethodMessageHandler - 
+	o.k.f.r.c.RoomWebSocketController:
+	{[MESSAGE],[/room/reconnect]}: setUserRoom(UserAuthData)
+02:34:50 2026-10-16 [main] DEBUG o.s.w.s.m.WebSocketAnnotationMethodMessageHandler - 
+	o.k.f.u.c.UserWebSocketController:
+	
+02:34:50 2026-10-16 [main] DEBUG o.s.w.s.m.WebSocketAnnotationMethodMessageHandler - 
+	o.k.f.u.c.UsersController:
+	
+02:34:50 2026-10-16 [main] DEBUG o.s.w.s.m.WebSocketAnnotationMethodMessageHandler - 
+	o.s.b.a.w.s.e.BasicErrorController:
+	
+02:34:50 2026-10-16 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+02:34:50 2026-10-16 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@588fb9fa]]
+02:34:50 2026-10-16 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+02:34:51 2026-10-16 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8083"]
+02:34:51 2026-10-16 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8083 (http) with context path '/'
+02:34:51 2026-10-16 [main] INFO  org.kirya343.ApiApplication - Started ApiApplication in 14.128 seconds (process running for 14.342)
+02:34:51 2026-10-16 [http-nio-8083-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+02:34:51 2026-10-16 [http-nio-8083-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+02:34:51 2026-10-16 [http-nio-8083-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+02:34:51 2026-10-16 [http-nio-8083-exec-1] DEBUG o.s.security.web.FilterChainProxy - Securing GET /ws
+02:34:51 2026-10-16 [http-nio-8083-exec-1] DEBUG o.s.s.o.s.r.a.JwtAuthenticationProvider - Authenticated token
+02:34:51 2026-10-16 [http-nio-8083-exec-1] DEBUG o.s.s.o.s.r.w.a.BearerTokenAuthenticationFilter - Set SecurityContextHolder to UserJwtAuthenticationToken [Principal=UserAuthData[id=1, openId=qob26MmQJt3VG231sxP9, name=Kirya, status=ACTIVE], Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=127.0.0.1, SessionId=null], Granted Authorities=[]]
+02:34:51 2026-10-16 [http-nio-8083-exec-1] DEBUG o.s.security.web.FilterChainProxy - Secured GET /ws
+02:34:51 2026-10-16 [http-nio-8083-exec-1] DEBUG o.s.w.s.s.s.WebSocketHandlerMapping - Mapped to org.springframework.web.socket.server.support.WebSocketHttpRequestHandler@41ba679c
+02:34:51 2026-10-16 [http-nio-8083-exec-1] DEBUG o.s.w.s.s.s.WebSocketHttpRequestHandler - GET /ws
+02:34:51 2026-10-16 [http-nio-8083-exec-1] DEBUG o.s.w.s.h.LoggingWebSocketHandlerDecorator - New StandardWebSocketSession[id=8d6fac83-d4a1-8d5f-f882-bec5573cceb7, uri=ws://localhost:8083/ws]
+02:34:51 2026-10-16 [http-nio-8083-exec-1] DEBUG o.k.f.p.services.PresenceService - Пользователь qob26MmQJt3VG231sxP9 теперь ONLINE
+02:34:51 2026-10-16 [clientInboundChannel-3] DEBUG o.s.w.s.m.WebSocketAnnotationMethodMessageHandler - Searching methods to handle SEND /app/room/reconnect session=8d6fac83-d4a1-8d5f-f882-bec5573cceb7, lookupDestination='/room/reconnect'
+02:34:51 2026-10-16 [clientInboundChannel-3] DEBUG o.s.w.s.m.WebSocketAnnotationMethodMessageHandler - Invoking RoomWebSocketController#setUserRoom[1 args]
+02:34:52 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.r.services.RoomCommandService - Пользователь Kirya присоединяется к комнате 25
+02:34:52 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.r.s.RoomWebSocketService - Sending room(25) info to user qob26MmQJt3VG231sxP9
+02:34:52 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.PlaybackWebsocketService - Sending state info to user qob26MmQJt3VG231sxP9, pos 300.0, qi 54
+02:34:53 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.r.s.RoomWebSocketService - Sending room(25) info to user qob26MmQJt3VG231sxP9
+02:34:53 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.RoomStreamWorkerManager - Пытаемся получить воркер для комнаты 25
+02:34:53 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.RoomStreamWorkerManager - Создаём новый воркер для комнаты 25
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Created RoomStreamWorker for 25, with state: 54, 301.0, false
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - applyState 301.0
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Создаём новый воркер для пользователя qob26MmQJt3VG231sxP9
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Created UserAudioStreamWorker for qob26MmQJt3VG231sxP9, with state: 54, 301.0, false
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.PlaybackWebsocketService - Sending state info to user qob26MmQJt3VG231sxP9, pos 301.0, qi 54
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - applyState state=false
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - SWITCH TRACK: null => 54
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Перематываем чанкер для пользователя qob26MmQJt3VG231sxP9 на позицию: 301.0
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.a.services.util.Fmp4Chunker - chunker seek to 301.0
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.PlaybackWebsocketService - Sending initialization chunk to qob26MmQJt3VG231sxP9: chunk=-1, audio={}
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - START STATE: entryId=54, position=301.0
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Кладём к остальным воркер для пользователя qob26MmQJt3VG231sxP9
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - applyState state=false
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - START STATE: entryId=54, position=301.0
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - START STATE: entryId=54, position=301.0
+02:34:54 2026-10-16 [clientInboundChannel-3] DEBUG o.k.f.p.s.s.RoomStreamWorkerManager - Кладём к остальным воркер для комнаты 25
+02:34:54 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:34:54 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Sending NEXT event: room=25
+02:34:54 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.e.PlaybackCommandHandler - Handled RoomCommand class org.kirya343.features.playback.dto.commands.ChangeTrack
+02:34:54 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.c.PlaybackCommandWorker - Submit command class org.kirya343.features.playback.dto.commands.ChangeTrack
+02:34:54 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.RoomStreamWorkerManager - Пытаемся получить воркер для комнаты 25
+02:34:55 2026-10-16 [room-executor-25] DEBUG o.k.f.playback.services.QueueService - Переключаем трек в комнате 25, номер предыдущего трека: 54
+02:34:56 2026-10-16 [room-executor-25] DEBUG o.k.f.playback.services.QueueService - Режим проигрывания комнаты: SHUFFLE
+02:34:56 2026-10-16 [room-executor-25] DEBUG o.k.f.playback.services.QueueService - Id следующего трека: 55
+02:34:56 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - applyState 0.0
+02:34:56 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:34:56 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - applyState state=false
+02:34:56 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - SWITCH TRACK: 54 => 55
+02:34:56 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Перематываем чанкер для пользователя qob26MmQJt3VG231sxP9 на позицию: 0.0
+02:34:56 2026-10-16 [room-executor-25] DEBUG o.k.f.a.services.util.Fmp4Chunker - chunker seek to 0.0
+02:34:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:34:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:34:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:34:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:34:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 0.0, target 20.422
+02:34:56 2026-10-16 [room-executor-25] DEBUG o.k.f.p.PlaybackWebsocketService - Sending initialization chunk to qob26MmQJt3VG231sxP9: chunk=-1, audio={}
+02:34:56 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:34:56 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 0.0, target 20.426
+02:34:57 2026-10-16 [room-executor-25] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=1, audio={}
+02:34:57 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 5.0, target 20.426
+02:34:57 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=0, audio={}
+02:34:57 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 5.0, target 20.422
+02:34:57 2026-10-16 [room-executor-25] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=2, audio={}
+02:34:57 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 10.0, target 20.426
+02:34:57 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=3, audio={}
+02:34:57 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 10.0, target 20.422
+02:34:57 2026-10-16 [room-executor-25] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=4, audio={}
+02:34:57 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 15.0, target 20.426
+02:34:57 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=5, audio={}
+02:34:57 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 15.0, target 20.422
+02:34:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=7, audio={}
+02:34:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 20.0, target 20.422
+02:34:58 2026-10-16 [room-executor-25] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=6, audio={}
+02:34:58 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 20.0, target 20.426
+02:34:58 2026-10-16 [room-executor-25] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=9, audio={}
+02:34:58 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - START STATE: entryId=55, position=0.0
+02:34:58 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:34:58 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:34:58 2026-10-16 [room-executor-25] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - START STATE: entryId=55, position=0.0
+02:34:58 2026-10-16 [room-executor-25] DEBUG o.k.f.p.PlaybackWebsocketService - Sending state info to user qob26MmQJt3VG231sxP9, pos 0.0, qi 55
+02:34:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=8, audio={}
+02:34:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:34:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:34:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:34:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:00 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:00 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:00 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:00 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 25.0, target 26.421
+02:35:03 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=10, audio={}
+02:35:04 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:04 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:04 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:04 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 30.0, target 30.422
+02:35:07 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=11, audio={}
+02:35:08 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:08 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:08 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:08 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:10 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:10 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:10 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:10 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 35.0, target 36.421
+02:35:13 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=12, audio={}
+02:35:14 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:14 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:14 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:14 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 40.0, target 40.421
+02:35:17 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=13, audio={}
+02:35:18 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:18 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:18 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:18 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:20 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:20 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:20 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:20 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 45.0, target 46.421
+02:35:23 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=14, audio={}
+02:35:24 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:24 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:24 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:24 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 50.0, target 50.421
+02:35:27 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=15, audio={}
+02:35:28 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:28 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:28 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:28 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:30 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:30 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:30 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:30 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 55.0, target 56.421
+02:35:33 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=16, audio={}
+02:35:34 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:34 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:34 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:34 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 60.0, target 60.421
+02:35:37 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=17, audio={}
+02:35:38 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:38 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:38 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:38 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:40 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:40 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:40 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:40 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 65.0, target 66.42099999999999
+02:35:43 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=18, audio={}
+02:35:44 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:44 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:44 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:44 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 70.0, target 70.42099999999999
+02:35:47 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=19, audio={}
+02:35:48 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:48 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:48 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:48 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:50 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:50 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:50 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:50 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:50 2026-10-16 [MessageBroker-1] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[1 current WS(1)-HttpStream(0)-HttpPoll(0), 1 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(1)-CONNECTED(1)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 12, active threads = 0, queued tasks = 0, completed tasks = 27], outboundChannel[pool size = 12, active threads = 0, queued tasks = 0, completed tasks = 29], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
+02:35:52 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:52 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:52 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:52 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:52 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 75.0, target 76.42099999999999
+02:35:53 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=20, audio={}
+02:35:54 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:54 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:54 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:54 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:35:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 80.0, target 80.42099999999999
+02:35:57 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=21, audio={}
+02:35:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:35:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:35:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:35:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:00 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:00 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:00 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:00 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 85.0, target 86.421
+02:36:03 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=22, audio={}
+02:36:04 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:04 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:04 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:04 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 90.0, target 90.421
+02:36:07 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=23, audio={}
+02:36:08 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:08 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:08 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:08 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:10 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:10 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:10 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:10 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 95.0, target 96.421
+02:36:13 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=24, audio={}
+02:36:14 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:14 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:14 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:14 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 100.0, target 100.421
+02:36:17 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=25, audio={}
+02:36:18 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:18 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:18 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:18 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:20 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:20 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:20 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:20 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 105.0, target 106.421
+02:36:23 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=26, audio={}
+02:36:24 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:24 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:24 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:24 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 110.0, target 110.421
+02:36:27 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=27, audio={}
+02:36:28 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:28 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:28 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:28 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:30 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:30 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:30 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:30 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 115.0, target 116.421
+02:36:33 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=28, audio={}
+02:36:34 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:34 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:34 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:34 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 120.0, target 120.421
+02:36:37 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=29, audio={}
+02:36:38 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:38 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:38 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:38 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:40 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:40 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:40 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:40 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 125.0, target 126.421
+02:36:43 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=30, audio={}
+02:36:44 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:44 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:44 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:44 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 130.0, target 130.421
+02:36:47 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=31, audio={}
+02:36:48 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:48 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:48 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:48 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:50 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:50 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:50 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:50 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:52 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:52 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:52 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:52 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:52 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 135.0, target 136.421
+02:36:53 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=32, audio={}
+02:36:54 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:54 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:54 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:54 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:36:56 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 140.0, target 140.421
+02:36:57 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=33, audio={}
+02:36:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:36:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:36:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:36:58 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:00 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:00 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:00 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:00 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:02 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 145.0, target 146.421
+02:37:03 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=34, audio={}
+02:37:04 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:04 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:04 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:04 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:06 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 150.0, target 150.421
+02:37:07 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=35, audio={}
+02:37:08 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:08 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:08 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:08 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:10 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:10 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:10 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:10 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:12 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 155.0, target 156.421
+02:37:13 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=36, audio={}
+02:37:14 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:14 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:14 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:14 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:16 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 160.0, target 160.421
+02:37:17 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=37, audio={}
+02:37:18 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:18 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:18 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:18 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:20 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:20 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:20 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:20 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:22 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 165.0, target 166.421
+02:37:23 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=38, audio={}
+02:37:24 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:24 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:24 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:24 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:26 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 170.0, target 170.421
+02:37:27 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=39, audio={}
+02:37:28 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:28 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:28 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:28 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:30 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:30 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:30 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:30 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:32 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 175.0, target 176.421
+02:37:33 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=40, audio={}
+02:37:34 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:34 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:34 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:34 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:36 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 180.0, target 180.421
+02:37:37 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=41, audio={}
+02:37:38 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:38 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:38 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:38 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:40 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:40 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:40 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:40 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:42 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 185.0, target 186.421
+02:37:43 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=42, audio={}
+02:37:44 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:44 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:44 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:44 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:46 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - buffered 190.0, target 190.421
+02:37:47 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.PlaybackWebsocketService - Sending media chunk to qob26MmQJt3VG231sxP9: chunk=43, audio={}
+02:37:48 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:48 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:48 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:48 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9
+02:37:50 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.streaming.RoomStreamWorker - Room tick 25, [qob26MmQJt3VG231sxP9]
+02:37:50 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorkerManager - Пытаемся получить воркер для пользователя qob26MmQJt3VG231sxP9
+02:37:50 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - Tick to user qob26MmQJt3VG231sxP9
+02:37:50 2026-10-16 [pool-4-thread-1] DEBUG o.k.f.p.s.s.UserAudioStreamWorker - fillBuffer to user qob26MmQJt3VG231sxP9

@@ -2,7 +2,7 @@ package org.kirya343.features.playback.diagnostics;
 
 import org.kirya343.features.playback.services.PlaybackDiagnosticsService;
 import org.kirya343.infrastructure.diagnostics.commands.DiagnosticCommand;
-import org.kirya343.infrastructure.diagnostics.models.DiagnosticResult;
+import org.kirya343.infrastructure.diagnostics.models.TextResult;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,7 +27,7 @@ public class InspectRoomStreamerCommand implements DiagnosticCommand {
     }
 
     @Override
-    public DiagnosticResult execute(String[] args) {
+    public TextResult execute(String[] args) {
         if (args.length != 1) {
             throw new IllegalArgumentException(
                 "Usage: playback.room <roomId>"

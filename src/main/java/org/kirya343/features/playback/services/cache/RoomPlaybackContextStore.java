@@ -27,6 +27,10 @@ public class RoomPlaybackContextStore {
         return rooms.get(roomId);
     }
 
+    public Map<Long, RoomPlaybackContext> getAll() {
+        return rooms;
+    }
+
     public RoomPlaybackContext computeIfAbsent(Long roomId) {
 
         return rooms.computeIfAbsent(

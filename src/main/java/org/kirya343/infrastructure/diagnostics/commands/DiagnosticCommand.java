@@ -1,10 +1,12 @@
 package org.kirya343.infrastructure.diagnostics.commands;
 
+import org.kirya343.infrastructure.diagnostics.models.CommandResult;
+
 public interface DiagnosticCommand {
 
     String getName();
 
     String getDescription();
 
-    Object execute(String[] args);
+    CommandResult execute(String[] args);
 }
