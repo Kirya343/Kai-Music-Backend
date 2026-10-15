@@ -1,4 +1,7 @@
 logging:
+
+  file.name: logs/application.log
+  
   level:
 
     org.springframework.web.multipart: INFO
