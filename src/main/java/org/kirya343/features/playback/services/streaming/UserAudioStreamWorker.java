@@ -52,13 +52,13 @@ public class UserAudioStreamWorker {
 
     public void applyState(PlaybackStateDTO state) {
 
-        log.info("applyState state={}", state == null);
+        log.debug("applyState state={}", state == null);
 
         if (state == null) return;
 
         updateState(state);
 
-        log.info("START STATE: entryId={}, position={}", state.entryId(), state.position());
+        log.debug("START STATE: entryId={}, position={}", state.entryId(), state.position());
 
         try {
             tick();
@@ -133,7 +133,7 @@ public class UserAudioStreamWorker {
          * and recreate all user chunkers with new parser
          */
         if (trackChanged) {
-            log.info(
+            log.debug(
                 "SWITCH TRACK: {} => {}",
                 previousState != null ? previousState.entryId() : "null",
                 currentState.entryId()
@@ -150,7 +150,7 @@ public class UserAudioStreamWorker {
         }
 
         if (positionChanged && !trackChanged) {
-            log.info(
+            log.debug(
                 "SEEK POSITION: {} => {}",
                 previousState != null ? previousState.position() : "null",
                 currentState.position()

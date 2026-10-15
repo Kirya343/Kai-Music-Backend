@@ -56,7 +56,7 @@ public class M4aBuilder {
                     input.toByteArray()
             );
 
-            log.info(
+            log.debug(
                     "FFmpeg input created: path={}, bytes={}",
                     inputFile,
                     Files.size(inputFile)
@@ -93,7 +93,7 @@ public class M4aBuilder {
 
             int exitCode = process.waitFor();
 
-            log.info(
+            log.debug(
                     "FFmpeg finished: exitCode={}, output={}",
                     exitCode,
                     ffmpegOutput
@@ -107,7 +107,7 @@ public class M4aBuilder {
 
             byte[] result = Files.readAllBytes(outputFile);
 
-            log.info(
+            log.debug(
                     "FFmpeg output created: path={}, bytes={}",
                     outputFile,
                     result.length
@@ -128,7 +128,7 @@ public class M4aBuilder {
         AudioChunk init = audioStorageService
                 .getInitializationChunk(audioFile.getPath());
 
-        log.info(
+        log.debug(
                 "Initialization chunk loaded: audioId={}, sequence={}, bytes={}, duration={}, initialization={}",
                 audioFile.getId(),
                 init.sequence(),
@@ -144,7 +144,7 @@ public class M4aBuilder {
 
             media.add(chunk);
 
-            log.info(
+            log.debug(
                     "Media chunk loaded: audioId={}, index={}, sequence={}, bytes={}, duration={}, initialization={}",
                     audioFile.getId(),
                     i,
@@ -154,7 +154,7 @@ public class M4aBuilder {
             );
         }
 
-        log.info(
+        log.debug(
                 "All chunks loaded: audioId={}, mediaChunks={}, storageTime={}ms",
                 audioFile.getId(),
                 media.size(),
@@ -166,7 +166,7 @@ public class M4aBuilder {
         long ffmpegStartedAt = System.currentTimeMillis();
 
         try {
-            log.info(
+            log.debug(
                     "Building M4A with FFmpeg: audioId={}, chunks={}",
                     audioFile.getId(),
                     media.size()
@@ -174,7 +174,7 @@ public class M4aBuilder {
 
             m4a = buildM4a(init, media);
 
-            log.info(
+            log.debug(
                     "M4A built successfully: audioId={}, bytes={}, ffmpegTime={}ms",
                     audioFile.getId(),
                     m4a.length,

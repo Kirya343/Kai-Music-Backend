@@ -5,11 +5,11 @@ logging:
     org.springframework.web.servlet.resource: INFO
     org.springframework.security: INFO
 
-    org.springframework.web.socket: DEBUG
+    org.springframework.web.socket: INFO
     org.springframework.messaging: INFO
 
-    org.kirya343.features: DEBUG
-    org.kirya343.features.audio.recognition: DEBUG
+    org.kirya343.features: INFO
+    org.kirya343.features.audio.recognition: INFO
 
     com.zaxxer.hikari: INFO
     org.hibernate.SQL: INFO

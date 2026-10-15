@@ -31,13 +31,13 @@ public class RoomStreamWorkerManager {
 
     public RoomStreamWorker getWorker(Long roomId) {
 
-        log.info("Пытаемся получить воркер для комнаты {}", roomId);
+        log.debug("Пытаемся получить воркер для комнаты {}", roomId);
 
         RoomStreamWorker worker = workers.get(roomId);
 
         if (worker == null) {
 
-            log.info("Создаём новый воркер для комнаты {}", roomId);
+            log.debug("Создаём новый воркер для комнаты {}", roomId);
 
             RoomPlaybackState state = roomPlaybackStateRepository.findById(roomId).orElse(null);
 
@@ -52,7 +52,7 @@ public class RoomStreamWorkerManager {
                 presenceService
             );
 
-            log.info("Кладём к остальным воркер для комнаты {}", roomId);
+            log.debug("Кладём к остальным воркер для комнаты {}", roomId);
 
             workers.putIfAbsent(roomId, worker);
         }

@@ -60,7 +60,7 @@ public class RoomCommandService {
     }
 
     public void connectUserToRoom(ListeningRoom room, UserAuthData authData) {
-        log.info("Пользователь {} присоединяется к комнате {}", authData.name(), room.getId());
+        log.debug("Пользователь {} присоединяется к комнате {}", authData.name(), room.getId());
         userRepository.updateListeningRoom(authData.id(), room.getId());
 
         roomWebSocketService.broadcastRoomInfo(authData.openId(), ShortRoomDTO.ofRoom(room));

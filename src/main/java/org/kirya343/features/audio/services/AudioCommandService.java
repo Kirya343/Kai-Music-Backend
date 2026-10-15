@@ -36,7 +36,7 @@ public class AudioCommandService {
             UserAuthData authData
     ) throws IOException {
 
-        log.info("Starting audio recognition: audioId={}", audioId);
+        log.debug("Starting audio recognition: audioId={}", audioId);
 
         AudioFile audioFile = audioFileRepository
                 .findById(audioId)
@@ -44,7 +44,7 @@ public class AudioCommandService {
                         "Audio file not found: " + audioId
                 ));
 
-        log.info(
+        log.debug(
                 "Audio loaded: audioId={}, path={}",
                 audioId,
                 audioFile.getPath()
@@ -54,7 +54,7 @@ public class AudioCommandService {
 
         long recognitionStartedAt = System.currentTimeMillis();
 
-        log.info(
+        log.debug(
                 "Sending audio to ACRCloud: audioId={}, bytes={}",
                 audioId,
                 m4a.length

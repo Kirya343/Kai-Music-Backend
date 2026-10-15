@@ -59,7 +59,7 @@ public class RoomStreamWorker {
 
         if (state == null) return;
 
-        log.info("applyState {}", state.position());
+        log.debug("applyState {}", state.position());
 
         currentState = state;
 
@@ -69,7 +69,7 @@ public class RoomStreamWorker {
             }
         });
 
-        log.info("START STATE: entryId={}, position={}", state.entryId(), state.position());
+        log.debug("START STATE: entryId={}, position={}", state.entryId(), state.position());
 
         if (task == null || task.isCancelled()) {
             task = scheduler.scheduleAtFixedRate(

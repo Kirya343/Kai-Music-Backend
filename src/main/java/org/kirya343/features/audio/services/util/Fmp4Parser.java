@@ -143,7 +143,7 @@ public class Fmp4Parser {
             true
         );
 
-        log.info("данные парсера заполнены");
+        log.debug("данные парсера заполнены");
     }
     
     public AudioChunk getInitializationChunk() {

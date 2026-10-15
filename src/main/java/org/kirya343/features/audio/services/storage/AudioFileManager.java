@@ -35,7 +35,7 @@ public class AudioFileManager {
         log.debug("Пользователь {} загружает аудио на сервер", authData.name());
 
         File tempInput = null;
-        File converted = null;
+        // File converted = null;
 
         try {
             // 1. Multipart → File
@@ -47,8 +47,8 @@ public class AudioFileManager {
             log.debug("Полученные метаданные файла: {}", metadata.toString());
 
             // 2. Конвертация → MP3
-            converted = AudioConverter.convertToMp3(tempInput);
-            log.debug("Конвертировали в mp3");
+            // converted = AudioConverter.convertToMp3(tempInput);
+            // log.debug("Конвертировали в mp3");
 
             // 3. Название
             String originalName = uploadedFile.getOriginalFilename();
@@ -59,7 +59,7 @@ public class AudioFileManager {
                 originalName = originalName.substring(0, originalName.lastIndexOf("."));
             }
 
-            Fmp4Parser parser = new Fmp4Parser(converted.toPath());
+            Fmp4Parser parser = new Fmp4Parser(tempInput.toPath());
 
             String audioDirectory = audioStorageService.createAudioDirectory();
 
@@ -103,7 +103,7 @@ public class AudioFileManager {
         } finally {
             // 6. Чистим временные файлы
             if (tempInput != null && tempInput.exists()) tempInput.delete();
-            if (converted != null && converted.exists()) converted.delete();
+            // if (converted != null && converted.exists()) converted.delete();
         }
     }
 }

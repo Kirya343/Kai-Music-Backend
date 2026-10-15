@@ -87,7 +87,7 @@ public class RoomController {
             userAudioStreamWorkerManager.removeWorker(authData.openId());
         }
 
-        log.info("Пользователь {} покинул комнату {}", authData.name(), room.getId());
+        log.debug("Пользователь {} покинул комнату {}", authData.name(), room.getId());
         userRepository.updateListeningRoom(authData.id(), null);
     }
 
