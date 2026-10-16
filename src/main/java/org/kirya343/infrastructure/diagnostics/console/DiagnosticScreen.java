@@ -4,12 +4,15 @@ import org.jline.terminal.Terminal;
 import org.jline.utils.WCWidth;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor 
 public class DiagnosticScreen {
 
     private static final int MAX_CONTENT_ENTRIES = 1000;
@@ -26,10 +29,6 @@ public class DiagnosticScreen {
      * 0 означает, что отображаются последние строки.
      */
     private int scrollOffset = 0;
-
-    public DiagnosticScreen(Terminal terminal) {
-        this.terminal = terminal;
-    }
 
     private int contentLines() {
         return Math.max(1, terminal.getHeight() - 7);
@@ -157,10 +156,14 @@ public class DiagnosticScreen {
         );
 
         // Статус.
+
         lines.add(
             "│"
                 + padRight(
-                    " Status: " + sanitize(status),
+                    String.format(
+                        " Status: %s",
+                        sanitize(status)
+                    ),
                     innerWidth
                 )
                 + "│"

@@ -1,12 +1,5 @@
 package org.kirya343.infrastructure.diagnostics.commands;
 
-import org.kirya343.infrastructure.diagnostics.core.DiagnosticStream;
-import org.kirya343.infrastructure.diagnostics.models.CommandResult;
-import org.kirya343.infrastructure.diagnostics.models.StreamingResult;
-import org.kirya343.infrastructure.diagnostics.models.StreamMode;
-import org.kirya343.infrastructure.diagnostics.models.TextResult;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
@@ -16,9 +9,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.kirya343.infrastructure.diagnostics.models.CommandResult;
+import org.kirya343.infrastructure.diagnostics.models.StreamMode;
+import org.kirya343.infrastructure.diagnostics.models.StreamingResult;
+import org.kirya343.infrastructure.diagnostics.models.TextResult;
+import org.springframework.stereotype.Component;
+
 @Component
 public class LogsCommand implements DiagnosticCommand {
 
+    private int limit = 50;
     private static final Path LOG_FILE = Path.of(
         "logs/application.log"
     );
@@ -37,22 +37,18 @@ public class LogsCommand implements DiagnosticCommand {
     public CommandResult execute(String[] args) {
         boolean follow = Arrays.asList(args).contains("-f");
 
-        if (follow) {
-            DiagnosticStream stream = this::streamLogs;
-
-            return new StreamingResult(
-                stream,
-                StreamMode.APPEND
-            );
-        }
-
-        int limit = 50;
-
         for (String arg : args) {
             if (!arg.equals("-f")) {
                 limit = Integer.parseInt(arg);
                 break;
             }
+        }
+
+        if (follow) {
+            return new StreamingResult(
+                this::createLogProvider,
+                StreamMode.APPEND
+            );
         }
 
         try (Stream<String> lines = Files.lines(LOG_FILE)) {
@@ -73,38 +69,59 @@ public class LogsCommand implements DiagnosticCommand {
         }
     }
 
-    private void streamLogs(java.util.function.Consumer<String> output) {
+    private String createLogProvider() {
+
+        long position = 0;
+        boolean initialized = false;
+
+        StringBuilder content = new StringBuilder();
+
+
         try (RandomAccessFile file = new RandomAccessFile(
             LOG_FILE.toFile(),
             "r"
         )) {
+            if (!initialized) {
+                List<String> lines = Files.readAllLines(LOG_FILE);
+                int start = Math.max(0, lines.size() - limit);
+
+                content.append(
+                    String.join(
+                        System.lineSeparator(),
+                        lines.subList(start, lines.size())
+                    )
+                );
+
+                position = file.length();
+                initialized = true;
+
+                return content.toString();
+            }
+
+            if (file.length() < position) {
+                position = 0;
+            }
+
+            file.seek(position);
+
             String line;
 
             while ((line = file.readLine()) != null) {
-                output.accept(decodeLine(line));
-            }
-
-            while (!Thread.currentThread().isInterrupted()) {
-                line = file.readLine();
-
-                if (line != null) {
-                    output.accept(decodeLine(line));
-                    continue;
+                if (!content.isEmpty()) {
+                    content.append(System.lineSeparator());
                 }
 
-                if (file.length() < file.getFilePointer()) {
-                    file.seek(0);
-                }
-
-                Thread.sleep(500);
+                content.append(decodeLine(line));
             }
+
+            position = file.getFilePointer();
+
         } catch (IOException exception) {
-            output.accept(
-                "Failed to read logs: " + exception.getMessage()
-            );
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
+            return "Failed to read logs: "
+                + exception.getMessage();
         }
+
+        return content.toString();
     }
 
     private String decodeLine(String line) {

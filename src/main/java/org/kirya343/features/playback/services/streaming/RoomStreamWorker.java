@@ -12,18 +12,26 @@ import org.kirya343.features.playback.dto.commands.ChangeTrack;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.presence.UserPresence;
 import org.kirya343.features.presence.services.PresenceService;
+import org.kirya343.infrastructure.diagnostics.core.DiagnosticComponent;
+import org.kirya343.infrastructure.diagnostics.core.DiagnosticTextBuilder;
+import org.kirya343.infrastructure.diagnostics.models.StreamMode;
+import org.kirya343.infrastructure.diagnostics.models.StreamingResult;
 import org.springframework.context.ApplicationEventPublisher;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class RoomStreamWorker {
+public class RoomStreamWorker implements DiagnosticComponent {
 
     private final ScheduledExecutorService scheduler =
         Executors.newSingleThreadScheduledExecutor();
     private final ApplicationEventPublisher eventPublisher;
     private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
     private final PresenceService presenceService;
+
+    @Getter 
+    private String[] lastActions;
 
     private final RoomPlaybackContext roomContext;
 
@@ -134,17 +142,33 @@ public class RoomStreamWorker {
         }
     }
 
-    public String getDiagnosticsContent() {
-        return """
-            position: %s
-            entryId: %s
-            pause: %s
-            user: %s
-            """.formatted(
-                currentState.position(),
-                currentState.entryId(),
-                currentState.pause(),
-                currentState.user()
-            );
+    // Diadnostic voids
+
+    public String getDiagnosticId() {
+        return "room-stream-worker-" + roomId;
+    }
+
+    public DiagnosticTextBuilder getData() {
+
+        DiagnosticTextBuilder builder = new DiagnosticTextBuilder()
+            .setTitle("Stream worker of " + roomId);
+
+        DiagnosticTextBuilder stateSection = new DiagnosticTextBuilder()
+            .setTitle("Playback state")
+            .addRow("position: " + currentState.position())
+            .addRow("entryId: " + currentState.entryId())
+            .addRow("pause: " + currentState.pause())
+            .addRow("user: " + currentState.user());
+
+        builder.addSection(stateSection);
+
+        return builder;
+    }
+
+    public StreamingResult getDiagnosticState() {
+        return new StreamingResult(
+            () -> getData().getContent(),
+            StreamMode.REPLACE
+        );
     }
 }

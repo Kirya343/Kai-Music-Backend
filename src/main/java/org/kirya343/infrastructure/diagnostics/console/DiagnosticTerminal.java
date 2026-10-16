@@ -3,41 +3,27 @@ package org.kirya343.infrastructure.diagnostics.console;
 import org.jline.terminal.Attributes;
 import org.jline.terminal.Terminal;
 import org.jline.utils.InfoCmp;
-import org.kirya343.infrastructure.diagnostics.commands.DiagnosticCommand;
-import org.kirya343.infrastructure.diagnostics.core.DiagnosticManager;
-import org.kirya343.infrastructure.diagnostics.models.CommandResult;
-import org.kirya343.infrastructure.diagnostics.models.StreamingResult;
-import org.kirya343.infrastructure.diagnostics.models.TextResult;
+import org.kirya343.infrastructure.diagnostics.core.TerminalCommandExecutor;
 import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor 
 public class DiagnosticTerminal {
 
     private final Terminal terminal;
     private final DiagnosticScreen screen;
-    private final DiagnosticManager diagnosticManager;
-
-    private Thread streamingThread;
+    private final TerminalCommandExecutor commandExecutor;
 
     private final List<String> commandHistory = new ArrayList<>();
 
     private int historyIndex = 0;
     private String savedInput = "";
-
-    public DiagnosticTerminal(
-        Terminal terminal,
-        DiagnosticScreen screen,
-        DiagnosticManager diagnosticManager
-    ) {
-        this.terminal = terminal;
-        this.screen = screen;
-        this.diagnosticManager = diagnosticManager;
-    }
 
     public void start() throws IOException {
         StringBuilder input = new StringBuilder();
@@ -89,7 +75,7 @@ public class DiagnosticTerminal {
                         historyIndex = commandHistory.size();
                         savedInput = "";
 
-                        executeCommand(command);
+                        commandExecutor.executeCommand(command);
                     }
 
                     screen.setInput("");
@@ -221,82 +207,5 @@ public class DiagnosticTerminal {
         input.append(value);
 
         screen.setInput(value);
-    }
-
-    /**
-     * Выполняет диагностическую команду.
-     */
-    private void executeCommand(String input) {
-        stopStreaming();
-
-        String trimmedInput = input.trim();
-
-        if (trimmedInput.isEmpty()) {
-            return;
-        }
-
-        String[] parts = trimmedInput.split("\\s+");
-        String commandName = parts[0];
-
-        String[] commandArgs = Arrays.copyOfRange(
-            parts,
-            1,
-            parts.length
-        );
-
-        try {
-            DiagnosticCommand command =
-                diagnosticManager.findCommand(commandName);
-
-            CommandResult result = command.execute(commandArgs);
-
-            if (result instanceof StreamingResult streamingResult) {
-                streamingThread = new Thread(
-                    () -> streamingResult.stream().start(content -> {
-                        if (streamingThread == null
-                            || Thread.currentThread().isInterrupted()) {
-                            return;
-                        }
-
-                        switch (streamingResult.mode()) {
-                            case APPEND -> screen.addLines(
-                                List.of(content.split("\\R"))
-                            );
-                            case REPLACE -> screen.setContent(
-                                List.of(content.split("\\R"))
-                            );
-                        }
-                    })
-                );
-
-                streamingThread.setDaemon(true);
-                streamingThread.start();
-
-                return;
-            }
-
-            if (result instanceof TextResult textResult) {
-                screen.setContent(
-                    List.of(textResult.content().split("\\R"))
-                );
-
-                return;
-            }
-
-            screen.setContent(
-                List.of("Unsupported diagnostic result: " + result)
-            );
-        } catch (Exception exception) {
-            screen.setContent(
-                List.of("Diagnostic error: " + exception.getMessage())
-            );
-        }
-    }
-
-    private void stopStreaming() {
-        if (streamingThread != null && streamingThread.isAlive()) {
-            streamingThread.interrupt();
-            streamingThread = null;
-        }
     }
 }

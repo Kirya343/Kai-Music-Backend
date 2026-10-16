@@ -1,10 +1,14 @@
 package org.kirya343.infrastructure.diagnostics.core;
 
-import io.github.bucket4j.distributed.remote.CommandResult;
+import org.kirya343.infrastructure.diagnostics.models.CommandResult;
 
 public interface DiagnosticComponent {
 
     String getDiagnosticId();
 
-    CommandResult<?> getDiagnosticState();
+    String[] getLastActions();
+
+    DiagnosticTextBuilder getData();
+
+    CommandResult getDiagnosticState();
 }
