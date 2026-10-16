@@ -44,6 +44,13 @@ public class DiagnosticScreenRenderer {
 
         writer.print("\033[J");
         writer.flush();
+
+        System.out.printf(
+            "Terminal type: %s, width: %d, height: %d%n",
+            terminal.getType(),
+            terminal.getWidth(),
+            terminal.getHeight()
+        );
     }
 
     private void renderHeader(

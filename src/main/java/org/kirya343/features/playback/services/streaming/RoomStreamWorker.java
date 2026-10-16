@@ -110,7 +110,11 @@ public class RoomStreamWorker implements DiagnosticComponent {
          */
         if (currentState.position() > roomContext.getCurrentAudio().getDuration()) {
 
-            addLog("Sending NEXT event: room=%s", roomId);
+            addLog("Sending NEXT event: room=%s, becouse position(%s) is after audioDuration(%s)", 
+                roomId,
+                currentState.position(),
+                roomContext.getCurrentAudio().getDuration()
+            );
 
             eventPublisher.publishEvent(new ChangeTrack(roomId, "next", UserAuthData.server()));
             return;

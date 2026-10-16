@@ -75,6 +75,7 @@ public class DiagnosticTerminal {
                         historyIndex = commandHistory.size();
                         savedInput = "";
 
+                        screen.clearContent();
                         commandExecutor.executeCommand(command);
                     }
 

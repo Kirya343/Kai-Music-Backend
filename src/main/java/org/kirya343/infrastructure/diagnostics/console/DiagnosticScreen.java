@@ -106,8 +106,6 @@ public class DiagnosticScreen {
             }
         }
 
-        scrollOffset = 0;
-
         render();
     }
 

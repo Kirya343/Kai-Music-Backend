@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class PlaybackController {
 
     private final RoomPlaybackStateRepository roomPlaybackStateRepository;
-    private final PlaybackCommandWorker roomCommandWorker;
+    private final PlaybackCommandWorker playbackCommandWorker;
     private final Map<String, Long> lastUpdate = new ConcurrentHashMap<>();
     private static final long UPDATE_DELAY_MS = 300;
     
@@ -59,7 +59,7 @@ public class PlaybackController {
 
         RoomCommand cmd = new UpdatePlayback(roomId, state, authData);
         
-        roomCommandWorker.submit(cmd);
+        playbackCommandWorker.submit(cmd);
     }
 
     @PostMapping("/{roomId}/change-track")
@@ -75,7 +75,7 @@ public class PlaybackController {
 
         RoomCommand cmd = new ChangeTrack(roomId, changing, authData);
         
-        roomCommandWorker.submit(cmd);
+        playbackCommandWorker.submit(cmd);
     }
 
     private boolean shouldIgnore(Long userId, Long roomId, String action) {
