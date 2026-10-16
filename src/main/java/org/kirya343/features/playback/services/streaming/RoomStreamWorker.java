@@ -133,4 +133,18 @@ public class RoomStreamWorker {
             task = null;
         }
     }
+
+    public String getDiagnosticsContent() {
+        return """
+            position: %s
+            entryId: %s
+            pause: %s
+            user: %s
+            """.formatted(
+                currentState.position(),
+                currentState.entryId(),
+                currentState.pause(),
+                currentState.user()
+            );
+    }
 }

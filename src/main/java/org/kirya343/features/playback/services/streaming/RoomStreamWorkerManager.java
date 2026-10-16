@@ -29,6 +29,10 @@ public class RoomStreamWorkerManager {
     private final Map<Long, RoomStreamWorker> workers =
             new ConcurrentHashMap<>();
 
+    public boolean checkWorker(Long roomId) {
+        return workers.get(roomId) != null;
+    }
+
     public RoomStreamWorker getWorker(Long roomId) {
 
         log.debug("Пытаемся получить воркер для комнаты {}", roomId);

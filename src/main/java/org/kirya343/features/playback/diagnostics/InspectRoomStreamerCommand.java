@@ -1,24 +1,28 @@
 package org.kirya343.features.playback.diagnostics;
 
-import org.kirya343.features.playback.services.PlaybackDiagnosticsService;
+import java.util.stream.Collectors;
+
+import org.kirya343.features.audio.datasource.AudioFile;
+import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
+import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
+import org.kirya343.features.playback.services.streaming.RoomStreamWorkerManager;
 import org.kirya343.infrastructure.diagnostics.commands.DiagnosticCommand;
-import org.kirya343.infrastructure.diagnostics.models.TextResult;
+import org.kirya343.infrastructure.diagnostics.models.StreamMode;
+import org.kirya343.infrastructure.diagnostics.models.StreamingResult;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor 
 public class InspectRoomStreamerCommand implements DiagnosticCommand {
 
-    private final PlaybackDiagnosticsService diagnosticsService;
-
-    public InspectRoomStreamerCommand(
-        PlaybackDiagnosticsService diagnosticsService
-    ) {
-        this.diagnosticsService = diagnosticsService;
-    }
+    private final RoomPlaybackContextStore roomPlaybackContextStore;
+    private final RoomStreamWorkerManager roomStreamWorkerManager;
 
     @Override
     public String getName() {
-        return "playback.room";
+        return "room";
     }
 
     @Override
@@ -27,7 +31,8 @@ public class InspectRoomStreamerCommand implements DiagnosticCommand {
     }
 
     @Override
-    public TextResult execute(String[] args) {
+    public StreamingResult execute(String[] args) {
+
         if (args.length != 1) {
             throw new IllegalArgumentException(
                 "Usage: playback.room <roomId>"
@@ -44,6 +49,54 @@ public class InspectRoomStreamerCommand implements DiagnosticCommand {
             );
         }
 
-        return diagnosticsService.inspectRoomStreamer(roomId);
+        return new StreamingResult(output -> {
+            while (!Thread.currentThread().isInterrupted()) {
+
+                boolean isOnline = roomStreamWorkerManager.checkWorker(roomId);
+
+                String content = "";
+
+                if (isOnline) {
+                    String workerContent = roomStreamWorkerManager.getWorker(roomId)
+                        .getDiagnosticsContent();
+
+                    RoomPlaybackContext context = roomPlaybackContextStore.get(roomId);
+
+                    AudioFile audio = context.getCurrentAudio();
+
+                    content = String.join("\n",
+                        "Room: " + roomId,
+                        "    Status: ONLINE",
+                        "    Listeners: " + context.getListeners(),
+                        "",
+                        "    Playing Audio: ",
+                        "       Id: " + audio.getId(),
+                        "       Name: " + audio.getName(),
+                        "       Title: " + audio.getTitle(),
+                        "       Path: " + audio.getPath(),
+                        "       Duration: " + audio.getDuration() + "s",
+                        "       Chunks: " + audio.getChunks(),
+                        "",
+                        "    Stream worker:",
+                        workerContent.lines()
+                            .map(line -> "        " + line.stripLeading())
+                            .collect(Collectors.joining("\n"))
+                    );
+                } else {
+                    content = String.join("\n",
+                        "Room: " + roomId,
+                        "    Status: OFFLINE"
+                    );
+                }
+
+                output.accept(content);
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException exception) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }, StreamMode.REPLACE);
     }
 }
