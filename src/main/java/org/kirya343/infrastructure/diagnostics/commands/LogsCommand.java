@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.kirya343.infrastructure.diagnostics.core.StreamingDataProvider;
 import org.kirya343.infrastructure.diagnostics.models.CommandResult;
 import org.kirya343.infrastructure.diagnostics.models.StreamMode;
 import org.kirya343.infrastructure.diagnostics.models.StreamingResult;
@@ -46,7 +47,7 @@ public class LogsCommand implements DiagnosticCommand {
 
         if (follow) {
             return new StreamingResult(
-                this::createLogProvider,
+                createLogProvider(),
                 StreamMode.APPEND
             );
         }
@@ -69,59 +70,61 @@ public class LogsCommand implements DiagnosticCommand {
         }
     }
 
-    private String createLogProvider() {
+    private StreamingDataProvider createLogProvider() {
+        return new StreamingDataProvider() {
+            private long position;
+            private boolean initialized;
 
-        long position = 0;
-        boolean initialized = false;
+            @Override
+            public synchronized String getData() {
+                StringBuilder content = new StringBuilder();
 
-        StringBuilder content = new StringBuilder();
+                try (RandomAccessFile file = new RandomAccessFile(
+                    LOG_FILE.toFile(),
+                    "r"
+                )) {
+                    if (!initialized) {
+                        List<String> lines = Files.readAllLines(LOG_FILE);
+                        int start = Math.max(0, lines.size() - limit);
 
+                        content.append(
+                            String.join(
+                                System.lineSeparator(),
+                                lines.subList(start, lines.size())
+                            )
+                        );
 
-        try (RandomAccessFile file = new RandomAccessFile(
-            LOG_FILE.toFile(),
-            "r"
-        )) {
-            if (!initialized) {
-                List<String> lines = Files.readAllLines(LOG_FILE);
-                int start = Math.max(0, lines.size() - limit);
+                        position = file.length();
+                        initialized = true;
 
-                content.append(
-                    String.join(
-                        System.lineSeparator(),
-                        lines.subList(start, lines.size())
-                    )
-                );
+                        return content.toString();
+                    }
 
-                position = file.length();
-                initialized = true;
+                    if (file.length() < position) {
+                        position = 0;
+                    }
+
+                    file.seek(position);
+
+                    String line;
+
+                    while ((line = file.readLine()) != null) {
+                        if (!content.isEmpty()) {
+                            content.append(System.lineSeparator());
+                        }
+
+                        content.append(decodeLine(line));
+                    }
+
+                    position = file.getFilePointer();
+
+                } catch (IOException exception) {
+                    return "Failed to read logs: " + exception.getMessage();
+                }
 
                 return content.toString();
             }
-
-            if (file.length() < position) {
-                position = 0;
-            }
-
-            file.seek(position);
-
-            String line;
-
-            while ((line = file.readLine()) != null) {
-                if (!content.isEmpty()) {
-                    content.append(System.lineSeparator());
-                }
-
-                content.append(decodeLine(line));
-            }
-
-            position = file.getFilePointer();
-
-        } catch (IOException exception) {
-            return "Failed to read logs: "
-                + exception.getMessage();
-        }
-
-        return content.toString();
+        };
     }
 
     private String decodeLine(String line) {

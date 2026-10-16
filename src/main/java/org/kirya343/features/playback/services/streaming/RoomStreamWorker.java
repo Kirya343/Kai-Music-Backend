@@ -1,5 +1,9 @@
 package org.kirya343.features.playback.services.streaming;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -31,7 +35,7 @@ public class RoomStreamWorker implements DiagnosticComponent {
     private final PresenceService presenceService;
 
     @Getter 
-    private String[] lastActions;
+    private List<String> logs = new ArrayList<>();
 
     private final RoomPlaybackContext roomContext;
 
@@ -57,7 +61,7 @@ public class RoomStreamWorker implements DiagnosticComponent {
         this.presenceService = presenceService;
         this.userAudioStreamWorkerManager = userAudioStreamWorkerManager;
 
-        log.debug("Created RoomStreamWorker for {}, with state: {}, {}, {}", 
+        addLog("Created RoomStreamWorker for %s, with state: %s, %s, %s",
             roomId, currentState.entryId(), currentState.position(), currentState.pause());
 
         this.applyState(currentState);
@@ -67,7 +71,7 @@ public class RoomStreamWorker implements DiagnosticComponent {
 
         if (state == null) return;
 
-        log.debug("applyState {}", state.position());
+        addLog("applyState %s", state.position());
 
         currentState = state;
 
@@ -77,7 +81,7 @@ public class RoomStreamWorker implements DiagnosticComponent {
             }
         });
 
-        log.debug("START STATE: entryId={}, position={}", state.entryId(), state.position());
+        addLog("START STATE: entryId=%s, position=%s", state.entryId(), state.position());
 
         if (task == null || task.isCancelled()) {
             task = scheduler.scheduleAtFixedRate(
@@ -99,14 +103,15 @@ public class RoomStreamWorker implements DiagnosticComponent {
 
         Set<String> listeners = roomContext.getListeners();
 
-        log.debug("Room tick {}, {}", roomId, listeners);
+        addLog("Room tick %s, %s", roomId, listeners);
 
         /**
          * if current playback position is after than audio duration - cancel task and send Next command
          */
         if (currentState.position() > roomContext.getCurrentAudio().getDuration()) {
 
-            log.debug("Sending NEXT event: room={}", roomId);
+            addLog("Sending NEXT event: room=%s", roomId);
+
             eventPublisher.publishEvent(new ChangeTrack(roomId, "next", UserAuthData.server()));
             return;
         }
@@ -148,19 +153,41 @@ public class RoomStreamWorker implements DiagnosticComponent {
         return "room-stream-worker-" + roomId;
     }
 
+    public void addLog(String format, Object... args) {
+
+        String newLog = String.format(format, args);
+
+        log.debug(newLog);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+        String timestamp = LocalDateTime.now().format(formatter);
+
+        logs.addLast(String.format("%s > %s", timestamp, newLog));
+
+        if (logs.size() > 15) {
+            logs.removeFirst();
+        }
+    }
+
     public DiagnosticTextBuilder getData() {
 
-        DiagnosticTextBuilder builder = new DiagnosticTextBuilder()
-            .setTitle("Stream worker of " + roomId);
+        DiagnosticTextBuilder builder = new DiagnosticTextBuilder("Stream worker of " + roomId);
 
-        DiagnosticTextBuilder stateSection = new DiagnosticTextBuilder()
-            .setTitle("Playback state")
+        DiagnosticTextBuilder stateSection = new DiagnosticTextBuilder("Playback state: ")
             .addRow("position: " + currentState.position())
             .addRow("entryId: " + currentState.entryId())
             .addRow("pause: " + currentState.pause())
             .addRow("user: " + currentState.user());
 
+        DiagnosticTextBuilder logsSection = new DiagnosticTextBuilder("Logs: ");
+
+        for (String log : logs) {
+            logsSection.addRow(log);
+        }
+
         builder.addSection(stateSection);
+        builder.addSection(logsSection);
 
         return builder;
     }

@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DiagnosticTextBuilder{
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor 
+public final class DiagnosticTextBuilder{
 
     private static final String INDENT = "    ";
 
@@ -18,15 +21,36 @@ public class DiagnosticTextBuilder{
         return getContent(0);
     }
 
+    /**
+     * structure:
+     *  title
+     *      content,
+     *      content
+     * 
+     *      section title
+     *          section content
+     * 
+     *      section title
+     *          section content
+     */
     private String getContent(int depth) {
         String indentation = INDENT.repeat(depth);
 
-        return String.join("\n",
-            renderTitle(indentation),
-            renderContent(depth),
-            "",
-            renderSections(depth)
-        );
+        String title = renderTitle(indentation);
+        String content = renderContent(depth);
+        String sectionsContent = renderSections(depth);
+
+        StringBuilder result = new StringBuilder(title);
+
+        if (!content.isEmpty()) {
+            result.append("\n").append(content);
+        }
+
+        if (!sectionsContent.isEmpty()) {
+            result.append("\n\n").append(sectionsContent);
+        }
+
+        return result.toString();
     }
 
 
@@ -68,6 +92,10 @@ public class DiagnosticTextBuilder{
     private String renderSections(int depth) {
         return sections.stream()
             .map(section -> section.getContent(depth + 1))
-            .collect(Collectors.joining("\n"));
+            .collect(Collectors.joining("\n\n"));
+    }
+
+    public DiagnosticTextBuilder(String title) {
+        this.title = title;
     }
 }

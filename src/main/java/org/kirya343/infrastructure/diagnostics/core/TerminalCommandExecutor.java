@@ -26,6 +26,7 @@ public class TerminalCommandExecutor {
      */
     public void executeCommand(String input) {
         stopStreaming();
+        screen.clearContent();
 
         String trimmedInput = input.trim();
 
@@ -58,9 +59,15 @@ public class TerminalCommandExecutor {
                         String content = streamingResult.provider().getData();
 
                         switch (streamingResult.mode()) {
-                            case APPEND -> screen.addLines(
-                                List.of(content.split("\\R"))
-                            );
+                            case APPEND -> {
+                                if (content == null || content.isEmpty()) {
+                                    break;
+                                }
+
+                                screen.addLines(
+                                    List.of(content.split("\\R"))
+                                );
+                            }
                             case REPLACE -> screen.setContent(
                                 List.of(content.split("\\R"))
                             );

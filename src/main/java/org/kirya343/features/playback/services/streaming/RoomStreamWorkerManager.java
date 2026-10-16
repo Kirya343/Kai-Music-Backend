@@ -47,14 +47,18 @@ public class RoomStreamWorkerManager {
 
             RoomPlaybackContext context = roomPlaybackContextStore.computeIfAbsent(roomId);
 
-            worker = new RoomStreamWorker(
-                roomId,
-                eventPublisher, 
-                userAudioStreamWorkerManager,
-                PlaybackStateDTO.ofState(state),
-                context,
-                presenceService
-            );
+            try {
+                worker = new RoomStreamWorker(
+                    roomId,
+                    eventPublisher, 
+                    userAudioStreamWorkerManager,
+                    PlaybackStateDTO.ofState(state),
+                    context,
+                    presenceService
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             log.debug("Кладём к остальным воркер для комнаты {}", roomId);
 

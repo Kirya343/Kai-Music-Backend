@@ -182,13 +182,13 @@ public class DiagnosticTerminal {
                 }
             }
 
-            // Page Up: прокрутка вверх на одну страницу.
+            // Page Up: прокрутка вверх на несколько строчек.
             case "\033[5~" ->
-                screen.scrollUp(screen.getContentLines());
+                screen.scrollUp(3);
 
-            // Page Down: прокрутка вниз на одну страницу.
+            // Page Down: прокрутка вниз на несколько строчек.
             case "\033[6~" ->
-                screen.scrollDown(screen.getContentLines());
+                screen.scrollDown(3);
 
             default -> {
                 // Неизвестные последовательности игнорируются.
